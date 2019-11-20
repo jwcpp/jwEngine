@@ -4,3 +4,9 @@
 [submodule "dependence/libuv"]
 	path = dependence/libuv
 	url = https://github.com/libuv/libuv.git
+[submodule "dependencies/libuv"]
+	path = dependencies/libuv
+	url = https://github.com/libuv/libuv.git
+[submodule "dependencies/concurrentqueue"]
+	path = dependencies/concurrentqueue
+	url = https://github.com/cameron314/concurrentqueue.git
