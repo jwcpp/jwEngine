@@ -20,7 +20,7 @@ public:
 	XLog();
 	~XLog();
 
-	void init(const char * dir);
+	void init(const char * rootdir, const char * childdir);
 	void setMaxsize(unsigned int size){ maxsize = size; }
 	void writeLog(int level, const char * filename, const char * func, int line, const char * format, ...);
 private:
@@ -29,6 +29,7 @@ private:
 private:
 	FILE * file;
 	std::string logdir;
+	std::string childdir;
 	std::string currdir;
 	int writeday;
 	unsigned int maxsize;
@@ -59,7 +60,7 @@ private:
 
 extern XLog commonlog;
 
-#define INIT_LOG(dir) commonlog.init(dir)
+#define INIT_LOG(rootdir, childdir) commonlog.init(rootdir, childdir)
 
 #define INFO_LOG(format, ...) commonlog.writeLog(LL_INFO , __FILE__, __FUNCTION__, __LINE__, format, __VA_ARGS__)
 #define WARNING_LOG(format, ...) commonlog.writeLog(LL_WARNING, __FILE__, __FUNCTION__, __LINE__, format, __VA_ARGS__)

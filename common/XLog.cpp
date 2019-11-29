@@ -41,10 +41,15 @@ XLog::~XLog()
 	closefile();
 }
 
-void XLog::init(const char * dir)
+void XLog::init(const char * rootdir, const char * child)
 {
-	logdir = dir;
-	XFile::createDirectory(dir);
+	logdir = rootdir;
+	childdir = child;
+
+	logdir.append("/");
+	childdir.append("/");
+	
+	XFile::createDirectory(rootdir);
 }
 
 
@@ -84,16 +89,13 @@ void XLog::writeFile(int level, const char * filename, const char * func, int ro
 	if (tm_->tm_mday != writeday)
 	{
 		writeday = tm_->tm_mday;
-		char dirname[12];
-		sprintf(dirname, "%d-%.2d-%.2d", tm_->tm_year + 1900, tm_->tm_mon + 1, tm_->tm_mday);
+		char dirname[16];
+		sprintf(dirname, "%d-%.2d-%.2d/", tm_->tm_year + 1900, tm_->tm_mon + 1, tm_->tm_mday);
 
 		currdir = logdir;
-		currdir.append("/");
 		currdir.append(dirname);
-		if (!XFile::existDir(currdir.c_str()))
-		{
-			XFile::mkdir(currdir.c_str());
-		}
+		currdir.append(childdir);
+		XFile::createDirectory(currdir.c_str());
 
 		newfile = true;
 	}
@@ -101,12 +103,10 @@ void XLog::writeFile(int level, const char * filename, const char * func, int ro
 	if (newfile || currsize >= maxsize)
 	{
 		closefile();
-		char dirname[12];
-		sprintf(dirname, "%.2d.%.2d.%.2d", tm_->tm_hour, tm_->tm_min, tm_->tm_sec);
+		char dirname[16];
+		sprintf(dirname, "%.2d.%.2d.%.2d.log", tm_->tm_hour, tm_->tm_min, tm_->tm_sec);
 		std::string filepath = currdir;
-		filepath.append("/");
 		filepath.append(dirname);
-		filepath.append(".log");
 		file = fopen(filepath.c_str(), "a+");
 	}
 
