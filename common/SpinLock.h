@@ -2,15 +2,15 @@
 
 #include <atomic>
 
-class TLock
+class SpinLock
 {
 public:
-	explicit TLock()
+	explicit SpinLock()
 	{
 		flag.clear();
 	}
 
-	~TLock()
+	~SpinLock()
 	{
 	}
 
@@ -39,5 +39,5 @@ protected:
 	mutable std::atomic_flag flag;// = ATOMIC_FLAG_INIT;
 
 private:
-	TLock& operator=(const TLock& src);
+	SpinLock& operator=(const SpinLock& src);
 };

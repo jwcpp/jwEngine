@@ -2,7 +2,7 @@
 
 #include <string>
 #include <sstream>
-#include "Mutex.h"
+#include "SpinLock.h"
 
 #define LOG_MAX_SIZE 1073741824
 
@@ -34,7 +34,7 @@ private:
 	int writeday;
 	unsigned int maxsize;
 	unsigned int currsize;
-	TLock _lock;
+	SpinLock _lock;
 };
 
 class LogStream
