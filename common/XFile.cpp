@@ -2,6 +2,7 @@
 #include <io.h>
 #include <direct.h>
 #include <string>
+#include <fstream>
 
 XFile::XFile()
 {
@@ -42,4 +43,19 @@ int XFile::createDirectory(const char * dir)
 		}
 	}
 	return 0;
+}
+
+int XFile::writeFile(const char * file, const char * content)
+{
+	std::ofstream fout(file);
+	if (!fout)
+	{
+		return -1;
+	}
+	else
+	{
+		fout << content << std::endl;
+		fout.close();
+		return 0;
+	}
 }
