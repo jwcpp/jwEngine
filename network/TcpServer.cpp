@@ -2,9 +2,8 @@
 #include "TcpServer.h"
 #include "EventLoop.h"
 
-TcpServer::TcpServer(EventLoop * loop, uint32 buffersize) :
-	mLoop(loop->GetLoop()),
-	m_buffersize(buffersize)
+TcpServer::TcpServer(EventLoop * loop) :
+	mLoop(loop->GetLoop())
 {
 	m_uv_tcp.data = this;
 	uv_tcp_init(mLoop, &m_uv_tcp);
@@ -34,9 +33,11 @@ int TcpServer::listen(const char * ip, int port, bool ipv6)
 	return uv_listen((uv_stream_t*)&m_uv_tcp, DEFAULT_BACKLOG, on_new_connection);
 }
 
-TcpSocket * TcpServer::createConnect()
+void TcpServer::shutdown()
 {
-	return new TcpSocket(m_buffersize);
+	uv_close((uv_handle_s *)&m_uv_tcp, [](uv_handle_t* handle){
+
+	});
 }
 
 void TcpServer::on_new_connection(uv_stream_t *server, int status)

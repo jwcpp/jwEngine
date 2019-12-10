@@ -9,14 +9,19 @@ class EventLoop;
 class TcpServer
 {
 public:
-	TcpServer(EventLoop * loop, uint32 buffersize = MESSAGE_BUFFER_SIZE);
+	TcpServer(EventLoop * loop);
 
 	int listen(const char * ip, int port, bool ipv6 = false);
 
+	/*
+	调用后无法连接进来，需要等待所有连接断开才退出事件循环
+	*/
+	void shutdown();
+
 protected:
 	
-	virtual TcpSocket * createConnect();
-	virtual void onConnect(TcpSocket * connect){};
+	virtual TcpSocket * createConnect() = 0;
+	virtual void onConnect(TcpSocket * connect) = 0;
 
 private:
 	static void on_new_connection(uv_stream_t *server, int status);
@@ -24,7 +29,6 @@ private:
 protected:
 	uv_loop_t * mLoop;
 	uv_tcp_t    m_uv_tcp;
-	uint32      m_buffersize;
 };
 
 #endif

@@ -3,9 +3,13 @@
 
 class NetConnect;
 class NetPacket;
+
 class NetEvent
 {
 public:
+	virtual NetConnect * createConnect();
+	virtual void destroyConnect(NetConnect * conn);
+
 	virtual void onAccept(NetConnect * conn){};
 	virtual void onConnect(NetConnect * conn){};
 	virtual void onClose(NetConnect * conn){};

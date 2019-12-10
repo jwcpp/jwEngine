@@ -8,7 +8,7 @@ class NetEvent;
 class NetServer : public TcpServer
 {
 public:
-	NetServer(EventLoop * loop, NetEvent * nevent, uint32 buffersize = MESSAGE_BUFFER_SIZE);
+	NetServer(EventLoop * loop, NetEvent * nevent);
 
 protected:
 

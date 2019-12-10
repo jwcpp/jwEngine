@@ -3,9 +3,9 @@
 #include "NetEvent.h"
 
 
-NetClient::NetClient(EventLoop * loop, NetEvent * nevent, uint32 buffersize) :
-TcpClient(loop, buffersize),
-_netevent(nevent)
+NetClient::NetClient(EventLoop * loop, NetEvent * nevent) :
+	TcpClient(loop),
+	_netevent(nevent)
 {
 
 }
@@ -17,7 +17,8 @@ NetClient::~NetClient(){
 
 TcpSocket * NetClient::createConnect()
 {
-	return new NetConnect(_netevent, m_buffersize);
+	NetConnect * conn = _netevent->createConnect();
+	return (TcpSocket *)conn;
 }
 
 void NetClient::onConnect(TcpSocket * conn)

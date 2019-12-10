@@ -2,9 +2,8 @@
 #include "XLog.h"
 #include "EventLoop.h"
 
-TcpClient::TcpClient(EventLoop * loop, uint32 buffersize) :
-	mLoop(loop->GetLoop()),
-	m_buffersize(buffersize)
+TcpClient::TcpClient(EventLoop * loop) :
+	mLoop(loop->GetLoop())
 {
 	
 }
@@ -45,14 +44,10 @@ int TcpClient::connect(const char * ip, int port, bool ipv6)
 			self->onConnect(NULL);
 		}
 		else {
+			user_conn->conn->on_read_start();
 			self->onConnect(user_conn->conn);
 		}
 
 		delete user_conn;
 	});
-}
-
-TcpSocket * TcpClient::createConnect()
-{
-	return new TcpSocket(m_buffersize);
 }

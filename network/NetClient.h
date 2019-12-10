@@ -9,7 +9,7 @@ class NetClient : public TcpClient
 {
 
 public:
-	NetClient(EventLoop * loop, NetEvent * nevent, uint32 buffersize = MESSAGE_BUFFER_SIZE);
+	NetClient(EventLoop * loop, NetEvent * nevent);
 
 	~NetClient();
 

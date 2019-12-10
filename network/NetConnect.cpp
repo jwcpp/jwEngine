@@ -4,7 +4,8 @@
 
 NetConnect::NetConnect(NetEvent * nevent,uint32 buffersize) :
 	_netevent(nevent),
-	TcpSocket(buffersize)
+	TcpSocket(buffersize),
+	mReadPacket(NULL)
 {
 }
 
@@ -50,6 +51,7 @@ void NetConnect::on_msgbuffer(MessageBuffer * buffer)
 void NetConnect::on_clsesocket()
 {
 	_netevent->onClose(this);
+	_netevent->destroyConnect(this);
 }
 
 
@@ -72,6 +74,7 @@ void NetConnect::sendMsg(uint32 msgtype, void * msg, uint32 len)
 	pack->append((uint8 *)msg, len);
 	pack->setMsgLen(len);
 	pack->setMsgType(msgtype);
+	pack->writeHead();
 
 	mSendPackets.push(pack);
 
@@ -81,7 +84,9 @@ void NetConnect::sendMsg(uint32 msgtype, void * msg, uint32 len)
 
 NetPacket * NetConnect::createPacket()
 {
-	return CREATE_TCP_PACKET;
+	NetPacket * packet = CREATE_TCP_PACKET;
+	packet->clear();
+	return packet;
 }
 
 void NetConnect::recyclePacket(NetPacket * pack)

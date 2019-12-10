@@ -2,15 +2,16 @@
 #include "NetConnect.h"
 #include "NetEvent.h"
 
-NetServer::NetServer(EventLoop * loop, NetEvent * nevent, uint32 buffersize) :
-	TcpServer(loop, buffersize),
+NetServer::NetServer(EventLoop * loop, NetEvent * nevent) :
+	TcpServer(loop),
 	_netevent(nevent)
 {
 }
 
 TcpSocket * NetServer::createConnect()
 {
-	return new NetConnect(_netevent, m_buffersize);
+	NetConnect * conn = _netevent->createConnect();
+	return (TcpSocket *)conn;
 }
 
 void NetServer::onConnect(TcpSocket * connect)
