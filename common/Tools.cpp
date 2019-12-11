@@ -52,3 +52,17 @@ unsigned long Tools::getCurrentThreadID()
 	return pthread_self();
 #endif
 }
+
+
+int Tools::binarySearch(int arr[], int len, int findX)
+{
+	int left = 0; int right = len - 1;
+	while (left <= right) {
+		int middle = (left + right) / 2;
+		if (findX == arr[middle]) return middle;
+		if (findX > arr[middle])left = middle + 1;
+		else right = middle - 1;
+	}
+
+	return -1;
+}

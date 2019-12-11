@@ -8,5 +8,6 @@ public:
 	static std::string format(const char * format, ...);
 	static void mySleep(int millionseconds);
 	static unsigned long getCurrentThreadID();
+	static int binarySearch(int arr[], int len, int findX);
 };
 
