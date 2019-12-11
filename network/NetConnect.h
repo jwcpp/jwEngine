@@ -11,6 +11,8 @@ class NetConnect : public TcpSocket
 public:
 	NetConnect(NetEvent * nevent, uint32 buffersize = MESSAGE_BUFFER_SIZE);
 
+	~NetConnect();
+
 	void close(){ TcpSocket::close(); }
 
 	void sendMsg(uint32 msgtype, NetPacket * pack);

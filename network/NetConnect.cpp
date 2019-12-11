@@ -9,22 +9,34 @@ NetConnect::NetConnect(NetEvent * nevent,uint32 buffersize) :
 {
 }
 
+NetConnect::~NetConnect()
+{
+	if (mReadPacket)
+	{
+		recyclePacket(mReadPacket);
+		mReadPacket = NULL;
+	}
+}
+
 void NetConnect::on_msgbuffer(MessageBuffer * buffer)
 {
+	if (!mReadPacket)
+	{
+		//create packet obj
+		mReadPacket = createPacket();
+	}
+
 	while (buffer->GetActiveSize() > 0)
 	{
 		//read head
-		if (!mReadPacket && buffer->GetActiveSize() >= MSG_HEAD_SIZE)
+		if (mReadPacket->rpos() < MSG_HEAD_SIZE)
 		{
-			//create packet obj
-			mReadPacket = createPacket();
-			mReadPacket->readHead(buffer->GetReadPointer());
-			buffer->ReadCompleted(MSG_HEAD_SIZE);
+			uint32 rlen = mReadPacket->readHead(buffer->GetReadPointer(), buffer->GetActiveSize());
+			buffer->ReadCompleted(rlen);
 		}
-
-		//read body
-		if (mReadPacket)
+		else
 		{
+			//read body
 			int32 needsize = mReadPacket->getMsgLen() + MSG_HEAD_SIZE - mReadPacket->wpos();
 			if (needsize > 0)
 			{
@@ -85,7 +97,7 @@ void NetConnect::sendMsg(uint32 msgtype, void * msg, uint32 len)
 NetPacket * NetConnect::createPacket()
 {
 	NetPacket * packet = CREATE_TCP_PACKET;
-	packet->clear();
+	packet->zero();
 	return packet;
 }
 

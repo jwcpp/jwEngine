@@ -15,7 +15,7 @@ class NetPacket : public ByteBuffer
 public:
 	NetPacket();
 
-	void clear();
+	void zero();
 
 	void setMsgLen(uint32 len){ msglen = len; }
 	uint32 getMsgLen(){ return msglen; }
@@ -26,7 +26,7 @@ public:
 	const uint8 * getBodyData(){ return _storage.data() + MSG_HEAD_SIZE; }
 
 	void writeHead();
-	void readHead(const uint8 * p);
+	uint32 readHead(const uint8 * p, uint32 size);
 private:
 	
 	void fillPacketHead();
