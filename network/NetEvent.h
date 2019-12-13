@@ -7,6 +7,9 @@ class NetPacket;
 class NetEvent
 {
 public:
+	NetEvent();
+	virtual ~NetEvent();
+
 	virtual NetConnect * createConnect();
 	virtual void destroyConnect(NetConnect * conn);
 

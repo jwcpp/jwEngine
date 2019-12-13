@@ -26,7 +26,7 @@ class KcpSessionBase
 {
 public:
 	KcpSessionBase();
-	~KcpSessionBase();
+	virtual ~KcpSessionBase();
 
 	void init(uint32 session_id, const sockaddr * addr, uv_udp_t * udp);
 	void destory();

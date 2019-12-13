@@ -14,7 +14,7 @@ class UdpClient
 {
 public:
 	UdpClient(EventLoop * loop);
-	~UdpClient();
+	virtual ~UdpClient();
 
 	//int connect(const char * server_ip, int server_port, int port, bool ipv6 = false);
 	int connect(const char * server_ip, int server_port, bool ipv6 = false);

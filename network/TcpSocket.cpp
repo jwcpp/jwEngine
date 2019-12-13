@@ -30,6 +30,11 @@ TcpSocket::TcpSocket(uint32 buffersize)
 	mBuffer.Resize(buffersize);
 }
 
+TcpSocket::~TcpSocket()
+{
+
+}
+
 void TcpSocket::clear()
 {
 	mBuffer.Reset();

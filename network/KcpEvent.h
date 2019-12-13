@@ -6,7 +6,7 @@ class KcpEvent
 {
 public:
 	KcpEvent();
-	~KcpEvent();
+	virtual ~KcpEvent();
 
 	virtual KcpSession * createConnect();
 	virtual void destroyConnect(KcpSession * conn);

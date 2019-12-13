@@ -5,6 +5,7 @@
 #include "KcpSession.h"
 #include "UdpPacket.h"
 #include "UdpPacketFactory.h"
+#include <time.h>
 
 class KNetEvent : public KcpEvent
 {
@@ -17,14 +18,16 @@ public:
 	virtual void onAccept(KcpSession * conn){
 		if (conn)
 		{
-			conn->sendMsg(1, "12345\0", 6);
+			
 		}
 	};
 
 	virtual void onConnect(KcpSession * conn){
 		if (conn)
 		{
-
+			int x = rand() % 100000;
+			std::string s(std::to_string(x));
+			conn->sendMsg(1, (void *)s.c_str(), s.length() + 1);
 		}
 	};
 	virtual void onClose(KcpSession * conn){
@@ -52,6 +55,7 @@ public:
 
 int main()
 {
+	srand((int)time(0));
 	EventLoop::Instance()->init();
 	udpPacketFactory = new UdpPacketFactory();
 

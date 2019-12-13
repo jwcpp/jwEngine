@@ -9,6 +9,11 @@ TcpServer::TcpServer(EventLoop * loop) :
 	uv_tcp_init(mLoop, &m_uv_tcp);
 }
 
+TcpServer::~TcpServer()
+{
+
+}
+
 int TcpServer::listen(const char * ip, int port, bool ipv6)
 {
 

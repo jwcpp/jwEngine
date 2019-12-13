@@ -10,6 +10,7 @@ class TcpServer
 {
 public:
 	TcpServer(EventLoop * loop);
+	virtual ~TcpServer();
 
 	int listen(const char * ip, int port, bool ipv6 = false);
 

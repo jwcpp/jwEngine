@@ -7,7 +7,7 @@ class TcpClient
 {
 public:
 	TcpClient(EventLoop * loop);
-	~TcpClient();
+	virtual ~TcpClient();
 
 	virtual int connect(const char * ip, int port, bool ipv6 = false);
 

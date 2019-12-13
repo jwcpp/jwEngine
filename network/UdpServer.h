@@ -14,7 +14,7 @@ class UdpServer
 {
 public:
 	UdpServer(EventLoop * loop);
-	~UdpServer();
+	virtual ~UdpServer();
 
 	int start(const char * ip, int port, bool ipv6 = false);
 

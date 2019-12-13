@@ -17,6 +17,7 @@ class TcpSocket
 
 public:
 	TcpSocket(uint32 buffersize = MESSAGE_BUFFER_SIZE);
+	virtual ~TcpSocket();
 
 	int init_uv_tcp(uv_loop_t * loop){ return uv_tcp_init(loop, getUvTcp()); }
 	int accept(uv_stream_t *server){ return uv_accept(server, (uv_stream_t*)getUvTcp()); }
