@@ -113,3 +113,8 @@ time_t XTime::stamp()
 	getTimeval(&tv);
 	return tv.tv_sec;
 }
+
+uint32 XTime::iclock()
+{
+	return (uint32)(std::clock() * 1000 / CLOCKS_PER_SEC);
+}

@@ -25,9 +25,9 @@ namespace ShareMemAPI
 		printf("handle = %d ,key = %d ,error: %d \r\n", hd, key, errno);
 		return hd;
 #else SYSTEM_WIN
-			CHAR keybuf[64];
+		WCHAR keybuf[64];
 		memset(keybuf, 0, 64);
-		sprintf(keybuf, "%d", key);
+		swprintf(keybuf, L"%d", key);
 		return  CreateFileMapping((HANDLE)0xFFFFFFFFFFFFFFFF, NULL, PAGE_READWRITE, 0, Size, keybuf);
 #endif
 			return SMHandle(-1);
@@ -45,9 +45,9 @@ namespace ShareMemAPI
 		printf("handle = %d ,key = %d ,error: %d \r\n", hd, key, errno);
 		return hd;
 #else SYSTEM_WIN
-			CHAR keybuf[64];
+		WCHAR keybuf[64];
 		memset(keybuf, 0, 64);
-		sprintf(keybuf, "%d", key);
+		swprintf(keybuf, L"%d", key);
 		return OpenFileMapping(FILE_MAP_ALL_ACCESS, TRUE, keybuf);
 #endif
 			return SMHandle(-1);
