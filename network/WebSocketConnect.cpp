@@ -1,4 +1,4 @@
-﻿#include "WebSocketProtocol.h"
+﻿#include "WebSocketConnect.h"
 
 /*-------------------------------------------------------------------
 
@@ -57,12 +57,19 @@
 	#include <arpa/inet.h>
 #endif
 
-WebSocketProtocol::WebSocketProtocol()
+#include "WebSocketEvent.h"
+#include "WebSocketPacket.h"
+
+WebSocketConnect::WebSocketConnect(WebSocketEvent * wevent, uint32 buffersize):
+	TcpSocket(buffersize),
+	__m_webevent(wevent),
+	__m_readPacket(NULL),
+	__m_isHandshake(false)
 {
 }
 
 
-WebSocketProtocol::~WebSocketProtocol()
+WebSocketConnect::~WebSocketConnect()
 {
 }
 
@@ -82,10 +89,10 @@ const char * ackHandshake = "HTTP/1.1 101 Switching Protocols\r\n"
 	"Upgrade: websocket\r\n"
 	"Connection: Upgrade\r\n"
 	"Sec-WebSocket-Accept: %s\r\n"
-	"WebSocket-Location: ws://%s/WebManagerSocket\r\n"
+	"WebSocket-Location: ws://%s/\r\n"
 	"WebSocket-Protocol: WebManagerSocket\r\n\r\n";
 
-bool WebSocketProtocol::parseHandshake(const char * pData, int len)
+bool WebSocketConnect::parseHandshake(const char * pData, int len)
 {
 	if (len < 2)
 		return false;
@@ -99,8 +106,11 @@ bool WebSocketProtocol::parseHandshake(const char * pData, int len)
 	std::map<std::string, std::string> mapKey;
 	while (std::getline(stream, line))
 	{
+		if (line == "\r" || line[line.size() - 1] != '\r') {
+			continue; //end
+		}
 		std::string::size_type pos = line.find(": ");
-		mapKey[std::string(line.c_str(), 0, pos)] = std::string(line.c_str() + pos + 2);
+		mapKey[std::string(line.c_str(), 0, pos)] = std::string(line.c_str() + (pos + 2), line.size() - 1 - (pos + 2));
 	}
 
 	auto ithost = mapKey.find("Host");
@@ -116,7 +126,7 @@ bool WebSocketProtocol::parseHandshake(const char * pData, int len)
 	return true;
 }
 
-std::string WebSocketProtocol::respondHandshake()
+std::string WebSocketConnect::respondHandshake()
 {
 	static const char * s_key = "258EAFA5-E914-47DA-95CA-C5AB0DC85B11";
 	std::string server_key = __m_strKey + s_key;
@@ -132,3 +142,142 @@ std::string WebSocketProtocol::respondHandshake()
 	server_key = base64_encode(reinterpret_cast<const unsigned char*>(message_digest), 20);
 	return Tools::format(ackHandshake, server_key.c_str(), __m_strHost.c_str());
 }
+
+
+void WebSocketConnect::on_msgbuffer(MessageBuffer * buffer)
+{
+	//未握手
+	if (!__m_isHandshake)
+	{
+		if (parseHandshake((const char *)buffer->GetReadPointer(), buffer->GetActiveSize()) == false)
+		{
+			__m_webevent->onClose(this);
+			return;
+		}
+
+		std::string sendmsg = respondHandshake();
+		write((char *)sendmsg.data(), sendmsg.size() - 1);
+
+		__m_isHandshake = true;
+		__m_webevent->onHandshake(this);
+		return;
+	}
+	
+	if (!__m_readPacket)
+	{
+		//create packet obj
+		__m_readPacket = createPacket();
+	}
+
+	while (buffer->GetActiveSize() > 0)
+	{
+		if (__m_readPacket->isHeadFull() == false)
+		{
+			uint32 rlen = __m_readPacket->readFrameHead(buffer->GetReadPointer(), buffer->GetActiveSize());
+			buffer->ReadCompleted(rlen);
+
+			if (__m_readPacket->isHeadFull())
+			{
+				__m_readPacket->wpos(__m_readPacket->rpos());
+			}
+		}
+
+		if (__m_readPacket->isHeadFull())
+		{
+			int32 needsize = __m_readPacket->getLength() + __m_readPacket->getHeadSize() - __m_readPacket->wpos();
+			if (needsize > 0)
+			{
+				int32 wsize = buffer->GetActiveSize() >= needsize ? needsize : buffer->GetActiveSize();
+				if (wsize > 0)
+				{
+					__m_readPacket->append(buffer->GetReadPointer(), wsize);
+					buffer->ReadCompleted(wsize);
+				}
+			}
+
+			//new packet
+			if (__m_readPacket->wpos() == __m_readPacket->getLength() + __m_readPacket->getHeadSize())
+			{
+
+				//解密
+				if (__m_readPacket->getMask())
+				{
+					decodingDatas(__m_readPacket, __m_readPacket->getMaskKey());
+				}
+
+				__m_webevent->onMsg(this, __m_readPacket);
+
+				// recycle packet
+				recyclePacket(__m_readPacket);
+				__m_readPacket = NULL;
+			}
+		}
+	}//while
+}
+
+void WebSocketConnect::sendMsg(WebSocketPacket * pack)
+{
+	pack->writeFrameHead();
+	__m_sendPackets.push(pack);
+	send_top_msg();
+}
+
+void WebSocketConnect::sendMsg(void * msg, uint32 len)
+{
+
+	WebSocketPacket *pack = createPacket();
+
+	pack->append((uint8 *)msg, len);
+	pack->writeFrameHead();
+
+	__m_sendPackets.push(pack);
+
+	send_top_msg();
+}
+
+void WebSocketConnect::on_clsesocket()
+{
+	__m_webevent->onClose(this);
+}
+
+void WebSocketConnect::on_writecomplete()
+{
+	//write complete
+	if (__m_sendPackets.size() == 0)
+		return;
+
+	recyclePacket(__m_sendPackets.back());
+	__m_sendPackets.pop();
+	send_top_msg();
+}
+
+
+WebSocketPacket * WebSocketConnect::createPacket()
+{
+	return new WebSocketPacket;
+}
+void WebSocketConnect::recyclePacket(WebSocketPacket * pack)
+{
+	if (pack)
+		delete pack;
+}
+
+bool WebSocketConnect::decodingDatas(WebSocketPacket* pPacket, uint32 msg_mask)
+{
+	uint8* c = pPacket->contents() + pPacket->rpos();
+	for (int i = 0; i < (int)pPacket->getLength(); i++) {
+		c[i] = c[i] ^ ((uint8*)(&msg_mask))[i % 4];
+	}
+
+	return true;
+}
+
+void WebSocketConnect::send_top_msg()
+{
+	if (__m_sendPackets.size() == 0)
+		return;
+
+	WebSocketPacket *tp = __m_sendPackets.back();
+	write((char *)tp->sendStream(), tp->sendLen());
+}
+

@@ -3,6 +3,7 @@
 
 #include <functional>
 #include <list>
+#include "XAssert.h"
 
 template< typename T>
 class ObjectPool
@@ -63,6 +64,7 @@ public:
 		}
 		if (!obj->isEnabledPoolObject())
 		{
+			XAssert(0, "The object is already in the pool");
 			return;
 		}
 
