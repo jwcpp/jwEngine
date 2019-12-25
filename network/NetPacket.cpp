@@ -8,9 +8,7 @@ NetPacket::NetPacket()
 void NetPacket::zero()
 {
 	_rpos = 0;
-	_wpos = MSG_HEAD_SIZE;
-	//fillPacketHead();
-	//_storage.reserve(DEFAULT_SIZE);
+	fillPacketHead();
 }
 
 void NetPacket::writeHead()

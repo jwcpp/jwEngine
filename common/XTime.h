@@ -37,10 +37,6 @@ public:
 	static time_t stamp();
 
 	static uint32 iclock();
-
-	static void updateTime(time_t t = time(NULL));
-private:
-	static time_t _currt;
 };
 
 #endif

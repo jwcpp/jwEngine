@@ -11,12 +11,10 @@
 #include "UdpPacket.h"
 #include "Objectpool.h"
 
-#define MAX_UDP_PACKET_COUNT 500
-
 class UdpPacketFactory
 {
 public:
-	UdpPacketFactory(int count = MAX_UDP_PACKET_COUNT);
+	UdpPacketFactory(int count);
 	
 	UdpPacket * createPacket();
 
@@ -26,7 +24,8 @@ private:
 };
 
 
-extern UdpPacketFactory * udpPacketFactory;
-
-#define CREATE_UDP_PACKET udpPacketFactory->createPacket()
-#define RECYCLE_UDP_PACKET(pack) udpPacketFactory->recyclePacket(pack)
+extern UdpPacketFactory * gUdpPacketFactory;
+#define INIT_UDP_PACKET_POOL(count) gUdpPacketFactory = new UdpPacketFactory(count)
+#define DESTROY_UDP_PACKET_POOL if(gUdpPacketFactory) delete gUdpPacketFactory;
+#define CREATE_UDP_PACKET gUdpPacketFactory->createPacket()
+#define RECYCLE_UDP_PACKET(pack) gUdpPacketFactory->recyclePacket(pack)

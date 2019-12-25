@@ -3,13 +3,11 @@
 #include "NetPacket.h"
 #include "Objectpool.h"
 
-#define MAX_TCP_PACKET_COUNT 500
-
 //tcp packet factory
 class TPacketFactory
 {
 public:
-	TPacketFactory(int count = MAX_TCP_PACKET_COUNT);
+	TPacketFactory(int count);
 
 	NetPacket * createPacket();
 
@@ -19,7 +17,8 @@ private:
 	ObjectPool<NetPacket> objpool;
 };
 
-extern TPacketFactory * tcpPacketFactory;
-
-#define CREATE_TCP_PACKET tcpPacketFactory->createPacket()
-#define RECYCLE_TCP_PACKET(pack) tcpPacketFactory->recyclePacket(pack)
+extern TPacketFactory * gTcpPacketFactory;
+#define INIT_TCP_PACKET_POOL(count) gTcpPacketFactory = new TPacketFactory(count)
+#define DESTROY_TCP_PACKET_POOL if(gTcpPacketFactory) delete gTcpPacketFactory;
+#define CREATE_TCP_PACKET gTcpPacketFactory->createPacket()
+#define RECYCLE_TCP_PACKET(pack) gTcpPacketFactory->recyclePacket(pack)

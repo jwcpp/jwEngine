@@ -1,4 +1,5 @@
 ﻿#include "WebSocketConnect.h"
+#include "WsPacketFactory.h"
 
 /*-------------------------------------------------------------------
 
@@ -205,7 +206,18 @@ void WebSocketConnect::on_msgbuffer(MessageBuffer * buffer)
 					decodingDatas(__m_readPacket, __m_readPacket->getMaskKey());
 				}
 
-				__m_webevent->onMsg(this, __m_readPacket);
+				switch (__m_readPacket->getOpcode())
+				{
+				case CLOSE_FRAME:
+					this->close();
+					break;
+				case PING_FRAME:
+					//TODO...
+					break;
+				default:
+					__m_webevent->onMsg(this, __m_readPacket);
+					break;
+				}
 
 				// recycle packet
 				recyclePacket(__m_readPacket);
@@ -254,12 +266,15 @@ void WebSocketConnect::on_writecomplete()
 
 WebSocketPacket * WebSocketConnect::createPacket()
 {
-	return new WebSocketPacket;
+	WebSocketPacket * packet = CREATE_WS_PACKET;
+	if (packet)
+		packet->zero();
+	return packet;
 }
 void WebSocketConnect::recyclePacket(WebSocketPacket * pack)
 {
 	if (pack)
-		delete pack;
+		RECYCLE_WS_PACKET(pack);
 }
 
 bool WebSocketConnect::decodingDatas(WebSocketPacket* pPacket, uint32 msg_mask)

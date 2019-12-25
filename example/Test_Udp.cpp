@@ -53,11 +53,11 @@ public:
 
 //#define UDP_CLIENT_TEST
 
-int main()
+int __main()
 {
 	srand((int)time(0));
 	EventLoop::Instance()->init();
-	udpPacketFactory = new UdpPacketFactory();
+	INIT_UDP_PACKET_POOL(10);
 
 	//初始化事件循环
 	KNetEvent eve;
@@ -75,7 +75,7 @@ int main()
 #endif
 
 	EventLoop::Instance()->Run();
-	delete udpPacketFactory;
+	DESTROY_UDP_PACKET_POOL;
 
 	system("pause");
 	return 0;

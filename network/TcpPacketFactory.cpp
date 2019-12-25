@@ -1,6 +1,6 @@
 #include "TcpPacketFactory.h"
 
-TPacketFactory * tcpPacketFactory;
+TPacketFactory * gTcpPacketFactory = NULL;
 
 TPacketFactory::TPacketFactory(int count) :
 	objpool(count)

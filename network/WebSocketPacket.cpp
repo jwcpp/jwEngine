@@ -15,7 +15,7 @@ WebSocketPacket::~WebSocketPacket()
 void WebSocketPacket::zero()
 {
 	_rpos = 0;
-	_wpos = WS_RESERVER_SIZE;
+	fillPacketHead();
 }
 
 uint32 WebSocketPacket::readFrameHead(const uint8 * pData, uint32 size)
@@ -152,4 +152,9 @@ void WebSocketPacket::fillPacketHead()
 uint32 WebSocketPacket::getMaskKey()
 {
 	return getValue<uint32>(getHeadSize() - 4);
+}
+
+const char * WebSocketPacket::getBodyData()
+{
+	return (const char *)contents() + getHeadSize();
 }

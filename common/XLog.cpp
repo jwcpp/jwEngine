@@ -4,6 +4,7 @@
 #include <iomanip>
 #include <stdarg.h>
 #include "Platform.h"
+#include "XTime.h"
 
 #ifdef SYSTEM_WIN
 #include <windows.h>
@@ -80,8 +81,7 @@ void XLog::writeLog(int level, const char * filename, const char * func, int row
 
 void XLog::writeFile(int level, const char * filename, const char * func, int row, const char * logstr)
 {
-	time_t t = time(NULL);
-	struct tm * tm_ = std::localtime(&t);
+	const struct tm * tm_ = XTime::getTMStruct();
 
 	AutoLock(this);
 

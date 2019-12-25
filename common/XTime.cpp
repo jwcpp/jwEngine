@@ -28,8 +28,6 @@ int gettimeofday(struct timeval *tp, void *tzp)
 #endif // PLATFORM_WINDOWS
 
 
-time_t XTime::_currt = time(NULL);
-
 bool XTime::isLeapYear(int year)
 {
 	return (year % 4 == 0 && ((year % 400 == 0) || (year % 100 != 0)));
@@ -63,12 +61,8 @@ int XTime::yearMonthDays(int year, int month)
 
 const struct tm * XTime::getTMStruct()
 {
+	time_t _currt = time(NULL);
 	return std::localtime(&_currt);
-}
-
-void XTime::updateTime(time_t t)
-{
-	_currt = t;
 }
 
 std::string XTime::format(const char * fmt)

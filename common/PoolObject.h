@@ -6,7 +6,7 @@
 		bool isEnabledPoolObject() const{ return isEnabledPoolObject_; }\
 		void setEnabledPoolObject(bool v){ isEnabledPoolObject_ = v; }\
 	private:\
-		bool isEnabledPoolObject_ = false;
+		bool isEnabledPoolObject_ = true;
 
 class PoolObject
 {

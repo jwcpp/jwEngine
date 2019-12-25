@@ -8,6 +8,7 @@
 
 #pragma once
 #include "ByteBuffer.h"
+#include "PoolObject.h"
 
 #define WS_HEAD_SIZE 2
 #define WS_RESERVER_SIZE (WS_HEAD_SIZE + 8)
@@ -68,6 +69,7 @@ public:
 	char * sendStream(){ return (char *)contents() + __m_sendpos; }
 	uint32 sendLen(){ return _wpos - __m_sendpos; }
 	uint32 getMaskKey();
+	const char * getBodyData();
 private:
 
 	void fillPacketHead();
@@ -84,5 +86,6 @@ private:
 private:
 	uint8 __m_head[WS_HEAD_SIZE];
 	uint8 __m_sendpos;
+	INCLUDE_POOL_OBJECT
 };
 

@@ -3,6 +3,7 @@
 #include "WebSocketPacket.h"
 #include "WebSocketServer.h"
 #include "EventLoop.h"
+#include "WsPacketFactory.h"
 #include <stdio.h>
 
 extern int makeWSFrameDataHeader(int len, std::vector<unsigned char>& header);
@@ -92,14 +93,19 @@ public:
 	
 	};
 	virtual void onClose(WebSocketConnect * conn){
-	
+		printf("close connect\n");
 	};
 	virtual void onMsg(WebSocketConnect * conn, WebSocketPacket * pack){
-		int size = pack->getHeadSize();
-		const char * p = (char *)pack->contents() + size;
-		p = U2G(p);
-		printf("%d, %s\n", pack->getOpcode(), p);
+		const char * p = pack->getBodyData();
 
+		char buff[1024] = {0};
+		strncpy(buff, p, pack->getLength());
+
+		p = U2G(buff);
+		printf("%d, %s\n", pack->size(), p);
+		delete [] p;
+
+		conn->sendMsg("1234567890",10);
 
 		//conn->sendMsg("123456789\0", 10);
 
@@ -109,14 +115,14 @@ public:
 		//conn->write((char *)pack->contents(), pack->wpos());
 
 
-		std::vector<uint8> vec;
-		vec.push_back(TEXT_FRAME);
-		vec.push_back(4);
-		vec.push_back('6');
-		vec.push_back('6');
-		vec.push_back('6');
-		vec.push_back('6');
-		conn->write((char *)&vec[0], vec.size());
+		//std::vector<uint8> vec;
+		//vec.push_back(TEXT_FRAME);
+		//vec.push_back(4);
+		//vec.push_back('6');
+		//vec.push_back('6');
+		//vec.push_back('6');
+		//vec.push_back('6');
+		//conn->write((char *)&vec[0], vec.size());
 
 	};
 };
@@ -124,11 +130,13 @@ public:
 
 int main()
 {
+	INIT_WS_PACKET_POOL(10);
 	EventLoop::Instance()->init();
 	IWebEvent wevent;
 	WebSocketServer server(EventLoop::Instance(), &wevent);
 	server.listen("127.0.0.1", 8080);
 	EventLoop::Instance()->Run();
+	DESTROY_WS_PACKET_POOL;
 
 	system("pause");
 	return 0;

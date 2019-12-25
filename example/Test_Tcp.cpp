@@ -42,10 +42,10 @@ public:
 
 //#define CLIENT_TEST
 
-int main()
+int _main()
 {
 	//初始化tcp包内存池
-	tcpPacketFactory = new TPacketFactory();
+	INIT_TCP_PACKET_POOL(10);
 
 	//初始化事件循环
 	INetEvent eve;
@@ -64,7 +64,7 @@ int main()
 	//开启事件循环
 	EventLoop::Instance()->Run();
 
-	delete tcpPacketFactory;
+	DESTROY_TCP_PACKET_POOL;
 
 	system("pause");
 	return 0;

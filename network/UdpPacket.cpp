@@ -14,7 +14,7 @@ UdpPacket::~UdpPacket()
 void UdpPacket::zero()
 {
 	_rpos = 0;
-	_wpos = UDP_PACK_HEAD_SIZE;
+	__fillPacketHead();
 }
 
 void UdpPacket::initSize(int s)

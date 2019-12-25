@@ -1,6 +1,6 @@
 #include "UdpPacketFactory.h"
 
-UdpPacketFactory * udpPacketFactory;
+UdpPacketFactory * gUdpPacketFactory = NULL;
 
 UdpPacketFactory::UdpPacketFactory(int count) :
 	objpool(count)
