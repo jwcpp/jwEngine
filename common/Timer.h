@@ -15,7 +15,7 @@ public:
 
 	~Timer()
 	{
-		stop();
+		uv_close((uv_handle_t *)&m_timer, NULL);
 	}
 
 	void start(std::function<void()> cb, uint64_t timeout, uint64_t repeat = 0)

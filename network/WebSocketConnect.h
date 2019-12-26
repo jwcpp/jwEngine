@@ -24,7 +24,7 @@ public:
 	bool parseHandshake(const char * pData, int len);
 
 	// 回客户端的握手协议
-	std::string respondHandshake();
+	void respondHandshake(std::string & msg);
 
 	void sendMsg(WebSocketPacket * pack);
 	void sendMsg(void * msg, uint32 len);
@@ -42,7 +42,7 @@ private:
 private:
 	std::string __m_strKey;
 	std::string __m_strHost;
-
+	std::string __m_handshakeMsg;
 	bool __m_isHandshake;
 	WebSocketEvent * __m_webevent;
 	WebSocketPacket * __m_readPacket;

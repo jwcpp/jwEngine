@@ -127,7 +127,7 @@ bool WebSocketConnect::parseHandshake(const char * pData, int len)
 	return true;
 }
 
-std::string WebSocketConnect::respondHandshake()
+void WebSocketConnect::respondHandshake(std::string & msg)
 {
 	static const char * s_key = "258EAFA5-E914-47DA-95CA-C5AB0DC85B11";
 	std::string server_key = __m_strKey + s_key;
@@ -141,7 +141,7 @@ std::string WebSocketConnect::respondHandshake()
 		message_digest[i] = htonl(message_digest[i]);
 
 	server_key = base64_encode(reinterpret_cast<const unsigned char*>(message_digest), 20);
-	return Tools::format(ackHandshake, server_key.c_str(), __m_strHost.c_str());
+	msg = Tools::format(ackHandshake, server_key.c_str(), __m_strHost.c_str());
 }
 
 
@@ -156,8 +156,8 @@ void WebSocketConnect::on_msgbuffer(MessageBuffer * buffer)
 			return;
 		}
 
-		std::string sendmsg = respondHandshake();
-		write((char *)sendmsg.data(), sendmsg.size() - 1);
+		respondHandshake(__m_handshakeMsg);
+		write((char *)__m_handshakeMsg.data(), __m_handshakeMsg.size() - 1);
 
 		__m_isHandshake = true;
 		__m_webevent->onHandshake(this);
