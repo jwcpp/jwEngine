@@ -53,7 +53,7 @@ public:
 
 //#define UDP_CLIENT_TEST
 
-int __main()
+int main()
 {
 	srand((int)time(0));
 	EventLoop::Instance()->init();

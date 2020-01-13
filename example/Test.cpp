@@ -1,21 +1,17 @@
 #include <string>
 #include <stdlib.h>
 
+#include <Timer.h>
 int main()
 {
-	std::string s("0");
-	s.reserve(20);
-	printf("%d\n", s.capacity());
-	printf("%x\n", s.data());
-	
-	s.resize(0);
-	s.insert(0, "111111111111111");
+	EventLoop::Instance()->init();
+	Timer t;
+	t.start([&](){
+		printf("1\n"); 
+		t.stop();
+	}, 1000, 1000);
+	EventLoop::Instance()->Run();
 
-	printf("%d\n", s.capacity());
-	printf("%x\n", s.data());
-
-
-	printf("%s\n", s.data());
-	system("pause");
+	//system("pause");
 	return 0;
 }
