@@ -7,11 +7,10 @@
 ************************************************************************/
 
 #pragma once
-#include "ByteBuffer.h"
+#include "BasePacket.h"
 #include "PoolObject.h"
 
 #define WS_HEAD_SIZE 2
-#define WS_RESERVER_SIZE (WS_HEAD_SIZE + 8)
 
 /*
 
@@ -49,43 +48,43 @@ enum WSFrameType
 	CLOSE_FRAME = 0x08
 };
 
-class WebSocketPacket : public ByteBuffer
+class WebSocketPacket : public BasePacket
 {
 public:
 	WebSocketPacket();
 	~WebSocketPacket();
 
-	void zero();
 	uint8 getFin(){ return (__m_head[0] >> 7) & 0x01; }
 	uint8 getOpcode(){ return __m_head[0] & 0x0F; }
 	uint8 getMask(){ return (__m_head[1] >> 7) & 0x01; }
 	uint8 getPayloadLen(){ return __m_head[1] & 0x7f; }
 
-	uint32 getHeadSize();
 	bool isHeadFull();
-	void writeFrameHead(WSFrameType ftype = BINARY_FRAME);
+	void writeFrameHead(int32 bodylen, WSFrameType ftype = BINARY_FRAME);
 	uint32 readFrameHead(const uint8 * p, uint32 size);
-	uint32 getLength();
-	char * sendStream(){ return (char *)contents() + __m_sendpos; }
-	uint32 sendLen(){ return _wpos - __m_sendpos; }
 	uint32 getMaskKey();
-	const char * getBodyData();
+
+
+	virtual int32  getBodySize();
+	virtual char * getBodyData();
+
+	// read msg call
+	virtual int32  getHeadSize();
+	virtual int32  getMarkLen();   // message head mark length
+
+	// send msg call
+	virtual int32  sendSize();
+	virtual char * sendStream();
+
+
+	void _fillHead();
+	virtual void moveData(WebSocketPacket * packet);
+
 private:
-
-	void fillPacketHead();
-
-	template<typename T>
-	T getValue(uint32 pos){
-		T value;
-		std::memcpy(&value, &_storage[pos], sizeof(T));
-		EndianConvert(value);
-
-		return value;
-	}
-
+	int32 calcHeadSize();
 private:
 	uint8 __m_head[WS_HEAD_SIZE];
-	uint8 __m_sendpos;
+	uint8 __m_bodypos;
 	INCLUDE_POOL_OBJECT
 };
 

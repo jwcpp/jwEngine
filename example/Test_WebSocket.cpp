@@ -99,15 +99,15 @@ public:
 		const char * p = pack->getBodyData();
 
 		char buff[1024] = {0};
-		strncpy(buff, p, pack->getLength());
+		strncpy(buff, p, pack->getBodySize());
 
 		p = U2G(buff);
 		printf("%d, %s\n", pack->size(), p);
 		delete [] p;
 
-		conn->sendMsg("1234567890",10);
+		//conn->sendMsg("1234567890",10);
 
-		//conn->sendMsg("123456789\0", 10);
+		conn->sendMsg(pack);
 
 		//std::vector<unsigned char> msg;
 		//makeWSFrameData("123456789\0", 10, msg);

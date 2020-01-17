@@ -37,7 +37,7 @@ void NetConnect::on_msgbuffer(MessageBuffer * buffer)
 		else
 		{
 			//read body
-			int32 needsize = mReadPacket->getMsgLen() + MSG_HEAD_SIZE - mReadPacket->wpos();
+			int32 needsize = mReadPacket->getMarkLen() + MSG_HEAD_SIZE - mReadPacket->wpos();
 			if (needsize > 0)
 			{
 				int32 wsize = buffer->GetActiveSize() >= needsize ? needsize : buffer->GetActiveSize();
@@ -49,7 +49,7 @@ void NetConnect::on_msgbuffer(MessageBuffer * buffer)
 			}
 
 			//new packet
-			if (mReadPacket->wpos() == mReadPacket->getMsgLen() + MSG_HEAD_SIZE)
+			if (mReadPacket->wpos() == mReadPacket->getMarkLen() + MSG_HEAD_SIZE)
 			{
 				_netevent->onMsg(this, mReadPacket);
 
@@ -67,13 +67,13 @@ void NetConnect::on_clsesocket()
 }
 
 
-void NetConnect::sendMsg(uint32 msgtype, NetPacket * pack){
+void NetConnect::sendMsg(uint32 msgtype, NetPacket * pack)
+{
+	NetPacket * packet = createPacket();
+	packet->moveData(pack);
+	packet->writeHead(msgtype);
 
-	pack->setMsgLen(pack->wpos() - MSG_HEAD_SIZE);
-	pack->setMsgType(msgtype);
-	pack->writeHead();
-
-	mSendPackets.push(pack);
+	mSendPackets.push(packet);
 
 	send_top_msg();
 }
@@ -84,9 +84,7 @@ void NetConnect::sendMsg(uint32 msgtype, void * msg, uint32 len)
 	NetPacket *pack = createPacket();
 
 	pack->append((uint8 *)msg, len);
-	pack->setMsgLen(len);
-	pack->setMsgType(msgtype);
-	pack->writeHead();
+	pack->writeHead(msgtype);
 
 	mSendPackets.push(pack);
 
@@ -97,14 +95,12 @@ void NetConnect::sendMsg(uint32 msgtype, void * msg, uint32 len)
 NetPacket * NetConnect::createPacket()
 {
 	NetPacket * packet = CREATE_TCP_PACKET;
-	packet->zero();
 	return packet;
 }
 
 void NetConnect::recyclePacket(NetPacket * pack)
 {
-	if (pack)
-		RECYCLE_TCP_PACKET(pack);
+	RECYCLE_TCP_PACKET(pack);
 }
 
 void NetConnect::on_writecomplete()
@@ -122,5 +118,5 @@ void NetConnect::send_top_msg()
 		return;
 
 	NetPacket *tp = mSendPackets.back();
-	write((char *)tp->getData(), tp->wpos());
+	write(tp->sendStream(), tp->sendSize());
 }

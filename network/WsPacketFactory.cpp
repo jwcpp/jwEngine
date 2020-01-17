@@ -15,9 +15,14 @@ WsPacketFactory::~WsPacketFactory()
 
 WebSocketPacket * WsPacketFactory::createPacket()
 {
-	return objpool.createObject();
+	WebSocketPacket * packet = objpool.createObject();
+	packet->zero();
+	return packet;
 }
 void WsPacketFactory::recyclePacket(WebSocketPacket * obj)
 {
-	objpool.reclaimObject(obj);
+	if (obj)
+	{
+		objpool.reclaimObject(obj);
+	}
 }

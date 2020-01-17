@@ -2,19 +2,50 @@
 
 NetPacket::NetPacket()
 {
-	fillPacketHead();
+	
 }
 
-void NetPacket::zero()
+int32  NetPacket::getBodySize()
 {
-	_rpos = 0;
-	fillPacketHead();
+	return wpos() - MSG_HEAD_SIZE;
 }
 
-void NetPacket::writeHead()
+char * NetPacket::getBodyData()
 {
-	put<uint32>(MSG_LEN_POS, msglen);
-	put<uint32>(MSG_TYPE_POS, msgtype);
+	return (char *)(contents() + MSG_HEAD_SIZE);
+}
+
+// read msg call
+int32  NetPacket::getHeadSize()
+{
+	return MSG_HEAD_SIZE;
+}
+int32  NetPacket::getMarkLen()
+{
+	// message head mark length
+	return getValue<uint32>(MSG_LEN_POS);
+}
+
+// send msg call
+int32  NetPacket::sendSize()
+{
+	return wpos();
+}
+char * NetPacket::sendStream()
+{
+	return (char *)contents();
+}
+
+uint32 NetPacket::getMsgType()
+{
+	return getValue<uint32>(MSG_TYPE_POS);
+}
+
+
+void NetPacket::writeHead(int msgtype)
+{
+	setValue<uint32>(MSG_LEN_POS, getBodySize());
+	setValue<uint32>(MSG_TYPE_POS, msgtype);
 }
 
 uint32 NetPacket::readHead(const uint8 * p, uint32 size)
@@ -41,16 +72,10 @@ uint32 NetPacket::readHead(const uint8 * p, uint32 size)
 	memcpy(&_storage[_rpos], p, rsize);
 	_rpos += rsize;
 
-	if (_rpos >= MSG_HEAD_SIZE)
-	{
-		msglen = getValue<uint32>(MSG_LEN_POS);
-		msgtype = getValue<uint32>(MSG_TYPE_POS);
-	}
-
 	return rsize;
 }
 
-void NetPacket::fillPacketHead()
+void NetPacket::_fillHead()
 {
 	this->_storage.resize(MSG_HEAD_SIZE);
 	_wpos = MSG_HEAD_SIZE;

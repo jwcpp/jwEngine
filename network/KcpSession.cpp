@@ -46,6 +46,9 @@ uint32 KcpSessionBase::getSessionId()
 
 uint32 KcpSessionBase::update(uint32 millisecond)
 {
+	if (!__m_kcp)
+		return 0;
+
 	ikcp_update(__m_kcp, millisecond);
 
 	int peeksize = ikcp_peeksize(__m_kcp);
@@ -132,7 +135,6 @@ void KcpSession::update()
 UdpPacket * KcpSession::_createPacket(int size)
 {
 	UdpPacket * packet = CREATE_UDP_PACKET;
-	packet->zero();
 	if (size > 0)
 	{
 		packet->initSize(size);
@@ -142,8 +144,7 @@ UdpPacket * KcpSession::_createPacket(int size)
 
 void KcpSession::_recyclePacket(UdpPacket * packet)
 {
-	if (packet)
-		RECYCLE_UDP_PACKET(packet);
+	RECYCLE_UDP_PACKET(packet);
 }
 
 void KcpSession::_onMsg(UdpPacket * packet)
@@ -155,10 +156,7 @@ void KcpSession::_onMsg(UdpPacket * packet)
 
 void KcpSession::sendMsg(uint32 msgtype, UdpPacket * pack)
 {
-
-	pack->setType(msgtype);
-	pack->writeHead();
-
+	pack->writeHead(msgtype);
 	send((const char *)pack->getData(), pack->wpos());
 }
 
@@ -166,10 +164,7 @@ void KcpSession::sendMsg(uint32 msgtype, void * msg, uint32 len)
 {
 
 	UdpPacket *pack = _createPacket();
-
 	pack->append((uint8 *)msg, len);
-	pack->setType(msgtype);
-	pack->writeHead();
-
-	send((const char *)pack->getData(), pack->wpos());
+	pack->writeHead(msgtype);
+	send(pack->sendStream(), pack->sendSize());
 }

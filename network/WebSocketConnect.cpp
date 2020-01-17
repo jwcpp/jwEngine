@@ -179,13 +179,13 @@ void WebSocketConnect::on_msgbuffer(MessageBuffer * buffer)
 
 			if (__m_readPacket->isHeadFull())
 			{
-				__m_readPacket->wpos(__m_readPacket->rpos());
+				__m_readPacket->rpos(__m_readPacket->wpos());
 			}
 		}
 
 		if (__m_readPacket->isHeadFull())
 		{
-			int32 needsize = __m_readPacket->getLength() + __m_readPacket->getHeadSize() - __m_readPacket->wpos();
+			int32 needsize = __m_readPacket->getMarkLen() + __m_readPacket->getHeadSize() - __m_readPacket->wpos();
 			if (needsize > 0)
 			{
 				int32 wsize = buffer->GetActiveSize() >= needsize ? needsize : buffer->GetActiveSize();
@@ -197,7 +197,7 @@ void WebSocketConnect::on_msgbuffer(MessageBuffer * buffer)
 			}
 
 			//new packet
-			if (__m_readPacket->wpos() == __m_readPacket->getLength() + __m_readPacket->getHeadSize())
+			if (__m_readPacket->wpos() == __m_readPacket->getMarkLen() + __m_readPacket->getHeadSize())
 			{
 
 				//解密
@@ -229,8 +229,9 @@ void WebSocketConnect::on_msgbuffer(MessageBuffer * buffer)
 
 void WebSocketConnect::sendMsg(WebSocketPacket * pack)
 {
-	pack->writeFrameHead();
-	__m_sendPackets.push(pack);
+	WebSocketPacket * packet = createPacket();
+	packet->moveData(pack);
+	__m_sendPackets.push(packet);
 	send_top_msg();
 }
 
@@ -240,7 +241,7 @@ void WebSocketConnect::sendMsg(void * msg, uint32 len)
 	WebSocketPacket *pack = createPacket();
 
 	pack->append((uint8 *)msg, len);
-	pack->writeFrameHead();
+	pack->writeFrameHead(len);
 
 	__m_sendPackets.push(pack);
 
@@ -267,20 +268,17 @@ void WebSocketConnect::on_writecomplete()
 WebSocketPacket * WebSocketConnect::createPacket()
 {
 	WebSocketPacket * packet = CREATE_WS_PACKET;
-	if (packet)
-		packet->zero();
 	return packet;
 }
 void WebSocketConnect::recyclePacket(WebSocketPacket * pack)
 {
-	if (pack)
-		RECYCLE_WS_PACKET(pack);
+	RECYCLE_WS_PACKET(pack);
 }
 
 bool WebSocketConnect::decodingDatas(WebSocketPacket* pPacket, uint32 msg_mask)
 {
 	uint8* c = pPacket->contents() + pPacket->rpos();
-	for (int i = 0; i < (int)pPacket->getLength(); i++) {
+	for (int i = 0; i < (int)pPacket->getMarkLen(); i++) {
 		c[i] = c[i] ^ ((uint8*)(&msg_mask))[i % 4];
 	}
 
@@ -293,6 +291,6 @@ void WebSocketConnect::send_top_msg()
 		return;
 
 	WebSocketPacket *tp = __m_sendPackets.back();
-	write((char *)tp->sendStream(), tp->sendLen());
+	write(tp->sendStream(), tp->sendSize());
 }
 

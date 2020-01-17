@@ -1,7 +1,7 @@
 #ifndef MSG_PACKET_H
 #define MSG_PACKET_H
 
-#include "ByteBuffer.h"
+#include "BasePacket.h"
 #include "PoolObject.h"
 
 #define MSG_LEN_POS  0
@@ -9,40 +9,31 @@
 #define MSG_HEAD_SIZE (sizeof(uint32) + sizeof(uint32))
 
 // packet head( msglen:uint32, msgtype:uint32 )
-class NetPacket : public ByteBuffer
+class NetPacket : public BasePacket
 {
 
 public:
 	NetPacket();
 
-	void zero();
+	virtual int32  getBodySize();
+	virtual char * getBodyData();
 
-	void setMsgLen(uint32 len){ msglen = len; }
-	uint32 getMsgLen(){ return msglen; }
-	void setMsgType(uint32 type){ msgtype = type; }
-	uint32 getMsgType(){ return msgtype;}
+	// read msg call
+	virtual int32  getHeadSize();
+	virtual int32  getMarkLen();   // message head mark length
 
-	const uint8 * getData(){ return _storage.data(); }
-	const uint8 * getBodyData(){ return _storage.data() + MSG_HEAD_SIZE; }
+	// send msg call
+	virtual int32  sendSize();
+	virtual char * sendStream();
 
-	void writeHead();
+	uint32 getMsgType();
+
+	void writeHead(int msgtype);
 	uint32 readHead(const uint8 * p, uint32 size);
 private:
 	
-	void fillPacketHead();
+	virtual void _fillHead();
 
-	template<typename T>
-	T getValue(uint32 pos){
-		T value;
-		std::memcpy(&value, &_storage[pos], sizeof(T));
-		EndianConvert(value);
-
-		return value;
-	}
-
-private:
-	uint32 msglen;
-	uint32 msgtype;
 	INCLUDE_POOL_OBJECT
 };
 

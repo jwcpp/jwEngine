@@ -5,11 +5,15 @@
 int main()
 {
 	EventLoop::Instance()->init();
-	Timer t;
-	t.start([&](){
+	Timer * t = new Timer;
+	t->start([&](){
 		printf("1\n"); 
-		t.stop();
+		t->stop();
+
+		delete t;
+
 	}, 1000, 1000);
+
 	EventLoop::Instance()->Run();
 
 	//system("pause");

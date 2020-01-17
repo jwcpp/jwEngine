@@ -1,6 +1,6 @@
 /************************************************************************
 * @file      UdpPacket.h
-* @brief     udpÊý¾Ý°ü
+* @brief     udp message packet
 * @author    jiangwang
 * @data      2019-12-12
 * @version   0.1
@@ -8,42 +8,38 @@
 
 #pragma once
 
-#include "ByteBuffer.h"
+#include "BasePacket.h"
 #include "PoolObject.h"
 
 #define UDP_PACK_HEAD_SIZE sizeof(uint32)
 
-class UdpPacket : public ByteBuffer
+class UdpPacket : public BasePacket
 {
 public:
 	UdpPacket();
 	~UdpPacket();
 
-	void zero();
 	void initSize(int size);
+	uint32 getMsgType();
 
-	void setType(uint32 type){ __m_MsgType = type; }
-	uint32 getType(){ return __m_MsgType; }
+	virtual int32  getBodySize();
+	virtual char * getBodyData();
+
+	// read msg call
+	virtual int32  getHeadSize();
+	virtual int32  getMarkLen();   // message head mark length
+
+	// send msg call
+	virtual int32  sendSize();
+	virtual char * sendStream();
 
 	void readHead();
-	void writeHead();
+	void writeHead(int msgtype);
 	void writeComplete(uint32 size);
 	char * getData(){ return (char *)contents(); }
 
-private:
-	template<typename T>
-	T __getValue(uint32 pos){
-		T value;
-		std::memcpy(&value, &_storage[pos], sizeof(T));
-		EndianConvert(value);
-
-		return value;
-	}
-
-	void __fillPacketHead();
-
-private:
-	uint32 __m_MsgType;
+protected:
+	void _fillHead();
 
 	INCLUDE_POOL_OBJECT
 };

@@ -11,10 +11,15 @@ UdpPacketFactory::UdpPacketFactory(int count) :
 
 UdpPacket * UdpPacketFactory::createPacket()
 {
-	return objpool.createObject();
+	UdpPacket * packet = objpool.createObject();
+	packet->zero();
+	return packet;
 }
 
 void UdpPacketFactory::recyclePacket(UdpPacket * obj)
 {
-	objpool.reclaimObject(obj);
+	if (obj)
+	{
+		objpool.reclaimObject(obj);
+	}
 }

@@ -66,7 +66,7 @@ public:
 	}
 };
 
-#define CLIENT_TEST
+//#define CLIENT_TEST
 
 int main()
 {

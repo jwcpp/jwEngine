@@ -10,10 +10,15 @@ TPacketFactory::TPacketFactory(int count) :
 
 NetPacket * TPacketFactory::createPacket()
 {
-	return objpool.createObject();
+	NetPacket * packet = objpool.createObject();
+	packet->zero();
+	return packet;
 }
 
 void TPacketFactory::recyclePacket(NetPacket * obj)
 {
-	objpool.reclaimObject(obj);
+	if (obj)
+	{
+		objpool.reclaimObject(obj);
+	}
 }
