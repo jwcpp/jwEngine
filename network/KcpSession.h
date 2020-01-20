@@ -51,7 +51,7 @@ private:
 };
 
 
-#include "Timer.h"
+#include "UTimer.h"
 class KcpEvent;
 class KcpSession : public KcpSessionBase
 {
@@ -71,7 +71,7 @@ protected:
 
 private:
 	KcpEvent * __m_kcpEvent;
-	Timer      __m_timer;
+	UTimer      __m_timer;
 	uint32     __m_nTimeout;
 	uint32     __m_nTalkTime;
 	uint32     __m_nUpdateTime;

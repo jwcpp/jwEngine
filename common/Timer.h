@@ -1,66 +1,38 @@
-#ifndef TIMER_H
-#define TIMER_H
+#pragma once
 
-#include "EventLoop.h"
+#include "Heap.h"
+#include "BaseType.h"
 #include <functional>
 
 class Timer
 {
+	struct TimerNode
+	{
+		struct Heap::heap_node m_node;
+		void * user = NULL;
+	};
+
+	//typedef void(*close_timer_cb)(TimerNode* timernode);
+
 public:
-	Timer()
-	{
-		m_timer = (uv_timer_t *)malloc(sizeof(uv_timer_t));
-		m_timer->data = this;
-		uv_timer_init(EventLoop::Instance()->GetLoop(), m_timer);
-	}
+	Timer();
+	~Timer();
 
-	~Timer()
-	{
-		uv_close((uv_handle_t *)m_timer, [](uv_handle_t* handle){
-			free(handle);
-		});
-	}
+	static void init();
+	static void update();
 
-	void start(std::function<void()> cb, uint64_t timeout, uint64_t repeat = 0)
-	{
-		m_cb = cb;
-		uv_timer_start(m_timer, timer_cb, timeout, repeat);
-	}
-
-	void stop()
-	{
-		uv_timer_stop(m_timer);
-	}
+	void start(std::function<void()> cb, uint64_t timeout, uint64_t repeat = 0);
+	void stop();
 
 private:
-	
-	static void timer_cb(uv_timer_t* handle)
-	{
-		Timer * timer = (Timer *)handle->data;
-		timer->m_cb();
-	}
+	static int compare_fn(const struct Heap::heap_node* a, const struct Heap::heap_node* b);
 
 private:
-	uv_timer_t * m_timer;
+	TimerNode * m_node = NULL;
+	uint32 m_time = 0;
+	uint32 m_repeat = 0;
 	std::function<void()> m_cb;
 
-	/*
-		uv_timer_t m_timer; 
-		£¨This is the wrong approach£©
-
-		class Test
-		{
-			void go()
-			{
-				timer.start([&]()
-				{
-					delete this; // m_timer Object is released
-				}1000);
-			}
-			
-			Timer timer;
-		}
-	*/
+	static struct Heap::heap gRootHeap;
 };
 
-#endif
