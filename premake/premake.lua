@@ -7,6 +7,7 @@ platforms {'x32', 'x64'}
 -- global scope, all workspaces will receive these values
  if os.target() == "windows" then
     defines '_CRT_SECURE_NO_WARNINGS'
+	defines 'snprintf=_snprintf'
  end
 
 project "libuv"
@@ -27,6 +28,26 @@ project "libuv"
 		targetname "d_libuv"
 	filter "configurations:Release"
 		targetname "r_libuv"
+
+project "liblua"
+	-- 工程生成目录
+	location "../dependencies"
+	-- 附加包含目录
+	includedirs{
+		"../dependencies/lua/include",
+	}
+	language "C++"
+	kind "StaticLib"
+	local codedir = "../dependencies/lua";
+	files { codedir.."/**.h",codedir.."/**.hpp", codedir.."/**.c", codedir.."/**.cc", codedir.."/**.cpp"}
+	removefiles {codedir .. "/testes/**"}
+	removefiles {codedir .. "/lua.c"}
+	removefiles {codedir .. "/onelua.c"}
+	targetdir "../libs"
+	filter "configurations:Debug"
+		targetname "d_liblua"
+	filter "configurations:Release"
+		targetname "r_liblua"
 
 project "common"
 	-- 工程生成目录
