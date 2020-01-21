@@ -7,7 +7,6 @@ platforms {'x32', 'x64'}
 -- global scope, all workspaces will receive these values
  if os.target() == "windows" then
     defines '_CRT_SECURE_NO_WARNINGS'
-	defines 'snprintf=_snprintf'
  end
 
 project "libuv"
