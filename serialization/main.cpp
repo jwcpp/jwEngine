@@ -1,36 +1,25 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <assert.h>
+
 #include "Token.h"
 #include "Fio.h"
-#include <assert.h>
 #include "Parser.h"
-#include "Event.h"
 #include "Typedef.h"
-#include "Generate.h"
 
 #include <fstream>
 #include <iostream>
 
 
-int main(int argc, char* argv[])
+#ifdef GEN_CPP
+
+#include "Generate.h"
+
+void start(std::string & dir, std::string & name, Token * token)
 {
-	const char * filename = argv[1];
-
-	FBuffer fbuff;
-	if (!fbuff.load(filename))
-	{
-		printf("load file:%s error\n", filename);
-		assert(0);
-	}
-
-	std::string dir = getFileDir(filename);
-	std::string name = getFileNameByFilePath(filename);
 	Generate gen;
 	gen.init(name.c_str());
-
-	Token token(&fbuff);
-
-	Parser parser(&token, &gen);
+	Parser parser(token, &gen);
 	parser.start();
 
 	{
@@ -59,6 +48,54 @@ int main(int argc, char* argv[])
 			fout.close();
 		}
 	}
+}
+
+#else
+
+#include "GenerateLua.h"
+
+void start(std::string & dir, std::string & name, Token * token)
+{
+	GenerateLua gen;
+	gen.init();
+	ParserLua parser(token, &gen);
+	parser.start();
+
+	{
+		std::ofstream fout(dir + name + ".lua");
+		if (!fout)
+		{
+			std::cout << "文件不能打开" << std::endl;
+		}
+		else
+		{
+			fout << gen.getfile() << std::endl;
+			fout.close();
+		}
+	}
+}
+
+#endif
+
+int main(int argc, char* argv[])
+{
+	const char * filename = argv[1];
+
+	FBuffer fbuff;
+	if (!fbuff.load(filename))
+	{
+		printf("load file:%s error\n", filename);
+		assert(0);
+	}
+
+	std::string dir = getFileDir(filename);
+	std::string name = getFileNameByFilePath(filename);
+
+
+	Token token(&fbuff);
+	
+	start(dir, name, &token);
+	
 
 	//system("pause");
 	return 0;

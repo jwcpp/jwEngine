@@ -13,7 +13,7 @@ public:
 	int value;
 	std::string name;
 	
-	// vector
+	// vector  [typedef vector<int> VEC]
 	std::string vec_name;
 };
 

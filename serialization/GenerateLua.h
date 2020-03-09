@@ -1,25 +1,20 @@
+#pragma once
+
 /************************************************************************
-* @file      Generate.h
-* @brief     生成c++代码
+* @file      GenerateLua.h
+* @brief     生成lua代码
 * @author    jiangwang
-* @data      2019-1-10
+* @data      2019-3-3
 * @version   0.1
 ************************************************************************/
 
-#pragma once
-
 #include "Event.h"
 #include <string>
-class Generate : public Event
+class GenerateLua : public Event
 {
 public:
-	Generate();
-	~Generate();
-
-	void init(const char * filename);
-	std::string getHfile(){ return __m_h; }
-	std::string getCppfile(){ return __m_cpp; }
-
+	void init();
+	std::string getfile() { return __m_file; }
 protected:
 	virtual void onTypedef(TypeInfo * tinfo, const char * name);
 
@@ -44,10 +39,13 @@ protected:
 
 private:
 	void genBaseType(TypeInfo * tinfo, const char * varName);
+	const char * readFuncName(int value);
+	const char * writeFuncName(int value);
+	const char * getInitStr(TypeInfo * tinfo);
 	void setDepth(int dep = 0);
+
 private:
-	std::string __m_h;
-	std::string __m_cpp;
+	std::string __m_file;
 
 	std::string __m_structName;
 	bool __m_isRead = false;

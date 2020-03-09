@@ -44,6 +44,9 @@ public:
 
 	void start();
 
+
+protected:
+	virtual const char * getOperStr(Oper op);
 private:
 
 	// Parse data type
@@ -59,7 +62,6 @@ private:
 	// ±Ì¥Ô Ω
 	Oper getOper(int op);
 	bool expre(std::string & str);
-	const char * getOperStr(Oper op);
 
 	// import
 	void __import();
@@ -70,3 +72,10 @@ private:
 	Event * __m_Event;
 };
 
+
+class ParserLua : public Parser
+{
+public:
+	ParserLua(Token * token, Event * ev);
+	virtual const char * getOperStr(Oper op);
+};

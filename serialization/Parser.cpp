@@ -483,3 +483,36 @@ const char * Parser::getOperStr(Oper op)
 
 	return NULL;
 }
+
+
+
+
+ParserLua::ParserLua(Token * token, Event * ev):
+	Parser(token, ev)
+{
+
+}
+const char * ParserLua::getOperStr(Oper op)
+{
+
+	/*
+		c++ ------> lua
+		!=			~=
+		&&			and
+		||			or
+
+	*/
+	switch (op)
+	{
+	case eOpr_NE:	// !=
+		return "~=";
+	case eOpr_AND: // &&
+		return " and ";
+	case eOpr_OR: // ||
+		return " or ";
+	default:
+		break;
+	}
+
+	return Parser::getOperStr(op);
+}

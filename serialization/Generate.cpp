@@ -3,11 +3,6 @@
 #include "Keyword.h"
 
 
-std::string gStructName;
-bool gIsRead = false;
-int gDepth = 0;
-
-
 std::string getStdName(std::string name)
 {
 	if (name == "string")
@@ -61,8 +56,8 @@ void Generate::onTypedef(TypeInfo * tinfo, const char * name)
 
 void Generate::onEnterStruct(const char * name)
 {
-	gStructName = name;
-	gDepth = 1;
+	__m_structName = name;
+	__m_depth = 1;
 
 	__m_h.append("struct ");
 	__m_h.append(name);
@@ -106,11 +101,11 @@ void Generate::onVariable(TypeInfo * tinfo, const char * varName, const char * e
 
 void Generate::onEnterRead()
 {
-	gIsRead = true;
+	__m_isRead = true;
 	__m_h.append("\t");
 	__m_h.append("void read(ByteBuffer * buffer);\n");
 
-	__m_cpp.append("void " + gStructName + "::read(ByteBuffer * buffer)\n{\n");
+	__m_cpp.append("void " + __m_structName + "::read(ByteBuffer * buffer)\n{\n");
 }
 void Generate::onExitRead()
 {
@@ -119,11 +114,11 @@ void Generate::onExitRead()
 
 void Generate::onEnterWrite()
 {
-	gIsRead = false;
+	__m_isRead = false;
 	__m_h.append("\t");
 	__m_h.append("void write(ByteBuffer * buffer);\n");
 
-	__m_cpp.append("void " + gStructName + "::write(ByteBuffer * buffer)\n{\n");
+	__m_cpp.append("void " + __m_structName + "::write(ByteBuffer * buffer)\n{\n");
 }
 
 void Generate::onExitWrite()
@@ -141,7 +136,7 @@ void Generate::onValue(const char * varName, const char * exp)
 
 void Generate::genBaseType(TypeInfo * tinfo, const char * varName)
 {
-	if (gIsRead)
+	if (__m_isRead)
 	{
 		if (Keyword::isBaseType(tinfo->value))
 		{
@@ -177,7 +172,7 @@ void Generate::onReadWriteVar(TypeInfo * tinfo, const char * varName)
 		std::string len_var = "len_";
 		len_var.append(varName);
 
-		if (gIsRead)
+		if (__m_isRead)
 		{
 			setDepth();
 			__m_cpp.append("int " + len_var + " = 0;\n");
@@ -232,7 +227,7 @@ void Generate::onEnterIf()
 
 void Generate::onElseIf()
 {
-	gDepth--;
+	__m_depth--;
 	setDepth();
 	__m_cpp.append("} else if");
 }
@@ -245,20 +240,20 @@ void Generate::onIfCond(const char * condition)
 
 	setDepth();
 	__m_cpp.append("{\n");
-	gDepth++;
+	__m_depth++;
 }
 void Generate::onElse()
 {
-	gDepth--;
+	__m_depth--;
 	__m_cpp.append("\n");
 	setDepth();
 	__m_cpp.append("}else{\n");
-	gDepth++;
+	__m_depth++;
 }
 
 void Generate::onExitIf()
 {
-	gDepth--;
+	__m_depth--;
 	__m_cpp.append("\n");
 	setDepth();
 	__m_cpp.append("}\n");
@@ -273,7 +268,7 @@ void Generate::onImport(const char * filename)
 
 void Generate::setDepth(int dep)
 {
-	for (int i = 0; i < gDepth + dep; ++i)
+	for (int i = 0; i < __m_depth + dep; ++i)
 	{
 		__m_cpp.append("\t");
 	}
