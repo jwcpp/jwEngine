@@ -1,5 +1,6 @@
 #include "NetConnect.h"
-#include "TcpPacketFactory.h"
+#include "NetPacket.h"
+#include "PacketPool.h"
 #include "NetEvent.h"
 
 NetConnect::NetConnect(NetEvent * nevent,uint32 buffersize) :
@@ -94,13 +95,13 @@ void NetConnect::sendMsg(uint32 msgtype, void * msg, uint32 len)
 
 NetPacket * NetConnect::createPacket()
 {
-	NetPacket * packet = CREATE_TCP_PACKET;
+	NetPacket * packet = create_packet<NetPacket>();
 	return packet;
 }
 
 void NetConnect::recyclePacket(NetPacket * pack)
 {
-	RECYCLE_TCP_PACKET(pack);
+	reclaim_packet(pack);
 }
 
 void NetConnect::on_writecomplete()

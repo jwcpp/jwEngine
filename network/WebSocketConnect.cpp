@@ -1,5 +1,4 @@
 ﻿#include "WebSocketConnect.h"
-#include "WsPacketFactory.h"
 
 /*-------------------------------------------------------------------
 
@@ -60,6 +59,7 @@
 
 #include "WebSocketEvent.h"
 #include "WebSocketPacket.h"
+#include "PacketPool.h"
 
 WebSocketConnect::WebSocketConnect(WebSocketEvent * wevent, uint32 buffersize):
 	TcpSocket(buffersize),
@@ -267,12 +267,12 @@ void WebSocketConnect::on_writecomplete()
 
 WebSocketPacket * WebSocketConnect::createPacket()
 {
-	WebSocketPacket * packet = CREATE_WS_PACKET;
+	WebSocketPacket * packet = create_packet<WebSocketPacket>();
 	return packet;
 }
 void WebSocketConnect::recyclePacket(WebSocketPacket * pack)
 {
-	RECYCLE_WS_PACKET(pack);
+	reclaim_packet(pack);
 }
 
 bool WebSocketConnect::decodingDatas(WebSocketPacket* pPacket, uint32 msg_mask)

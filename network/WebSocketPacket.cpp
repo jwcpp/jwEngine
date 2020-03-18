@@ -3,7 +3,7 @@
 
 WebSocketPacket::WebSocketPacket()
 {
-
+	_fillHead();
 }
 
 

@@ -3,7 +3,7 @@
 
 UdpPacket::UdpPacket()
 {
-	
+	_fillHead();
 }
 
 

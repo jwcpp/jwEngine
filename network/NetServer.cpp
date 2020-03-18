@@ -8,13 +8,13 @@ NetServer::NetServer(EventLoop * loop, NetEvent * nevent) :
 {
 }
 
-TcpSocket * NetServer::createConnect()
+TcpSocket * NetServer::createSocket()
 {
 	NetConnect * conn = _netevent->createConnect();
 	return (TcpSocket *)conn;
 }
 
-void NetServer::onConnect(TcpSocket * connect)
+void NetServer::onSocket(TcpSocket * connect)
 {
 	_netevent->onAccept((NetConnect *)connect);
 }

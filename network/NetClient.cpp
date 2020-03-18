@@ -15,13 +15,13 @@ NetClient::~NetClient(){
 }
 
 
-TcpSocket * NetClient::createConnect()
+TcpSocket * NetClient::createSocket()
 {
 	NetConnect * conn = _netevent->createConnect();
 	return (TcpSocket *)conn;
 }
 
-void NetClient::onConnect(TcpSocket * conn)
+void NetClient::onSocket(TcpSocket * conn)
 {
 	_netevent->onConnect((NetConnect *)conn);
 }

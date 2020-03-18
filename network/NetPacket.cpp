@@ -2,7 +2,7 @@
 
 NetPacket::NetPacket()
 {
-	
+	_fillHead();
 }
 
 int32  NetPacket::getBodySize()

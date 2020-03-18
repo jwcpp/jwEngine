@@ -9,7 +9,7 @@
 #include "Timer.h"
 #include "NetConnect.h"
 #include "NetPacket.h"
-#include "TcpPacketFactory.h"
+#include "PacketPool.h"
 
 class INetEvent : public NetEvent
 {
@@ -45,7 +45,7 @@ public:
 int main()
 {
 	//初始化tcp包内存池
-	INIT_TCP_PACKET_POOL(10);
+	init_packet_pool<NetPacket>(10);
 
 	//初始化事件循环
 	INetEvent eve;
@@ -63,8 +63,6 @@ int main()
 
 	//开启事件循环
 	EventLoop::Instance()->Run();
-
-	DESTROY_TCP_PACKET_POOL;
 
 	system("pause");
 	return 0;

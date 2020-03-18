@@ -54,13 +54,13 @@ void TcpServer::on_new_connection(uv_stream_t *server, int status)
 
 	TcpServer * self = (TcpServer *)server->data;
 	// new connect
-	TcpSocket * connect = self->createConnect();
+	TcpSocket * connect = self->createSocket();
 	connect->clear();
 	connect->init_uv_tcp(self->mLoop);
 	if (connect->accept(server) == 0) {
 
 		connect->on_read_start();
-		self->onConnect(connect);
+		self->onSocket(connect);
 	}
 	else {
 		uv_close((uv_handle_t*)connect->getUvTcp(), NULL);

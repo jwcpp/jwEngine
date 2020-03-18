@@ -14,8 +14,8 @@ public:
 	~NetClient();
 
 protected:
-	virtual TcpSocket * createConnect();
-	virtual void onConnect(TcpSocket * conn);
+	virtual TcpSocket * createSocket();
+	virtual void onSocket(TcpSocket * conn);
 
 private:
 	NetEvent * _netevent;

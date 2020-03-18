@@ -4,7 +4,7 @@
 #include "KcpEvent.h"
 #include "KcpSession.h"
 #include "UdpPacket.h"
-#include "UdpPacketFactory.h"
+#include "PacketPool.h"
 #include <time.h>
 
 class KNetEvent : public KcpEvent
@@ -57,7 +57,7 @@ int main()
 {
 	srand((int)time(0));
 	EventLoop::Instance()->init();
-	INIT_UDP_PACKET_POOL(10);
+	init_packet_pool<UdpPacket>(10);
 
 	//初始化事件循环
 	KNetEvent eve;
@@ -75,7 +75,6 @@ int main()
 #endif
 
 	EventLoop::Instance()->Run();
-	DESTROY_UDP_PACKET_POOL;
 
 	system("pause");
 	return 0;

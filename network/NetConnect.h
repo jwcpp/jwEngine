@@ -15,8 +15,11 @@ public:
 
 	void close(){ TcpSocket::close(); }
 
+	// write data to socket
 	void sendMsg(uint32 msgtype, NetPacket * pack);
 	void sendMsg(uint32 msgtype, void * msg, uint32 len);
+	void sendPacket(uint32 msgtype, NetPacket * pack) { sendMsg(msgtype, pack);}
+	void sendData(uint32 msgtype, void * msg, uint32 len) { sendMsg(msgtype, msg, len);}
 
 	
 	void setUserdata(void * userdata){ _userdata = userdata; }

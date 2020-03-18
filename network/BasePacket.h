@@ -30,8 +30,43 @@ public:
 	virtual int32  sendSize();
 	virtual char * sendStream();
 
+public:
+
+	//------->get
+	int8 getInt8();
+	uint8 getUint8();
+	int16 getInt16();
+	uint16 getUint16();
+	int32 getInt32();
+	uint32 getUint32();
+	int64 getInt64();
+	uint64 getUint64();
+	float getFloat();
+	double getDouble();
+	std::string getString();
+
+	//------->push
+	void pushInt8(int8 value);
+	void pushUint8(uint8 value);
+	void pushInt16(int16 value);
+	void pushUint16(uint16 value);
+	void pushInt32(int32 value);
+	void pushUint32(uint32 value);
+	void pushInt64(int64 value);
+	void pushUint64(uint64 value);
+	void pushFloat(float value);
+	void pushDouble(double value);
+	void pushString(std::string value);
+
 protected:
 	virtual void _fillHead();
+
+	template<typename T>
+	T popValue() {
+		T t;
+		*this >> t;
+		return t;
+	}
 
 	template<typename T>
 	T getValue(uint32 pos){

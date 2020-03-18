@@ -14,12 +14,12 @@ WebSocketServer::~WebSocketServer()
 }
 
 
-TcpSocket * WebSocketServer::createConnect()
+TcpSocket * WebSocketServer::createSocket()
 {
 	return (TcpSocket *)__m_event->createConnect();
 }
 
-void WebSocketServer::onConnect(TcpSocket * connect)
+void WebSocketServer::onSocket(TcpSocket * connect)
 {
 	__m_event->onConnect((WebSocketConnect *)connect);
 }

@@ -18,8 +18,8 @@ public:
 	~WebSocketServer();
 
 protected:
-	virtual TcpSocket * createConnect();
-	virtual void onConnect(TcpSocket * connect);
+	virtual TcpSocket * createSocket();
+	virtual void onSocket(TcpSocket * connect);
 
 private:
 	WebSocketEvent * __m_event;

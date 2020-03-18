@@ -21,8 +21,8 @@ public:
 
 protected:
 	
-	virtual TcpSocket * createConnect() = 0;
-	virtual void onConnect(TcpSocket * connect) = 0;
+	virtual TcpSocket * createSocket() = 0;
+	virtual void onSocket(TcpSocket * connect) = 0;
 
 private:
 	static void on_new_connection(uv_stream_t *server, int status);

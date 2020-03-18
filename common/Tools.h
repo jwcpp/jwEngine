@@ -9,5 +9,7 @@ public:
 	static void mySleep(int millionseconds);
 	static unsigned long getCurrentThreadID();
 	static int binarySearch(int arr[], int len, int findX);
+	static std::string gbkToUtf8(const char *src_str);
+	static std::string utf8ToGbk(const char *src_str);
 };
 

@@ -11,7 +11,7 @@ class ObjectPool
 	typedef std::list<T*> OBJECTS;
 
 public:
-	ObjectPool(int32 maxcount) :
+	ObjectPool(int32 maxcount = 0) :
 		max_count(maxcount), total_allocs_(0), obj_count_(0)
 	{
 		
@@ -19,6 +19,11 @@ public:
 
 	~ObjectPool(){
 		destroy();
+	}
+
+	void init(int32 count)
+	{
+		max_count = count;
 	}
 
 	void destroy()
@@ -32,6 +37,7 @@ public:
 
 		objects_.clear();
 		obj_count_ = 0;
+		total_allocs_ = 0;
 	}
 
 	T* createObject()

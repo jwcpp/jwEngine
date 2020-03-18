@@ -25,7 +25,7 @@ void start(std::string & dir, std::string & name, Token * token)
 	{
 		// write h file
 		std::ofstream fout(dir + name + ".h");
-		if (!fout)
+		if (!fout.is_open())
 		{
 			std::cout << "文件不能打开" << std::endl;
 		}
@@ -38,7 +38,7 @@ void start(std::string & dir, std::string & name, Token * token)
 	{
 		// write cpp file
 		std::ofstream fout(dir + name + ".cpp");
-		if (!fout)
+		if (!fout.is_open())
 		{
 			std::cout << "文件不能打开" << std::endl;
 		}
@@ -63,7 +63,7 @@ void start(std::string & dir, std::string & name, Token * token)
 
 	{
 		std::ofstream fout(dir + name + ".lua");
-		if (!fout)
+		if (!fout.is_open())
 		{
 			std::cout << "文件不能打开" << std::endl;
 		}
