@@ -11,21 +11,8 @@ extern "C" {
 
 extern void luabind_netserver(sol::state & lua);
 extern void luabind_eventloop(sol::state & lua);
-
-
-class A
-{
-public:
-	A()
-	{
-		go();
-	}
-
-	virtual void go() {
-		printf("A:go\n");
-	}
-};
-
+extern void luabind_mysql(sol::state & lua);
+extern void luabind_common(sol::state & lua);
 
 int main(int argc, char* argv[])
 {
@@ -35,6 +22,8 @@ int main(int argc, char* argv[])
 	// bind c++ && lua
 	luabind_netserver(lua);
 	luabind_eventloop(lua);
+	luabind_mysql(lua);
+	luabind_common(lua);
 
 	lua.script_file(argv[1]);
 

@@ -141,3 +141,21 @@ std::string Tools::utf8ToGbk(const char *src_str)
 #endif
 	return strTemp;
 }
+
+int Tools::charCount(char * pStr, char c)
+{
+	int nCount = 0;
+
+	char* pTemp = pStr;
+	while (*pTemp != '\0')
+	{
+		if (*pTemp == c)
+		{
+			nCount += 1;
+		}
+
+		pTemp += 1;
+	}
+
+	return nCount;
+}

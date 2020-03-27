@@ -47,73 +47,40 @@ project "liblua"
 		targetname "d_liblua"
 	filter "configurations:Release"
 		targetname "r_liblua"
-
-project "common"
-	-- 工程生成目录
-	location "../common"
-	-- 附加包含目录
-	includedirs{
-		"../dependencies"
-	}
-	language "C++"
-	kind "StaticLib"
-	local codedir = "../common/";
-	files { codedir.."/**.h",codedir.."/**.hpp", codedir.."/**.c", codedir.."/**.cc", codedir.."/**.cpp"}
-	libdirs{"../libs"}
-	targetdir "../libs"
-	filter "configurations:Debug"
-		links {'d_libuv'}
-		targetname "d_common"
-	filter "configurations:Release"
-		links {'r_libuv'}
-		targetname "r_common"
 		
-project "network"
+project "engine"
 	-- 工程生成目录
-	location "../network"
+	location "../src"
 	-- 附加包含目录
 	includedirs{
 		"../dependencies",
-		"../common"
-	}
-	language "C++"
-	kind "StaticLib"
-	local codedir = "../network/";
-	files { codedir.."/**.h",codedir.."/**.hpp", codedir.."/**.c", codedir.."/**.cc", codedir.."/**.cpp"}
-	libdirs{"../libs"}
-	targetdir "../libs"
-	filter "configurations:Debug"
-		links {'d_libuv'}
-		links {'d_common'}
-		targetname "d_network"
-	filter "configurations:Release"
-		links {'r_libuv'}
-		links {'r_common'}
-		targetname "r_network"
-		
-project "example"
-	-- 工程生成目录
-	location "../example"
-	-- 附加包含目录
-	includedirs{
-		"../dependencies",
-		"../common",
-		"../network"
+		"../dependencies/sol2/include",
+		"../dependencies/lua",
+		"../dependencies/mysql",
+		"../src/common",
+		"../src/network",
+		"../src/utils"
 	}
 	language "C++"
 	kind "ConsoleApp"
-	local codedir = "../example/";
+	local codedir = "../src/common";
+	files { codedir.."/**.h",codedir.."/**.hpp", codedir.."/**.c", codedir.."/**.cc", codedir.."/**.cpp"}
+	local codedir = "../src/network";
+	files { codedir.."/**.h",codedir.."/**.hpp", codedir.."/**.c", codedir.."/**.cc", codedir.."/**.cpp"}
+	local codedir = "../src/utils";
+	files { codedir.."/**.h",codedir.."/**.hpp", codedir.."/**.c", codedir.."/**.cc", codedir.."/**.cpp"}
+	local codedir = "../src/script";
 	files { codedir.."/**.h",codedir.."/**.hpp", codedir.."/**.c", codedir.."/**.cc", codedir.."/**.cpp"}
 	libdirs{"../libs"}
+	targetdir "../bin"
 	filter "configurations:Debug"
-		links {'d_libuv'}
 		links {'ws2_32'}
 		links {'Iphlpapi'}
 		links {'Psapi'}
 		links {'Userenv'}
-		links {'d_common'}
-		links {'d_network'}
+		links {'libmysqlclient'}
+		links {'d_liblua'}
+		links {'d_libuv'}
 	filter "configurations:Release"
+		links {'r_liblua'}
 		links {'r_libuv'}
-		links {'r_common'}
-		links {'r_network'}

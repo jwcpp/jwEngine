@@ -8,6 +8,7 @@ namespace Thread
 	class Task
 	{
 	public:
+		virtual ~Task();
 		virtual void process() = 0;
 		virtual void complete() = 0;
 	};
@@ -17,16 +18,17 @@ namespace Thread
 	{
 	public:
 		CThread(ThreadPool * pool);
+		virtual ~CThread();
 		static void backfunc(CThread * t);
 		void stop();
 
-		virtual void run(Task * task) { task->process(); };
+		virtual void run(Task * task);
 
 	protected:
 		virtual void onStart() {};
 		virtual void onEnd() {};
 
-	private:
+	protected:
 		ThreadPool * _pool;
 		std::thread _thread;
 		std::atomic<bool> _isrun{ true };
@@ -37,7 +39,7 @@ namespace Thread
 		friend CThread;
 	public:
 		ThreadPool();
-		~ThreadPool();
+		virtual ~ThreadPool();
 
 		void create(int count);
 		void exit();

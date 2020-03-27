@@ -3,11 +3,21 @@
 
 using namespace Thread;
 
+Task::~Task()
+{
+
+}
+
 CThread::CThread(ThreadPool * pool) :
 	_pool(pool),
 	_thread(CThread::backfunc, this)
 {
 	//_thread.detach();
+}
+
+CThread::~CThread()
+{
+
 }
 
 void CThread::backfunc(CThread * t)
@@ -31,6 +41,11 @@ void CThread::stop()
 	_isrun = false;
 	_thread.join();
 }
+
+void CThread::run(Task * task)
+{
+	task->process();
+};
 
 ThreadPool::ThreadPool()
 {

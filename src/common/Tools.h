@@ -11,5 +11,6 @@ public:
 	static int binarySearch(int arr[], int len, int findX);
 	static std::string gbkToUtf8(const char *src_str);
 	static std::string utf8ToGbk(const char *src_str);
+	static int charCount(char * pStr, char c);
 };
 
