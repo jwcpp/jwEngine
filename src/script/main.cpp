@@ -13,6 +13,7 @@ extern void luabind_netserver(sol::state & lua);
 extern void luabind_eventloop(sol::state & lua);
 extern void luabind_mysql(sol::state & lua);
 extern void luabind_common(sol::state & lua);
+extern void luabind_redis(sol::state & lua);
 
 int main(int argc, char* argv[])
 {
@@ -24,6 +25,7 @@ int main(int argc, char* argv[])
 	luabind_eventloop(lua);
 	luabind_mysql(lua);
 	luabind_common(lua);
+	luabind_redis(lua);
 
 	lua.script_file(argv[1]);
 

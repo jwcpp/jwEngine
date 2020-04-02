@@ -5,25 +5,26 @@
 #include "XLog.h"
 #include "BaseType.h"
 #include <strstream>
+#include "DBResult.h"
 
-class DBResult
+class MysqlResult : public DBResult
 {
 public:
-	DBResult();
-	~DBResult();
+	MysqlResult();
+	~MysqlResult();
 
 	void setResult(MYSQL_RES * result);
 
-	bool isEmpty();
-	bool fetch();
-	uint32 getRowCount();
-	uint32 getFieldsCount();
+	virtual bool isEmpty();
+	virtual bool fetch();
+	virtual uint32 getRowCount();
+	virtual uint32 getFieldsCount();
 	
-	const char * getData(int & len);
-	const char * getData();
+	virtual const char * getData(int & len);
+	virtual const char * getData();
 
 	template<typename T>
-	DBResult & operator >> (T & t)
+	MysqlResult & operator >> (T & t)
 	{
 		if (pos >= getFieldsCount())
 		{

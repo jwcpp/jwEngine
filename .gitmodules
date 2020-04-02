@@ -10,3 +10,6 @@
 [submodule "dependencies/sol2"]
 	path = dependencies/sol2
 	url = https://github.com/ThePhD/sol2.git
+[submodule "dependencies/hiredis"]
+	path = dependencies/hiredis
+	url = https://github.com/redis/hiredis

@@ -11,25 +11,60 @@
 #include "ThreadPool.h"
 using namespace Thread;
 
+struct DBConfig
+{
+	std::string device = "mysql"; // mysql or redis
+	std::string ip = "local";
+	unsigned int port = 3306;
+	std::string dbname;
+	std::string user = "root";
+	std::string pswd;
+};
+
+class DB_Interface;
+class RedisCommand;
+class DBResult;
+class SqlPrepare;
+
 class DBTask : public Task
 {
 public:
-	DBTask(SqlPrepare * pre);
+	DBTask();
 	~DBTask();
 
 	void complete_back(std::function<void()> backfunc);
-	virtual void process();
+	void dbi(DB_Interface * dbi);
 	virtual void complete();
-	void mysql(MYSQL * sql);
-	SqlPrepare * prepare();
 
-private:
-	MYSQL * _mysql;
-	SqlPrepare * _pre;
+protected:
+	DB_Interface * _dbi;
 	std::function<void()> _complete_back;
 };
 
-class DBInterfaceMysql;
+class DBSqlTask : public DBTask
+{
+public:
+	DBSqlTask(SqlPrepare * pre);
+	~DBSqlTask();
+
+	virtual void process();
+
+private:
+	SqlPrepare * _pre;
+};
+
+class DBRedisTask : public DBTask
+{
+public:
+	DBRedisTask(RedisCommand * command, DBResult * result);
+	~DBRedisTask();
+
+	virtual void process();
+private:
+	RedisCommand * _command;
+	DBResult * _result;
+};
+
 class DBThread : public CThread
 {
 public:
@@ -41,29 +76,21 @@ public:
 	virtual void run(Task * task);
 
 private:
-	DBInterfaceMysql * m_db;
+	DB_Interface * m_db;
 };
 
 class DBThreadPool : public ThreadPool
 {
 public:
-	DBThreadPool(const char * host, const char * dbname, const char * user, const char * pswd = "", unsigned int port = 3306);
+	DBThreadPool(DBConfig config);
 	~DBThreadPool();
 	virtual CThread* createThread();
 	virtual void deleteThread(CThread * t);
 	virtual void completeTask(Task * task);
 
-	const char * host();
-	const char * dbname();
-	const char * user();
-	const char * pswd();
-	unsigned int port();
+	const DBConfig * getConfig();
 
 private:
-	std::string _host;
-	std::string _dbname;
-	std::string _user;
-	std::string _pswd;
-	unsigned int _port;
+	DBConfig m_config;
 };
 

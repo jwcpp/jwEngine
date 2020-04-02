@@ -1,4 +1,12 @@
-pool = DBThreadPool:new("127.0.0.1", "jw_test", "root", "1111", 3306)
+local config = DBConfig:new()
+config.device = "mysql"
+config.ip = "127.0.0.1"
+config.dbname = "jw_test"
+config.user = "root"
+config.pswd = "1111"
+config.port = 3306
+
+pool = DBThreadPool:new(config)
 pool:create(1)
 
 func = function(result)
@@ -16,15 +24,12 @@ func = function(result)
 
 function exec()
 	local sql = SqlCommand:new("select * from test where id = ?")
-	sql:pushInt8(1)
+	sql:pushInt32(1)
 	sql:setBackfunc(func)
 	sql:addToPool(pool)
-	local t = TEST.new()
 end
 
-
 exec()
-
 event_init()
 
 timer = UTimer:new()

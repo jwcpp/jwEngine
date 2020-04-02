@@ -1,7 +1,8 @@
 #include "sol/sol.hpp"
 
+#include "mysql.h"
 #include "DB_Interface_mysql.h"
-#include "DBResult.h"
+#include "MysqlResult.h"
 #include "SqlPrepare.h"
 #include "DBThreadPool.h"
 
@@ -41,7 +42,7 @@ public:
 	Lua_SqlCommand(const char * sql)
 	{
 		SqlPrepare * sqlPre = new SqlPrepare(sql);
-		DBTask * dbTask = new DBTask(sqlPre);
+		DBSqlTask * dbTask = new DBSqlTask(sqlPre);
 		Lua_SqlResult * sqlRet = new Lua_SqlResult(sqlPre);
 
 		// back func
@@ -65,7 +66,7 @@ public:
 
 	~Lua_SqlCommand()
 	{
-		printf("ssss");
+		
 	}
 
 	void setBackfunc(std::function<void(Lua_SqlResult *)> backfunc)
@@ -100,8 +101,16 @@ public:
 
 void luabind_mysql(sol::state & lua)
 {
+	lua.new_usertype<DBConfig>("DBConfig",
+		"device", &DBConfig::device,
+		"ip", &DBConfig::ip,
+		"port", &DBConfig::port,
+		"dbname", &DBConfig::dbname,
+		"user", &DBConfig::user,
+		"pswd", &DBConfig::pswd);
+
 	lua.new_usertype<DBThreadPool>("DBThreadPool",
-		sol::constructors<DBThreadPool(const char *, const char *, const char *, const char *, unsigned int)>(),
+		sol::constructors<DBThreadPool(DBConfig)>(),
 		"create", &DBThreadPool::create,
 		"exit", &DBThreadPool::exit,
 		"update", &DBThreadPool::update);

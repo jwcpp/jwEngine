@@ -1,11 +1,17 @@
 #include <string>
-
+#include "mysql.h"
 #include "DB_Interface_mysql.h"
 #include "XLog.h"
-#include "DBResult.h"
+#include "MysqlResult.h"
 #include "SqlPrepare.h"
 
-DBInterfaceMysql::DBInterfaceMysql() {
+DBInterfaceMysql::DBInterfaceMysql(const char * host, const char * dbname, const char * user, const char * pswd, unsigned int port):
+	DB_Interface(host, port)
+{
+	m_dbname = dbname;
+	m_user = user;
+	m_pswd = pswd;
+
 	if (!mysql_init(&mMysql_))
 	{
 		ERROR_LOG("mysql init error!!");
@@ -14,31 +20,37 @@ DBInterfaceMysql::DBInterfaceMysql() {
 
 DBInterfaceMysql::~DBInterfaceMysql()
 {
-	mysql_close(&mMysql_);
+	detach();
 }
 
-int DBInterfaceMysql::connect(const char * host, const char * dbname, const char * user, const char * pswd, unsigned int port)
+bool DBInterfaceMysql::connect()
 {
 	if (mysql_options(&mMysql_, MYSQL_SET_CHARSET_NAME, "utf8"))
 	{
-		ERROR_LOG("mysql_options(MYSQL_SET_CHARSET_NAME) failed: %s", getError());
-		return -1;
+		ERROR_LOG("mysql_options(MYSQL_SET_CHARSET_NAME) Errno:%d failed: %s", getErrno(), getError());
+		return false;
 	}
 
 	my_bool reconnect = 1;
 	if (mysql_options(&mMysql_, MYSQL_OPT_RECONNECT, &reconnect))
 	{
-		ERROR_LOG("mysql_options(MYSQL_OPT_RECONNECT) failed: %s", getError());
-		return -1;
+		ERROR_LOG("mysql_options(MYSQL_OPT_RECONNECT) Errno:%d failed: %s", getErrno(), getError());
+		return false;
 	}
 
-	if (!mysql_real_connect(&mMysql_, host, user, pswd, dbname, port, NULL, 0))
+	if (!mysql_real_connect(&mMysql_, m_ip.c_str(), m_user.c_str(), m_pswd.c_str(), m_dbname.c_str(), m_port, NULL, 0))
 	{
-		ERROR_LOG("mysql_real_connect error: %s", getError());
-		return -1;
+		ERROR_LOG("mysql_real_connect Errno:%d error: %s", getErrno(), getError());
+		return false;
 	}
 
-	return 0;
+	return true;
+}
+
+bool DBInterfaceMysql::detach()
+{
+	::mysql_close(&mMysql_);
+	return true;
 }
 
 int DBInterfaceMysql::execute(DBResult * result, const char * cmd, int len)
@@ -46,7 +58,7 @@ int DBInterfaceMysql::execute(DBResult * result, const char * cmd, int len)
 	int nResult = mysql_real_query(&mMysql_, cmd, (len <= 0 ? strlen(cmd) : len));
 	if (nResult != 0)
 	{
-		ERROR_LOG("mysql_real_query error: %s", getError());
+		ERROR_LOG("mysql_real_query Errno:%d error: %s", getErrno(), getError());
 		return -1;
 	}
 
@@ -77,7 +89,7 @@ int DBInterfaceMysql::execute(DBResult * result, const char * cmd, int len)
 	}
 	*/
 
-	result->setResult(pResult);
+	static_cast<MysqlResult *>(result)->setResult(pResult);
 
 	return 0;
 }
@@ -98,13 +110,4 @@ bool DBInterfaceMysql::ping() {
 
 MYSQL * DBInterfaceMysql::mysql() {
 	return &mMysql_;
-}
-
-std::string DBInterfaceMysql::getErrorLog()
-{
-	std::string info;
-	info.append("ErrorNo:" + std::to_string(mysql_errno(&mMysql_)) + ", ErrorMsg:");
-	info.append(mysql_error(&mMysql_));
-
-	return info;
 }

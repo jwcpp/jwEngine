@@ -1,13 +1,13 @@
-#include "DBResult.h"
+#include "MysqlResult.h"
 
-DBResult::DBResult()
+MysqlResult::MysqlResult()
 {
 	pResult = NULL;
 	pos = 0;
 	lengths = NULL;
 }
 
-DBResult::~DBResult()
+MysqlResult::~MysqlResult()
 {
 	if (pResult)
 	{
@@ -15,7 +15,7 @@ DBResult::~DBResult()
 	}
 }
 
-void DBResult::setResult(MYSQL_RES * result) {
+void MysqlResult::setResult(MYSQL_RES * result) {
 	pResult = result;
 	if (result)
 		lengths = mysql_fetch_lengths(pResult);
@@ -23,29 +23,29 @@ void DBResult::setResult(MYSQL_RES * result) {
 		lengths = NULL;
 }
 
-bool DBResult::isEmpty()
+bool MysqlResult::isEmpty()
 {
 	return pResult == NULL;
 }
 
-bool DBResult::fetch() {
+bool MysqlResult::fetch() {
 	pos = 0;
 	return (aRow = mysql_fetch_row(pResult)) != NULL;
 }
 
-uint32 DBResult::getRowCount() {
+uint32 MysqlResult::getRowCount() {
 	return (uint32)mysql_num_rows(pResult);
 }
 
-uint32 DBResult::getFieldsCount() {
+uint32 MysqlResult::getFieldsCount() {
 	return (uint32)mysql_num_fields(pResult);
 }
 
-const char * DBResult::getData(int & len) {
+const char * MysqlResult::getData(int & len) {
 	len = lengths[pos];
 	return aRow[pos++];
 }
 
-const char * DBResult::getData() {
+const char * MysqlResult::getData() {
 	return aRow[pos++];
 }

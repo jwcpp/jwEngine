@@ -48,6 +48,26 @@ project "liblua"
 	filter "configurations:Release"
 		targetname "r_liblua"
 		
+project "hiredis"
+	-- 工程生成目录
+	location "../dependencies"
+	-- 附加包含目录
+	includedirs{
+		--"../dependencies/lua/include",
+	}
+	language "C++"
+	kind "StaticLib"
+	local codedir = "../dependencies/hiredis";
+	files { codedir.."/**.h",codedir.."/**.hpp", codedir.."/**.c", codedir.."/**.cc", codedir.."/**.cpp"}
+	removefiles {codedir .. "/test.c"}
+	removefiles {codedir .. "/ssl.c"}
+	removefiles {codedir .. "/examples/**"}
+	targetdir "../libs"
+	filter "configurations:Debug"
+		targetname "d_redis"
+	filter "configurations:Release"
+		targetname "r_redis"
+		
 project "engine"
 	-- 工程生成目录
 	location "../src"
@@ -57,9 +77,10 @@ project "engine"
 		"../dependencies/sol2/include",
 		"../dependencies/lua",
 		"../dependencies/mysql",
+		"../dependencies/hiredis",
 		"../src/common",
 		"../src/network",
-		"../src/utils"
+		"../src/db"
 	}
 	language "C++"
 	kind "ConsoleApp"
@@ -67,7 +88,7 @@ project "engine"
 	files { codedir.."/**.h",codedir.."/**.hpp", codedir.."/**.c", codedir.."/**.cc", codedir.."/**.cpp"}
 	local codedir = "../src/network";
 	files { codedir.."/**.h",codedir.."/**.hpp", codedir.."/**.c", codedir.."/**.cc", codedir.."/**.cpp"}
-	local codedir = "../src/utils";
+	local codedir = "../src/db";
 	files { codedir.."/**.h",codedir.."/**.hpp", codedir.."/**.c", codedir.."/**.cc", codedir.."/**.cpp"}
 	local codedir = "../src/script";
 	files { codedir.."/**.h",codedir.."/**.hpp", codedir.."/**.c", codedir.."/**.cc", codedir.."/**.cpp"}
@@ -81,6 +102,8 @@ project "engine"
 		links {'libmysqlclient'}
 		links {'d_liblua'}
 		links {'d_libuv'}
+		links {'d_redis'}
 	filter "configurations:Release"
 		links {'r_liblua'}
 		links {'r_libuv'}
+		links {'r_redis'}

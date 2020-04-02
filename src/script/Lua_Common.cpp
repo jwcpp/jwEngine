@@ -23,5 +23,5 @@ void luabind_common(sol::state & lua)
 		"start", &UTimer::start,
 		"stop", &UTimer::stop);
 
-	lua["sleep"] = &Tools::mySleep;
+	lua["sleep"] = &Tools::sleep;
 }

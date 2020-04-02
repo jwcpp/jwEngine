@@ -35,7 +35,7 @@ std::string Tools::format(const char * format, ...)
 }
 
 
-void Tools::mySleep(int millionseconds)
+void Tools::sleep(int millionseconds)
 {
 #if defined(SYSTEM_WIN)
 	Sleep(millionseconds);
@@ -158,4 +158,21 @@ int Tools::charCount(char * pStr, char c)
 	}
 
 	return nCount;
+}
+
+void Tools::srand(unsigned int t)
+{
+	::srand(t);
+}
+
+int Tools::random(int begin, int end)
+{
+	int value;
+#ifdef SYSTEM_WIN
+	value = rand() % (end - begin + 1);
+#else
+	value = random() % (end - begin + 1);
+#endif
+
+	return value + begin;
 }
