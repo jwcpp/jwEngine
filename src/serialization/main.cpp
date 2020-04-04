@@ -77,6 +77,7 @@ void start(std::string & dir, std::string & name, Token * token)
 
 #endif
 
+
 int main(int argc, char* argv[])
 {
 	const char * filename = argv[1];

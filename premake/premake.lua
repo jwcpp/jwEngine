@@ -107,3 +107,11 @@ project "engine"
 		links {'r_liblua'}
 		links {'r_libuv'}
 		links {'r_redis'}
+		
+project "serialization"
+	location "../src"
+	language "C++"
+	kind "ConsoleApp"
+	local codedir = "../src/serialization";
+	files { codedir.."/**.h",codedir.."/**.hpp", codedir.."/**.c", codedir.."/**.cc", codedir.."/**.cpp"}
+	targetdir "../tool"

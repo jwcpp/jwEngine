@@ -40,13 +40,14 @@ class Parser
 {
 public:
 	Parser(Token * token, Event * ev);
-	~Parser();
+	virtual ~Parser();
 
 	void start();
 
 
 protected:
 	virtual const char * getOperStr(Oper op);
+	virtual std::string getExpreVar(const std::string & var);
 private:
 
 	// Parse data type
@@ -78,4 +79,5 @@ class ParserLua : public Parser
 public:
 	ParserLua(Token * token, Event * ev);
 	virtual const char * getOperStr(Oper op);
+	virtual std::string getExpreVar(const std::string & var);
 };

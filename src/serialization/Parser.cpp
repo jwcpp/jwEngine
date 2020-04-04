@@ -60,7 +60,7 @@ void Parser::__baseType(TypeInfo * tinfo)
 	int token = P_TOKEN->getToken();
 	tinfo->value = token;
 	tinfo->name = P_TOKEN->getName();
-	if (Keyword::isBaseType(token))
+	if (Keyword::isBaseType(token) || Keyword::isStrType(token))
 	{
 		// base type
 	}
@@ -423,7 +423,7 @@ bool Parser::expre(std::string & str)
 	while (1)
 	{
 		CHECK_TOKEN(eKw_VAR) || CHECK_TOKEN(eKw_NUM) || CHECK_TOKEN(eKw_DECIMALS) || TOKEN_ERROR;
-		str.append(P_TOKEN->getName());
+		str.append(getExpreVar(P_TOKEN->getName()));
 		NEXT_TOKEN;
 
 		Oper oper = getOper(P_TOKEN->getToken());
@@ -434,6 +434,11 @@ bool Parser::expre(std::string & str)
 	}
 
 	return true;
+}
+
+std::string Parser::getExpreVar(const std::string & var)
+{
+	return var;
 }
 
 const char * Parser::getOperStr(Oper op)
@@ -515,4 +520,15 @@ const char * ParserLua::getOperStr(Oper op)
 	}
 
 	return Parser::getOperStr(op);
+}
+
+std::string ParserLua::getExpreVar(const std::string & var)
+{
+	// member variable
+	if (gVars.find(var) != gVars.end())
+	{
+		return std::string("self." + var);
+	}
+
+	return var;
 }

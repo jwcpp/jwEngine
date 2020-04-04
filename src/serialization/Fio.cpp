@@ -61,6 +61,11 @@ char FBuffer::next()
 std::string getFileNameByFilePath(const std::string filepath)
 {
 	int l_idx = filepath.rfind('\\');
+	if (l_idx == std::string::npos)
+	{
+		l_idx = filepath.rfind('/');
+	}
+
 	int r_idx = filepath.rfind('.');
 	return filepath.substr(l_idx + 1, r_idx - l_idx - 1);
 }
@@ -68,5 +73,9 @@ std::string getFileNameByFilePath(const std::string filepath)
 std::string getFileDir(const std::string filepath)
 {
 	int l_idx = filepath.rfind('\\');
+	if (l_idx == std::string::npos)
+	{
+		l_idx = filepath.rfind('/');
+	}
 	return filepath.substr(0, l_idx + 1);
 }

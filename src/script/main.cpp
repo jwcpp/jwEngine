@@ -27,7 +27,13 @@ int main(int argc, char* argv[])
 	luabind_common(lua);
 	luabind_redis(lua);
 
-	lua.script_file(argv[1]);
+	//lua.script_file(argv[1]);
+
+	if (luaL_dofile(lua.lua_state(), argv[1]) == 1) {
+		if (lua_isstring(lua.lua_state(), -1)) {
+			printf("load lua file error:%s\n", lua_tostring(lua.lua_state(), -1));
+		}
+	}
 
 	system("pause");
 	return 0;

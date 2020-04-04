@@ -117,5 +117,8 @@ void luabind_netserver(sol::state & lua)
 		"pushUint64", &NetPacket::pushUint64,
 		"pushFloat", &NetPacket::pushFloat,
 		"pushDouble", &NetPacket::pushDouble,
-		"pushString", &NetPacket::pushString);
+		"pushString", &NetPacket::pushString,
+		
+		"wpos", &NetPacket::writePos,
+		"rpos", &NetPacket::readPos);
 }

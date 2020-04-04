@@ -38,9 +38,15 @@ protected:
 	virtual void onImport(const char * filename);
 
 private:
-	void genBaseType(TypeInfo * tinfo, const char * varName);
+	void genRead(int value, std::string & varName, int depth = 0);
+	void genWrite(int value, std::string & varName);
+
+	void genRead(TypeInfo * tinfo, std::string & varName);
+	void genWrite(TypeInfo * tinfo, std::string & varName);
+
 	const char * readFuncName(int value);
 	const char * writeFuncName(int value);
+	int typeSizeof(int value);
 	const char * getInitStr(TypeInfo * tinfo);
 	void setDepth(int dep = 0);
 

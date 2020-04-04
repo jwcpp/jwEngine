@@ -54,11 +54,15 @@ bool Keyword::isBaseType(int value)
 	case eKw_UINT64:
 	case eKw_FLOAT:
 	case eKw_DOUBLE:
-	case eKw_STRING:
 		return true;
 
 	default:
 		return false;
 
 	}
+}
+
+bool Keyword::isStrType(int value)
+{
+	return value == eKw_STRING;
 }

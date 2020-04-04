@@ -29,9 +29,7 @@ void Generate::init(const char * filename)
 	__m_h.append("#include <vector> \n");
 	__m_h.append("class ByteBuffer;\n\n");
 
-	__m_cpp.append("#include \"");
-	__m_cpp.append(filename);
-	__m_cpp.append(".h\" \n");
+	__m_cpp.append("#include \"" + std::string(filename) + ".h\" \n");
 	__m_cpp.append("#include \"ByteBuffer.h\" \n");
 }
 
@@ -57,11 +55,8 @@ void Generate::onTypedef(TypeInfo * tinfo, const char * name)
 void Generate::onEnterStruct(const char * name)
 {
 	__m_structName = name;
-	__m_depth = 1;
 
-	__m_h.append("struct ");
-	__m_h.append(name);
-	__m_h.append("\n{\n");
+	__m_h.append("struct " + std::string(name) + "\n{\n");
 	__m_h.append("public:\n");
 }
 void Generate::onExitStruct()
@@ -103,13 +98,17 @@ void Generate::onEnterRead()
 {
 	__m_isRead = true;
 	__m_h.append("\t");
-	__m_h.append("void read(ByteBuffer * buffer);\n");
+	__m_h.append("bool read(ByteBuffer * buffer);\n");
 
-	__m_cpp.append("void " + __m_structName + "::read(ByteBuffer * buffer)\n{\n");
+	__m_cpp.append("bool " + __m_structName + "::read(ByteBuffer * buffer)\n{\n");
+	__m_depth++;
 }
 void Generate::onExitRead()
 {
+	setDepth();
+	__m_cpp.append("return true;\n");
 	__m_cpp.append("}\n");
+	__m_depth--;
 }
 
 void Generate::onEnterWrite()
@@ -119,11 +118,13 @@ void Generate::onEnterWrite()
 	__m_h.append("void write(ByteBuffer * buffer);\n");
 
 	__m_cpp.append("void " + __m_structName + "::write(ByteBuffer * buffer)\n{\n");
+	__m_depth++;
 }
 
 void Generate::onExitWrite()
 {
 	__m_cpp.append("}\n");
+	__m_depth--;
 }
 void Generate::onValue(const char * varName, const char * exp)
 {
@@ -134,88 +135,112 @@ void Generate::onValue(const char * varName, const char * exp)
 	__m_cpp.append("; \n");
 }
 
-void Generate::genBaseType(TypeInfo * tinfo, const char * varName)
+
+void Generate::genRead(int value, std::string & varName, int depth)
 {
-	if (__m_isRead)
+	if (Keyword::isBaseType(value))
 	{
-		if (Keyword::isBaseType(tinfo->value))
-		{
-			__m_cpp.append("*buffer >> ");
-			__m_cpp.append(varName);
-		}
-		else
-		{
-			__m_cpp.append(varName);
-			__m_cpp.append(".read(buffer)");
-		}
+		__m_cpp.append("if(sizeof(" + varName + ") + buffer->rpos() > buffer->wpos()) return false;\n");
+		setDepth(depth);
+		__m_cpp.append("*buffer >> " + varName);
+	}
+	else if (Keyword::isStrType(value))
+	{
+		//The string ends with '\0'
+		__m_cpp.append("*buffer >> " + varName);
 	}
 	else
 	{
-		if (Keyword::isBaseType(tinfo->value))
-		{
-			__m_cpp.append("*buffer << ");
-			__m_cpp.append(varName);
-		}
-		else
-		{
-			__m_cpp.append(varName);
-			__m_cpp.append(".write(buffer)");
-		}
+		__m_cpp.append("if(" + varName + ".read(buffer) == false) return false");
 	}
 
 	__m_cpp.append(";\n");
 }
-void Generate::onReadWriteVar(TypeInfo * tinfo, const char * varName)
+
+void Generate::genRead(TypeInfo * tinfo, std::string & varName)
 {
+	// vector
 	if (tinfo->type == 1)
 	{
-		std::string len_var = "len_";
-		len_var.append(varName);
+		std::string len_var = "len_" + varName;
+		std::string r_var = "temp_" + varName;
 
-		if (__m_isRead)
-		{
-			setDepth();
-			__m_cpp.append("int " + len_var + " = 0;\n");
-			setDepth();
-			__m_cpp.append("*buffer >> " + len_var + ";\n");
-			setDepth();
-			__m_cpp.append("for( int i = 0; i< " + len_var + "; ++i) { \n");
+		setDepth();
+		__m_cpp.append("int " + len_var + ";\n");
+		setDepth();
+		genRead(eKw_INT32, len_var);
 
-			std::string r_var = "temp_";
-			r_var += varName;
-			setDepth(+1);
-			__m_cpp.append(tinfo->name + " " + r_var + ";\n");
-			setDepth(+1);
-			genBaseType(tinfo, r_var.c_str());
-			setDepth(+1);
-			__m_cpp.append(varName);
-			__m_cpp.append(".push_back(" + r_var + ");\n");
+		setDepth();
+		__m_cpp.append("for( int i = 0; i< " + len_var + "; ++i) { \n");
 
-			setDepth();
-			__m_cpp.append("}\n");
-		}
-		else
-		{
-			setDepth();
-			__m_cpp.append("int " + len_var + " = " + varName + ".size();\n");
-			setDepth();
-			__m_cpp.append("*buffer << " + len_var+ "; \n");
-			setDepth();
-			__m_cpp.append("for( int i = 0; i< " + len_var + "; ++i) { \n");
+		setDepth(+1);
+		__m_cpp.append(getStdName(tinfo->name) + " " + r_var + ";\n");
+		setDepth(+1);
+		genRead(tinfo->value, r_var, 1);
+		setDepth(+1);
+		__m_cpp.append(varName + ".push_back(" + r_var + ");\n");
 
-			std::string w_var = varName;
-			w_var += "[i]";
-			setDepth(+1);
-			genBaseType(tinfo, w_var.c_str());
-
-			setDepth();
-			__m_cpp.append("}\n");
-		}
+		setDepth();
+		__m_cpp.append("}\n");
 	}
 	else
 	{
 		setDepth();
-		genBaseType(tinfo, varName);
+		genRead(tinfo->value, varName);
+	}
+}
+
+void Generate::genWrite(int value, std::string & varName)
+{
+	if (Keyword::isBaseType(value) || Keyword::isStrType(value))
+	{
+		__m_cpp.append("*buffer << " + varName);
+	}
+	else
+	{
+		__m_cpp.append(varName + ".write(buffer)");
+	}
+
+	__m_cpp.append(";\n");
+}
+
+void Generate::genWrite(TypeInfo * tinfo, std::string & varName)
+{
+	// vector
+	if (tinfo->type == 1)
+	{
+		std::string len_var = "len_" + varName;
+
+		setDepth();
+		__m_cpp.append("int " + len_var + " = " + varName + ".size();\n");
+		setDepth();
+		genWrite(eKw_INT32, len_var);
+		setDepth();
+		__m_cpp.append("for( int i = 0; i< " + len_var + "; ++i) { \n");
+
+		std::string w_var = varName + "[i]";
+		setDepth(+1);
+		genWrite(tinfo->value, w_var);
+
+		setDepth();
+		__m_cpp.append("}\n");
+	}
+	else
+	{
+		setDepth();
+		genWrite(tinfo->value, varName);
+	}
+}
+
+void Generate::onReadWriteVar(TypeInfo * tinfo, const char * varName)
+{
+	if (__m_isRead)
+	{
+		genRead(tinfo, std::string(varName));
+	}
+	else
+	{
+		genWrite(tinfo, std::string(varName));
 	}
 }
 

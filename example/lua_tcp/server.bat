@@ -1,2 +1,2 @@
-script.exe	server.lua
+start ../../bin/engine.exe	server.lua
 pause

@@ -134,3 +134,13 @@ void BasePacket::pushDouble(double value) {
 void BasePacket::pushString(std::string value) {
 	*this << value;
 }
+
+int BasePacket::readPos()
+{
+	return rpos();
+}
+
+int BasePacket::writePos()
+{
+	return wpos();
+}

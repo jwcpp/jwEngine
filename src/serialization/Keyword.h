@@ -58,6 +58,7 @@ public:
 
 	static int getKeyword(const char * name);
 	static bool isBaseType(int value);
+	static bool isStrType(int value);
 
 private:
 	static std::map<std::string, int> __m_keywords;

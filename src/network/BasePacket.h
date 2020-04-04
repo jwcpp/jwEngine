@@ -58,6 +58,9 @@ public:
 	void pushDouble(double value);
 	void pushString(std::string value);
 
+	int readPos();
+	int writePos();
+
 protected:
 	virtual void _fillHead();
 
