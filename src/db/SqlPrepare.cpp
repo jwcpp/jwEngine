@@ -5,7 +5,10 @@
 #include "SqlPrepare.h"
 #include "Tools.h"
 #include "XLog.h"
+#include "BasePacket.h"
+#include "SpinLock.h"
 
+SpinLock sql_stmt_lock;
 
 SqlPrepare::SqlPrepare(const char * sqlstr)
 {
@@ -32,10 +35,12 @@ SqlPrepare::SqlPrepare(const char * sqlstr)
 
 SqlPrepare::~SqlPrepare()
 {
+	sql_stmt_lock.lock();
 	if (mysql_stmt_close(m_stmt))
 	{
 		ERROR_LOG(mysql_stmt_error(m_stmt));
 	}
+	sql_stmt_lock.unlock();
 
 	if (m_paramBind != NULL)
 	{
@@ -190,7 +195,6 @@ void SqlPrepare::pushString(std::string value)
 	MYSQL_BIND* pBind = &m_paramBind[m_widx++];
 
 	int len = value.length();
-	int oldLen = pBind->buffer_length;
 
 	pBind->buffer_length = *pBind->length = len;
 	pBind->buffer_type = MYSQL_TYPE_STRING;
@@ -198,16 +202,22 @@ void SqlPrepare::pushString(std::string value)
 
 	if (pBind->buffer == NULL)
 		allocateParamBuffer(pBind);
-	else
-	{
-		// This is longer than the last one
-		if (len > oldLen)
-		{
-			free(pBind->buffer);
-			allocateParamBuffer(pBind);
-		}
-	}
 	memcpy(pBind->buffer, value.data(), len);
+}
+
+void SqlPrepare::pushBlob(BasePacket * packet)
+{
+	MYSQL_BIND* pBind = &m_paramBind[m_widx++];
+
+	int len = packet->writePos();
+
+	pBind->buffer_length = *pBind->length = len;
+	pBind->buffer_type = MYSQL_TYPE_BLOB;
+	pBind->is_unsigned = 0;
+
+	if (pBind->buffer == NULL)
+		allocateParamBuffer(pBind);
+	memcpy(pBind->buffer, packet->contents(), len);
 }
 
 
@@ -327,6 +337,32 @@ std::string SqlPrepare::getString()
 	return str;
 }
 
+int SqlPrepare::readBlob(BasePacket * packet)
+{
+	MYSQL_BIND* pBind = &m_resultBind[m_ridx];
+	if (*pBind->is_null)
+	{
+		return 0;
+	}
+
+	packet->resize(*pBind->length);
+
+	void *tmp = pBind->buffer;
+	pBind->buffer = packet->contents();
+	pBind->buffer_length = *pBind->length;
+	if (mysql_stmt_fetch_column(m_stmt, pBind, m_ridx++, 0))
+	{
+		pBind->buffer = tmp;
+		pBind->buffer_length = 1;
+		ERROR_LOG("mysql_stmt_fetch_column() failed: %s",mysql_stmt_error(m_stmt));
+		return 0;
+	}
+	pBind->buffer = tmp;
+	pBind->buffer_length = 1;
+	
+	return *pBind->length;
+}
+
 
 void SqlPrepare::allocateParamBuffer(MYSQL_BIND* bind)
 {
@@ -444,18 +480,22 @@ void SqlPrepare::allocateResultBuffer(MYSQL_BIND* bind, MYSQL_FIELD *field)
 
 int SqlPrepare::prepare(MYSQL * mysql)
 {
+	sql_stmt_lock.lock();
 	m_stmt = mysql_stmt_init(mysql);
 	if (!m_stmt)
 	{
-		ERROR_LOG(mysql_stmt_error(m_stmt));
+		sql_stmt_lock.unlock();
+		ERROR_LOG("mysql_stmt_init return null");
 		return -1;
 	}
 
 	if (mysql_stmt_prepare(m_stmt, m_sql.data(), static_cast<unsigned long>(m_sql.length())))
 	{
-		ERROR_LOG(mysql_stmt_error(m_stmt));
+		sql_stmt_lock.unlock();
+		ERROR_LOG("errno:%d, error:%s", mysql_stmt_errno(m_stmt),mysql_stmt_error(m_stmt));
 		return -1;
 	}
+	sql_stmt_lock.unlock();
 
 	if (mysql_stmt_param_count(m_stmt) != m_count)
 	{
@@ -508,17 +548,22 @@ int SqlPrepare::execute()
 			return -1;
 		}
 	}
+
+	sql_stmt_lock.lock();
 	if (mysql_stmt_execute(m_stmt))
 	{
+		sql_stmt_lock.unlock();
 		ERROR_LOG(mysql_stmt_error(m_stmt));
 		return -1;
 	}
 
 	if (mysql_stmt_store_result(m_stmt))
 	{
+		sql_stmt_lock.unlock();
 		ERROR_LOG(mysql_stmt_error(m_stmt));
 		return -1;
 	}
+	sql_stmt_lock.unlock();
 
 	return static_cast<int>(mysql_stmt_affected_rows(m_stmt));
 }

@@ -32,7 +32,7 @@ public:
 		}
 	};
 
-	virtual void onConnect(NetConnect * conn){
+	virtual void onConnect(NetConnect * conn, int argv){
 		if (conn)
 		{
 

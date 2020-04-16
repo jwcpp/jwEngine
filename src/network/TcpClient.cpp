@@ -13,16 +13,18 @@ TcpClient::~TcpClient()
 {
 }
 
-int TcpClient::connect(const char * ip, int port, bool ipv6)
+int TcpClient::connect(const char * ip, int port, bool ipv6, int argv)
 {
 	struct user_connect : public uv_connect_t
 	{
 		TcpSocket * conn;
+		int argv;
 	};
 
 	user_connect * user_conn = new user_connect;
 	user_conn->conn = createSocket();
 	user_conn->data = this;
+	user_conn->argv = argv;
 
 	uv_tcp_init(mLoop, user_conn->conn->getUvTcp());
 
@@ -41,11 +43,11 @@ int TcpClient::connect(const char * ip, int port, bool ipv6)
 
 		if (status < 0) {
 			uv_close((uv_handle_t*)(user_conn->conn->getUvTcp()), NULL);
-			self->onSocket(NULL);
+			self->onSocket(NULL, user_conn->argv);
 		}
 		else {
 			user_conn->conn->on_read_start();
-			self->onSocket(user_conn->conn);
+			self->onSocket(user_conn->conn, user_conn->argv);
 		}
 
 		delete user_conn;

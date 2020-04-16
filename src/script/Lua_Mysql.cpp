@@ -26,6 +26,7 @@ public:
 	float getFloat() { return sqlPre->getFloat(); }
 	double getDouble() { return sqlPre->getDouble(); }
 	std::string getString() { return sqlPre->getString(); }
+	int readBlob(BasePacket * packet) { return sqlPre->readBlob(packet); }
 
 	bool fetch()
 	{
@@ -91,6 +92,7 @@ public:
 	void pushFloat(float value) { _sqlPre->pushFloat(value); }
 	void pushDouble(double value) { _sqlPre->pushDouble(value); }
 	void pushString(std::string value) { _sqlPre->pushString(value); }
+	void pushBlob(BasePacket * packet) { _sqlPre->pushBlob(packet); }
 
 	DBTask * _dbTask = NULL;
 	SqlPrepare * _sqlPre = NULL;
@@ -128,6 +130,7 @@ void luabind_mysql(sol::state & lua)
 		"pushFloat", &Lua_SqlCommand::pushFloat,
 		"pushDouble", &Lua_SqlCommand::pushDouble,
 		"pushString", &Lua_SqlCommand::pushString,
+		"pushBlob", &Lua_SqlCommand::pushBlob,
 		"setBackfunc", &Lua_SqlCommand::setBackfunc,
 		"addToPool", &Lua_SqlCommand::addToPool);
 
@@ -143,5 +146,6 @@ void luabind_mysql(sol::state & lua)
 		"getFloat", &Lua_SqlResult::getFloat,
 		"getDouble", &Lua_SqlResult::getDouble,
 		"getString", &Lua_SqlResult::getString,
+		"readBlob", &Lua_SqlResult::readBlob,
 		"fetch", &Lua_SqlResult::fetch);
 }

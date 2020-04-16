@@ -169,7 +169,7 @@ void GenerateLua::genRead(TypeInfo * tinfo, std::string & varName)
 		genRead(eKw_INT32, len_var);
 
 		setDepth();
-		__m_file.append("for i = 0, " + len_var + " - 1, 1 do\n");
+		__m_file.append("for i = 1, " + len_var + ", 1 do\n");
 
 		if (tinfo->value == eKw_STRUCT)
 		{
@@ -181,7 +181,7 @@ void GenerateLua::genRead(TypeInfo * tinfo, std::string & varName)
 		genRead(tinfo->value, r_var, 1);
 
 		setDepth(+1);
-		__m_file.append(self_var + "[#" + self_var + "+1] = " + r_var + "\n");
+		__m_file.append(self_var + "[i] = " + r_var + "\n");
 
 		setDepth();
 		__m_file.append("end\n");

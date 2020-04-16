@@ -27,6 +27,7 @@ public:
 	float getFloat() { return getValue<float>(); }
 	double getDouble() { return getValue<double>(); }
 	std::string getString() { return getValue<std::string>(); }
+	int readBlob(BasePacket * packet) { return result.readBlob(packet); }
 
 	bool fetch() {
 		return result.fetch();
@@ -83,6 +84,7 @@ public:
 	void pushFloat(float value) { _command->pushFloat(value); }
 	void pushDouble(double value) { _command->pushDouble(value); }
 	void pushString(std::string value) { _command->pushString(value); }
+	void pushBlob(BasePacket * pack) { _command->pushBlob(pack); }
 
 	void addToPool(DBThreadPool * pool)
 	{
@@ -115,6 +117,7 @@ void luabind_redis(sol::state & lua)
 		"pushFloat", &Lua_RedisCommand::pushFloat,
 		"pushDouble", &Lua_RedisCommand::pushDouble,
 		"pushString", &Lua_RedisCommand::pushString,
+		"pushBlob", &Lua_RedisCommand::pushBlob,
 		"setBackfunc", &Lua_RedisCommand::setBackfunc,
 		"addToPool", &Lua_RedisCommand::addToPool);
 
@@ -130,5 +133,6 @@ void luabind_redis(sol::state & lua)
 		"getFloat", &Lua_RedisResult::getFloat,
 		"getDouble", &Lua_RedisResult::getDouble,
 		"getString", &Lua_RedisResult::getString,
+		"readBlob", &Lua_RedisResult::readBlob,
 		"fetch", &Lua_RedisResult::fetch);
 }

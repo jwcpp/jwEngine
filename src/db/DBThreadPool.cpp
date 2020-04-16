@@ -81,7 +81,7 @@ DBThread::DBThread(ThreadPool * pool):
 
 DBThread::~DBThread()
 {
-	
+
 }
 
 void DBThread::onStart()
@@ -97,7 +97,7 @@ void DBThread::onStart()
 	{
 		m_db = new DBInterfaceRedis(config->ip.c_str(), config->port);
 	}
-
+	
 	m_db->connect();
 }
 

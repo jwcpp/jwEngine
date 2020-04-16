@@ -22,7 +22,7 @@ public:
 
 	virtual void onHandshake(WebSocketConnect *){};  //Œ’ ÷
 	virtual void onAccept(WebSocketConnect * conn){};
-	virtual void onConnect(WebSocketConnect * conn){};
+	//virtual void onConnect(WebSocketConnect * conn){};
 	virtual void onClose(WebSocketConnect * conn){};
 	virtual void onMsg(WebSocketConnect * conn, WebSocketPacket * pack){};
 };

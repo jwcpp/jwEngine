@@ -7,6 +7,7 @@
 * @version   0.1
 ************************************************************************/
 
+class BasePacket;
 class SqlPrepare
 {
 public:
@@ -27,6 +28,7 @@ public:
 	void pushFloat(float value);
 	void pushDouble(double value);
 	void pushString(std::string value);
+	void pushBlob(BasePacket * packet);
 
 	//get
 	int8 getInt8();
@@ -40,6 +42,7 @@ public:
 	float getFloat();
 	double getDouble();
 	std::string getString();
+	int readBlob(BasePacket * packet);
 
 	int prepare(MYSQL * mysql);
 	int execute();

@@ -64,3 +64,8 @@ void CsvParser::parseContent(std::string & line)
 
 	_content.push_back(csvrow);
 }
+
+int CsvParser::row()
+{
+	return _content.size();
+}

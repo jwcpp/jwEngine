@@ -1,5 +1,6 @@
 #include "RedisResult.h"
 #include "hiredis.h"
+#include "BasePacket.h"
 
 RedisResult::RedisResult()
 {
@@ -86,4 +87,15 @@ RedisResult &RedisResult::operator>>(std::string& value)
 
 	pos++;
 	return *this;
+}
+
+int RedisResult::readBlob(BasePacket * packet)
+{
+	int len;
+	const char * pdata = getData(len);
+	if (len > 0)
+	{
+		packet->append((const uint8 *)pdata, len);
+	}
+	return len;
 }

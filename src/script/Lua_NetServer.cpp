@@ -48,8 +48,8 @@ public:
 
 protected:
 
-	virtual void onConnect(NetConnect * conn) {
-		on_connect(conn);
+	virtual void onConnect(NetConnect * conn, int argv) {
+		on_connect(conn, argv);
 	};
 	virtual void onClose(NetConnect * conn) {
 		on_close(conn);
@@ -59,7 +59,7 @@ protected:
 	};
 
 public:
-	std::function<void(NetConnect *)> on_connect;
+	std::function<void(NetConnect *, int)> on_connect;
 	std::function<void(NetConnect *)> on_close;
 	std::function<void(NetConnect *, NetPacket *)> on_msg;
 };
@@ -95,30 +95,5 @@ void luabind_netserver(sol::state & lua)
 		"on_msg", &Lua_NetServer::on_msg);
 
 	lua.new_usertype<NetPacket>("NetPacket",
-		"getInt8", &NetPacket::getInt8,
-		"getUint8", &NetPacket::getUint8,
-		"getInt16", &NetPacket::getInt16,
-		"getUint16", &NetPacket::getUint16,
-		"getInt32", &NetPacket::getInt32,
-		"getUint32", &NetPacket::getUint32,
-		"getInt64", &NetPacket::getInt64,
-		"getUint64", &NetPacket::getUint64,
-		"getFloat", &NetPacket::getFloat,
-		"getDouble", &NetPacket::getDouble,
-		"getString", &NetPacket::getString,
-		
-		"pushInt8", &NetPacket::pushInt8,
-		"pushUint8", &NetPacket::pushUint8,
-		"pushInt16", &NetPacket::pushInt16,
-		"pushUint16", &NetPacket::pushUint16,
-		"pushInt32", &NetPacket::pushInt32,
-		"pushUint32", &NetPacket::pushUint32,
-		"pushInt64", &NetPacket::pushInt64,
-		"pushUint64", &NetPacket::pushUint64,
-		"pushFloat", &NetPacket::pushFloat,
-		"pushDouble", &NetPacket::pushDouble,
-		"pushString", &NetPacket::pushString,
-		
-		"wpos", &NetPacket::writePos,
-		"rpos", &NetPacket::readPos);
+		sol::base_classes, sol::bases<BasePacket>());
 }

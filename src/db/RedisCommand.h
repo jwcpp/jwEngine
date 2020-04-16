@@ -7,6 +7,7 @@
 * @version   0.1
 ************************************************************************/
 
+class BasePacket;
 class RedisCommand
 {
 public:
@@ -23,6 +24,7 @@ public:
 	void pushFloat(float value);
 	void pushDouble(double value);
 	void pushString(std::string value);
+	void pushBlob(BasePacket * packet);
 
 	template<class T>
 	void pushValue(T t)

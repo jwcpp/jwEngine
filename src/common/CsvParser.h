@@ -44,6 +44,8 @@ public:
 		return T();
 	}
 
+	int row();
+
 protected:
 	void parseHeader(std::string & line);
 	void parseContent(std::string & line);

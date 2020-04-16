@@ -1,0 +1,13 @@
+struct test_blob
+{
+	int32 id
+	string str
+	vector<int32> vec
+	
+	read{
+		[id, str, vec]
+	}
+	write{
+		[id, str, vec]
+	}
+}

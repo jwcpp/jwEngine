@@ -15,7 +15,7 @@ public:
 
 protected:
 	virtual TcpSocket * createSocket();
-	virtual void onSocket(TcpSocket * conn);
+	virtual void onSocket(TcpSocket * conn, int argv);
 
 private:
 	NetEvent * _netevent;

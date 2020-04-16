@@ -21,7 +21,7 @@ TcpSocket * NetClient::createSocket()
 	return (TcpSocket *)conn;
 }
 
-void NetClient::onSocket(TcpSocket * conn)
+void NetClient::onSocket(TcpSocket * conn, int argv)
 {
-	_netevent->onConnect((NetConnect *)conn);
+	_netevent->onConnect((NetConnect *)conn, argv);
 }

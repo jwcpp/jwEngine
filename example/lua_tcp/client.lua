@@ -3,8 +3,8 @@ init_netpacket_pool(10)
 
 -- create server
 client = NetClient:new()
-client.on_connect = function(conn)
-	print("on onnect")
+client.on_connect = function(conn, argv)
+	print("on onnect:".. argv)
 end
 
 client.on_close = function(conn)

@@ -42,9 +42,6 @@ public:
 		conn->sendMsg(1, &packet);
 	};
 
-	virtual void onConnect(NetConnect * conn) {
-
-	};
 	virtual void onClose(NetConnect * conn) {
 
 	};

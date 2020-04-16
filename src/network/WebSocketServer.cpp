@@ -21,5 +21,5 @@ TcpSocket * WebSocketServer::createSocket()
 
 void WebSocketServer::onSocket(TcpSocket * connect)
 {
-	__m_event->onConnect((WebSocketConnect *)connect);
+	__m_event->onAccept((WebSocketConnect *)connect);
 }

@@ -12,6 +12,7 @@
 #include <strstream>
 #include "DBResult.h"
 
+class BasePacket;
 struct redisReply;
 class RedisResult : public DBResult
 {
@@ -48,7 +49,7 @@ public:
 
 	// string type
 	RedisResult &operator>>(std::string& value);
-
+	int readBlob(BasePacket * packet);
 private:
 	redisReply * m_reply;
 	int pos;
