@@ -40,7 +40,7 @@ void Tools::sleep(int millionseconds)
 #if defined(SYSTEM_WIN)
 	Sleep(millionseconds);
 #else
-	usleep(millionseconds * 1000);
+	sleep(millionseconds);
 #endif
 }
 
@@ -71,10 +71,10 @@ int Tools::binarySearch(int arr[], int len, int findX)
 
 #include <iconv.h>
 
-static int iconv_convert(char *src_str, size_t src_len, char *dst_str, size_t dst_len, const char * from_charset = "gbk", const char * to_charset = "utf8")
+static int iconv_convert(const char *src_str, size_t src_len, char *dst_str, size_t dst_len, const char * from_charset = "gbk", const char * to_charset = "utf8")
 {
 	iconv_t cd;
-	char **pin = &src_str;
+	char **pin = (char **)&src_str;
 	char **pout = &dst_str;
 
 	cd = iconv_open(to_charset, from_charset);
@@ -84,7 +84,6 @@ static int iconv_convert(char *src_str, size_t src_len, char *dst_str, size_t ds
 	if (iconv(cd, pin, &src_len, pout, &dst_len) == -1)
 		return -1;
 	iconv_close(cd);
-	*pout = '\0';
 
 	return 0;
 }
@@ -110,7 +109,7 @@ std::string Tools::gbkToUtf8(const char *src_str)
 #else
 	char dst_gbk[1024] = { 0 };
 	iconv_convert(src_str, strlen(src_str), dst_gbk, sizeof(dst_gbk), "gbk", "utf8");
-	strTemp = outbuf;
+	strTemp = dst_gbk;
 
 #endif
 
@@ -136,7 +135,7 @@ std::string Tools::utf8ToGbk(const char *src_str)
 #else
 	char dst_gbk[1024] = { 0 };
 	iconv_convert(src_str, strlen(src_str), dst_gbk, sizeof(dst_gbk), "utf8", "gbk");
-	strTemp = outbuf;
+	strTemp = dst_gbk;
 
 #endif
 	return strTemp;
@@ -171,7 +170,7 @@ int Tools::random(int begin, int end)
 #ifdef SYSTEM_WIN
 	value = rand() % (end - begin + 1);
 #else
-	value = random() % (end - begin + 1);
+	value = ::random() % (end - begin + 1);
 #endif
 
 	return value + begin;

@@ -1,3 +1,4 @@
+#include <type_traits>
 #include "CMath.h"
 #include <math.h>
 

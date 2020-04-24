@@ -6,6 +6,7 @@
 #include "BaseType.h"
 #include "libuv/include/uv.h"
 #include "MessageBuffer.h"
+#include <string>
 
 
 class TcpSocket

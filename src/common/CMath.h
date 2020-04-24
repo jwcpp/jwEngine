@@ -44,8 +44,8 @@ public:
 
 	void typeOk()
 	{
-		static_assert((is_same<T, Vector2>::value)
-			|| (is_same<T, Vector3>::value)
+		static_assert((std::is_same<T, Vector2>::value)
+			|| (std::is_same<T, Vector3>::value)
 			, "not Vector2 or Vector3");
 	}
 

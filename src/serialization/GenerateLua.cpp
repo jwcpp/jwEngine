@@ -1,6 +1,7 @@
 #include "GenerateLua.h"
 #include "Typedef.h"
 #include "Keyword.h"
+#include <cstring>
 
 void GenerateLua::init()
 {
@@ -229,13 +230,14 @@ void GenerateLua::genWrite(TypeInfo * tinfo, std::string & varName)
 
 void GenerateLua::onReadWriteVar(TypeInfo * tinfo, const char * varName)
 {
+	std::string tempstr(varName);
 	if (__m_isRead)
 	{
-		genRead(tinfo, std::string(varName));
+		genRead(tinfo, tempstr);
 	}
 	else
 	{
-		genWrite(tinfo, std::string(varName));
+		genWrite(tinfo, tempstr);
 	}
 }
 

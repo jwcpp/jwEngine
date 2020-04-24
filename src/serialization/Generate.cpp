@@ -1,6 +1,7 @@
 #include "Generate.h"
 #include "Typedef.h"
 #include "Keyword.h"
+#include <cstring>
 
 
 std::string getStdName(std::string name)
@@ -234,13 +235,14 @@ void Generate::genWrite(TypeInfo * tinfo, std::string & varName)
 
 void Generate::onReadWriteVar(TypeInfo * tinfo, const char * varName)
 {
+	std::string tempstr(varName);
 	if (__m_isRead)
 	{
-		genRead(tinfo, std::string(varName));
+		genRead(tinfo, tempstr);
 	}
 	else
 	{
-		genWrite(tinfo, std::string(varName));
+		genWrite(tinfo, tempstr);
 	}
 }
 

@@ -8,6 +8,7 @@
 	#include <io.h>
 	#include <direct.h>
 #else
+	#include <unistd.h>
 	#include <sys/stat.h>
 	#include <sys/types.h>
 	#include <dirent.h>
@@ -37,7 +38,7 @@ int XFile::mkdir(const char * dir)
 #ifdef SYSTEM_WIN
 	return _mkdir(dir);
 #else
-	return mkdir(dir, 0755);
+	return ::mkdir(dir, 0755);
 #endif
 }
 

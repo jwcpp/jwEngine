@@ -62,10 +62,9 @@ extern XLog commonlog;
 
 #define INIT_LOG(rootdir, childdir) commonlog.init(rootdir, childdir)
 
-#define INFO_LOG(format, ...) commonlog.writeLog(LL_INFO , __FILE__, __FUNCTION__, __LINE__, format, __VA_ARGS__)
-#define WARNING_LOG(format, ...) commonlog.writeLog(LL_WARNING, __FILE__, __FUNCTION__, __LINE__, format, __VA_ARGS__)
-#define ERROR_LOG(format, ...) commonlog.writeLog(LL_ERROR, __FILE__, __FUNCTION__, __LINE__, format, __VA_ARGS__)
-
+#define INFO_LOG(...) commonlog.writeLog(LL_INFO , __FILE__, __FUNCTION__, __LINE__, __VA_ARGS__)
+#define WARNING_LOG(...) commonlog.writeLog(LL_WARNING, __FILE__, __FUNCTION__, __LINE__, __VA_ARGS__)
+#define ERROR_LOG(...) commonlog.writeLog(LL_ERROR, __FILE__, __FUNCTION__, __LINE__, __VA_ARGS__)
 #define XLOG(level) LogStream(&commonlog, level, __FILE__, __FUNCTION__, __LINE__)
 #define XLOG_IF(condition, level) if(condition)\
 	LogStream(&commonlog, level, __FILE__, __FUNCTION__, __LINE__)

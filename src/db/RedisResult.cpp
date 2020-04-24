@@ -1,6 +1,7 @@
 #include "RedisResult.h"
 #include "hiredis.h"
 #include "BasePacket.h"
+#include <sstream>
 
 RedisResult::RedisResult()
 {
@@ -82,7 +83,7 @@ RedisResult &RedisResult::operator>>(std::string& value)
 	}
 
 	// string
-	std::istrstream ins(m_reply->str ? m_reply->str : m_reply->element[pos]->str);
+	std::istringstream ins(m_reply->str ? m_reply->str : m_reply->element[pos]->str);
 	ins >> value;
 
 	pos++;

@@ -19,10 +19,44 @@ project "libuv"
 	}
 	language "C++"
 	kind "StaticLib"
-	local codedir = "../dependencies/libuv/src";
-	files { codedir.."/**.h",codedir.."/**.hpp", codedir.."/**.c", codedir.."/**.cc", codedir.."/**.cpp"}
-	removefiles {codedir .. "/unix/**"}
 	targetdir "../libs"
+	local codedir = "../dependencies/libuv/src";
+	files { codedir.."/*.h",codedir.."/*.hpp", codedir.."/*.c", codedir.."/*.cc", codedir.."/*.cpp"}
+	filter "system:windows"
+		local windir = codedir .. "/win"
+		files { windir.."/*.h",windir.."/*.hpp", windir.."/*.c", windir.."/*.cc", windir.."/*.cpp"}
+	filter "system:not windows"
+		local lindir = codedir .. "/unix"
+		files {
+		   lindir .. "/async.c",
+		   lindir .. "/core.c",
+		   lindir .. "/dl.c",
+		   lindir .. "/fs.c",
+		   lindir .. "/getaddrinfo.c",
+		   lindir .. "/getnameinfo.c",
+		   lindir .. "/loop-watcher.c",
+		   lindir .. "/loop.c",
+		   lindir .. "/pipe.c",
+		   lindir .. "/poll.c",
+		   lindir .. "/process.c",
+		   lindir .. "/random-devurandom.c",
+		   lindir .. "/signal.c",
+		   lindir .. "/stream.c",
+		   lindir .. "/tcp.c",
+		   lindir .. "/thread.c",
+		   lindir .. "/tty.c",
+		   lindir .. "/udp.c",
+		   ----------
+		   lindir .. "/proctitle.c",
+		   ----------
+		   lindir .. "/linux-core.c",
+		   lindir .. "/linux-inotify.c",
+		   lindir .. "/linux-syscalls.c",
+		   lindir .. "/procfs-exepath.c",
+		   lindir .. "/random-getrandom.c",
+		   lindir .. "/random-sysctl-linux.c",
+		   lindir .. "/sysinfo-loadavg.c"
+		}
 	filter "configurations:Debug"
 		targetname "d_libuv"
 	filter "configurations:Release"
@@ -38,8 +72,7 @@ project "liblua"
 	language "C++"
 	kind "StaticLib"
 	local codedir = "../dependencies/lua";
-	files { codedir.."/**.h",codedir.."/**.hpp", codedir.."/**.c", codedir.."/**.cc", codedir.."/**.cpp"}
-	removefiles {codedir .. "/testes/**"}
+	files { codedir.."/*.h",codedir.."/*.hpp", codedir.."/*.c", codedir.."/*.cc", codedir.."/*.cpp"}
 	removefiles {codedir .. "/lua.c"}
 	removefiles {codedir .. "/onelua.c"}
 	targetdir "../libs"
@@ -74,6 +107,7 @@ project "engine"
 	-- 附加包含目录
 	includedirs{
 		"../dependencies",
+		"../dependencies/libuv/include",
 		"../dependencies/sol2/include",
 		"../dependencies/lua",
 		"../dependencies/mysql",
@@ -83,6 +117,8 @@ project "engine"
 		"../src/db"
 	}
 	language "C++"
+	buildoptions {"-std=c++17"}
+	linkoptions {"-pthread"}
 	kind "ConsoleApp"
 	local codedir = "../src/common";
 	files { codedir.."/**.h",codedir.."/**.hpp", codedir.."/**.c", codedir.."/**.cc", codedir.."/**.cpp"}
@@ -94,12 +130,17 @@ project "engine"
 	files { codedir.."/**.h",codedir.."/**.hpp", codedir.."/**.c", codedir.."/**.cc", codedir.."/**.cpp"}
 	libdirs{"../libs"}
 	targetdir "../bin"
-	filter "configurations:Debug"
+	filter "system:windows"
 		links {'ws2_32'}
 		links {'Iphlpapi'}
 		links {'Psapi'}
 		links {'Userenv'}
 		links {'libmysqlclient'}
+	filter "system:not windows"
+		links {'pthread'}
+		links {'mysqlclient'}
+		links {'dl', 'rt'}
+	filter "configurations:Debug"
 		links {'d_liblua'}
 		links {'d_libuv'}
 		links {'d_redis'}
@@ -107,6 +148,8 @@ project "engine"
 		links {'r_liblua'}
 		links {'r_libuv'}
 		links {'r_redis'}
+	filter {}
+		
 		
 project "serialization"
 	location "../src"

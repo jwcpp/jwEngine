@@ -1,5 +1,6 @@
 #include "BaseType.h"
 #include <vector>
+#include <string>
 #include "RedisCommand.h"
 #include "BasePacket.h"
 

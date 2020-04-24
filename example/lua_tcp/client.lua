@@ -17,6 +17,6 @@ client.on_msg = function(conn, pack)
 	conn:sendPacket(1, pack)
 end
 
-client:connect("127.0.0.1", 3001, false);
+client:connect("127.0.0.1", 3001, false, 1);
 
 event_run()

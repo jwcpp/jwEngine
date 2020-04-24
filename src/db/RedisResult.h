@@ -9,8 +9,8 @@
 
 #include "XLog.h"
 #include "BaseType.h"
-#include <strstream>
 #include "DBResult.h"
+#include <cstring>
 
 class BasePacket;
 struct redisReply;

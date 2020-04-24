@@ -182,13 +182,13 @@ void XLog::writeFile(int level, const char * filename, const char * func, int ro
 #else
 	switch (level)
 	{
-	case L_INFO:
+	case LL_INFO:
 		printf("\033[1;32;40m%s\033[0m", wstr.c_str());
 		break;
-	case L_WARNING:
+	case LL_WARNING:
 		printf("\033[1;33;40m%s\033[0m", wstr.c_str());
 		break;
-	case L_ERROR:
+	case LL_ERROR:
 		printf("\033[1;31;40m%s\033[0m", wstr.c_str());
 		break;
 	default:

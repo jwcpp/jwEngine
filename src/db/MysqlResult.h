@@ -4,7 +4,7 @@
 #include "mysql.h"
 #include "XLog.h"
 #include "BaseType.h"
-#include <strstream>
+#include <sstream>
 #include "DBResult.h"
 
 class MysqlResult : public DBResult
@@ -31,7 +31,7 @@ public:
 			ERROR_LOG("mysql row count upper limit");
 			return *this;
 		}
-		std::istrstream ins(aRow[pos]);
+		std::istringstream ins(aRow[pos]);
 		ins >> t;
 		pos++;
 		return *this;

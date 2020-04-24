@@ -1,4 +1,5 @@
 #include <string>
+#include <cstring>
 #include "mysql.h"
 #include "DB_Interface_mysql.h"
 #include "XLog.h"
