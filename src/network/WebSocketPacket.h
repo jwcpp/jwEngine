@@ -79,6 +79,7 @@ public:
 
 	void _fillHead();
 	virtual void moveData(WebSocketPacket * packet);
+	void setPongPacket();
 
 private:
 	int32 calcHeadSize();

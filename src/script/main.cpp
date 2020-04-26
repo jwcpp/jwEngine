@@ -10,6 +10,8 @@ extern "C" {
 #include "sol/sol.hpp"
 
 extern void luabind_netserver(sol::state & lua);
+extern void luabind_kcpserver(sol::state & lua);
+extern void luabind_websocket(sol::state & lua);
 extern void luabind_eventloop(sol::state & lua);
 extern void luabind_mysql(sol::state & lua);
 extern void luabind_redis(sol::state & lua);
@@ -24,6 +26,8 @@ int main(int argc, char* argv[])
 
 	// bind c++ && lua
 	luabind_netserver(lua);
+	luabind_kcpserver(lua);
+	luabind_websocket(lua);
 	luabind_eventloop(lua);
 	luabind_mysql(lua);
 	luabind_redis(lua);

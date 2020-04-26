@@ -24,4 +24,6 @@ void luabind_common(sol::state & lua)
 		"stop", &UTimer::stop);
 
 	lua["sleep"] = &Tools::sleep;
+	lua["gbk_utf8"] = &Tools::gbkToUtf8;
+	lua["utf8_gbk"] = &Tools::utf8ToGbk;
 }

@@ -11,30 +11,30 @@ class Lua_SqlResult
 public:
 	Lua_SqlResult(SqlPrepare * pre)
 	{
-		sqlPre = pre;
+		m_sqlPre = pre;
 	}
 
 	//get
-	int8 getInt8() { return sqlPre->getInt8(); }
-	uint8 getUint8() { return sqlPre->getUint8(); }
-	int16 getInt16() { return sqlPre->getInt16(); }
-	uint16 getUint16() { return sqlPre->getUint16(); }
-	int32 getInt32() { return sqlPre->getInt32(); }
-	uint32 getUint32() { return sqlPre->getUint32(); }
-	int64 getInt64() { return sqlPre->getInt64(); }
-	uint64 getUint64() { return sqlPre->getUint64(); }
-	float getFloat() { return sqlPre->getFloat(); }
-	double getDouble() { return sqlPre->getDouble(); }
-	std::string getString() { return sqlPre->getString(); }
-	int readBlob(BasePacket * packet) { return sqlPre->readBlob(packet); }
+	int8 getInt8() { return m_sqlPre->getInt8(); }
+	uint8 getUint8() { return m_sqlPre->getUint8(); }
+	int16 getInt16() { return m_sqlPre->getInt16(); }
+	uint16 getUint16() { return m_sqlPre->getUint16(); }
+	int32 getInt32() { return m_sqlPre->getInt32(); }
+	uint32 getUint32() { return m_sqlPre->getUint32(); }
+	int64 getInt64() { return m_sqlPre->getInt64(); }
+	uint64 getUint64() { return m_sqlPre->getUint64(); }
+	float getFloat() { return m_sqlPre->getFloat(); }
+	double getDouble() { return m_sqlPre->getDouble(); }
+	std::string getString() { return m_sqlPre->getString(); }
+	int readBlob(BasePacket * packet) { return m_sqlPre->readBlob(packet); }
 
 	bool fetch()
 	{
-		return sqlPre->fetch();
+		return m_sqlPre->fetch();
 	}
 
-	SqlPrepare * sqlPre = NULL;
-	std::function<void(Lua_SqlResult *)> backfunc;
+private:
+	SqlPrepare * m_sqlPre;
 };
 
 class Lua_SqlCommand
@@ -42,27 +42,7 @@ class Lua_SqlCommand
 public:
 	Lua_SqlCommand(const char * sql)
 	{
-		SqlPrepare * sqlPre = new SqlPrepare(sql);
-		DBSqlTask * dbTask = new DBSqlTask(sqlPre);
-		Lua_SqlResult * sqlRet = new Lua_SqlResult(sqlPre);
-
-		// back func
-		dbTask->complete_back(
-			[sqlPre, dbTask, sqlRet](){
-
-			if (sqlRet->backfunc != nullptr)
-			{
-				sqlRet->backfunc(sqlRet);
-			}
-			delete sqlPre;
-			delete dbTask;
-			delete sqlRet;
-			}
-		);
-
-		_sqlPre = sqlPre;
-		_dbTask = dbTask;
-		_sqlRet = sqlRet;
+		m_sqlPre = new SqlPrepare(sql);
 	}
 
 	~Lua_SqlCommand()
@@ -70,33 +50,43 @@ public:
 		
 	}
 
-	void setBackfunc(std::function<void(Lua_SqlResult *)> backfunc)
+	void addToPool(DBThreadPool * pool, std::function<void(Lua_SqlResult *)> backfunc)
 	{
-		_sqlRet->backfunc = backfunc;
-	}
+		SqlPrepare * sqlPre = m_sqlPre;
+		DBSqlTask * dbTask = new DBSqlTask(sqlPre);
 
-	void addToPool(DBThreadPool * pool)
-	{
-		pool->addTask(_dbTask);
+		// back func
+		dbTask->complete_back(
+			[sqlPre, dbTask, backfunc]() {
+
+			if (backfunc != nullptr)
+			{
+				Lua_SqlResult _result(sqlPre);
+				backfunc(&_result);
+			}
+			delete sqlPre;
+			delete dbTask;
+		}
+		);
+		pool->addTask(dbTask);
 	}
 
 	// push
-	void pushInt8(int8 value) { _sqlPre->pushInt8(value); }
-	void pushUint8(uint8 value) { _sqlPre->pushUint8(value); }
-	void pushInt16(int16 value) { _sqlPre->pushInt16(value); }
-	void pushUint16(uint16 value) { _sqlPre->pushUint16(value); }
-	void pushInt32(int32 value) { _sqlPre->pushInt32(value); }
-	void pushUint32(uint32 value) { _sqlPre->pushUint32(value); }
-	void pushInt64(int64 value) { _sqlPre->pushInt64(value); }
-	void pushUint64(uint64 value) { _sqlPre->pushUint64(value); }
-	void pushFloat(float value) { _sqlPre->pushFloat(value); }
-	void pushDouble(double value) { _sqlPre->pushDouble(value); }
-	void pushString(std::string value) { _sqlPre->pushString(value); }
-	void pushBlob(BasePacket * packet) { _sqlPre->pushBlob(packet); }
+	void pushInt8(int8 value) { m_sqlPre->pushInt8(value); }
+	void pushUint8(uint8 value) { m_sqlPre->pushUint8(value); }
+	void pushInt16(int16 value) { m_sqlPre->pushInt16(value); }
+	void pushUint16(uint16 value) { m_sqlPre->pushUint16(value); }
+	void pushInt32(int32 value) { m_sqlPre->pushInt32(value); }
+	void pushUint32(uint32 value) { m_sqlPre->pushUint32(value); }
+	void pushInt64(int64 value) { m_sqlPre->pushInt64(value); }
+	void pushUint64(uint64 value) { m_sqlPre->pushUint64(value); }
+	void pushFloat(float value) { m_sqlPre->pushFloat(value); }
+	void pushDouble(double value) { m_sqlPre->pushDouble(value); }
+	void pushString(std::string value) { m_sqlPre->pushString(value); }
+	void pushBlob(BasePacket * packet) { m_sqlPre->pushBlob(packet); }
 
-	DBTask * _dbTask = NULL;
-	SqlPrepare * _sqlPre = NULL;
-	Lua_SqlResult * _sqlRet = NULL;
+private:
+	SqlPrepare * m_sqlPre;
 };
 
 
@@ -131,7 +121,6 @@ void luabind_mysql(sol::state & lua)
 		"pushDouble", &Lua_SqlCommand::pushDouble,
 		"pushString", &Lua_SqlCommand::pushString,
 		"pushBlob", &Lua_SqlCommand::pushBlob,
-		"setBackfunc", &Lua_SqlCommand::setBackfunc,
 		"addToPool", &Lua_SqlCommand::addToPool);
 
 	lua.new_usertype<Lua_SqlResult>("SqlResult",

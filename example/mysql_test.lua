@@ -25,8 +25,7 @@ func = function(result)
 function exec()
 	local sql = SqlCommand:new("select * from test where id = ?")
 	sql:pushInt32(1)
-	sql:setBackfunc(func)
-	sql:addToPool(pool)
+	sql:addToPool(pool, func)
 end
 
 exec()

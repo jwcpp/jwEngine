@@ -28,6 +28,8 @@ public:
 
 	void sendMsg(WebSocketPacket * pack);
 	void sendMsg(void * msg, uint32 len);
+	void sendPacket(WebSocketPacket * pack) { sendMsg(pack); }
+	void sendData(void * msg, uint32 len) { sendMsg(msg, len); }
 protected:
 
 	virtual void on_msgbuffer(MessageBuffer * buffer);

@@ -20,8 +20,7 @@ function exec()
 	command:pushString("t1")
 	command:pushString("0")
 	command:pushString("10")
-	command:setBackfunc(func)
-	command:addToPool(pool)
+	command:addToPool(pool, func)
 end
 
 exec()

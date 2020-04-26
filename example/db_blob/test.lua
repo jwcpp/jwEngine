@@ -28,8 +28,7 @@ function select()
 				end
 			end
 		end
-	sql:setBackfunc(func)
-	sql:addToPool(pool)
+	sql:addToPool(pool, func)
 end
 
 function insert()
@@ -43,13 +42,12 @@ function insert()
 	local pack = BasePacket:new()
 	st:write(pack)
 	sql:pushBlob(pack)
-	sql:setBackfunc(function(result)
+	sql:addToPool(pool, function(result)
 			select()
 		end)
-	sql:addToPool(pool)
 end
 
-insert()
+select()
 
 event_init()
 

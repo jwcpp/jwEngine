@@ -10,9 +10,9 @@
 class Lua_RedisResult
 {
 public:
-	Lua_RedisResult()
+	Lua_RedisResult(RedisResult * result)
 	{
-		
+		m_result = result;
 	}
 
 	//get
@@ -27,22 +27,22 @@ public:
 	float getFloat() { return getValue<float>(); }
 	double getDouble() { return getValue<double>(); }
 	std::string getString() { return getValue<std::string>(); }
-	int readBlob(BasePacket * packet) { return result.readBlob(packet); }
+	int readBlob(BasePacket * packet) { return m_result->readBlob(packet); }
 
 	bool fetch() {
-		return result.fetch();
+		return m_result->fetch();
 	}
 
 	template<class T>
 	T getValue()
 	{
 		T t;
-		result >> t;
+		*m_result >> t;
 		return t;
 	}
 
-	RedisResult result;
-	std::function<void(Lua_RedisResult *)> backfunc;
+private:
+	RedisResult * m_result;
 };
 
 class Lua_RedisCommand
@@ -50,56 +50,48 @@ class Lua_RedisCommand
 public:
 	Lua_RedisCommand(const char * cmd)
 	{
-		RedisCommand *command = new RedisCommand(cmd);
-		Lua_RedisResult *result = new Lua_RedisResult();
-		DBRedisTask *dbTask = new DBRedisTask(command, &(result->result));
+		m_command = new RedisCommand(cmd);
+		
+	}
+
+	void pushInt8(int8 value) { m_command->pushInt8(value); }
+	void pushUint8(uint8 value) { m_command->pushUint8(value); }
+	void pushInt16(int16 value) { m_command->pushInt16(value); }
+	void pushUint16(uint16 value) { m_command->pushUint16(value); }
+	void pushInt32(int32 value) { m_command->pushInt32(value); }
+	void pushUint32(uint32 value) { m_command->pushUint32(value); }
+	void pushInt64(int64 value) { m_command->pushInt64(value); }
+	void pushUint64(uint64 value) { m_command->pushUint64(value); }
+	void pushFloat(float value) { m_command->pushFloat(value); }
+	void pushDouble(double value) { m_command->pushDouble(value); }
+	void pushString(std::string value) { m_command->pushString(value); }
+	void pushBlob(BasePacket * pack) { m_command->pushBlob(pack); }
+
+	void addToPool(DBThreadPool * pool, std::function<void(Lua_RedisResult *)> backfunc)
+	{
+		RedisCommand * command = m_command;
+		RedisResult * result = new RedisResult;
+		DBRedisTask * dbTask = new DBRedisTask(command, result);
 
 		// back func
 		dbTask->complete_back(
-			[command, dbTask, result]() {
+			[command, result, dbTask, backfunc]() {
 
-			if (result->backfunc != nullptr)
+			if (backfunc != nullptr)
 			{
-				result->backfunc(result);
+				Lua_RedisResult _result(result);
+				backfunc(&_result);
 			}
 			delete command;
-			delete dbTask;
 			delete result;
+			delete dbTask;
 		}
 		);
-
-		_command = command;
-		_result = result;
-		_dbTask = dbTask;
-	}
-
-	void pushInt8(int8 value) { _command->pushInt8(value); }
-	void pushUint8(uint8 value) { _command->pushUint8(value); }
-	void pushInt16(int16 value) { _command->pushInt16(value); }
-	void pushUint16(uint16 value) { _command->pushUint16(value); }
-	void pushInt32(int32 value) { _command->pushInt32(value); }
-	void pushUint32(uint32 value) { _command->pushUint32(value); }
-	void pushInt64(int64 value) { _command->pushInt64(value); }
-	void pushUint64(uint64 value) { _command->pushUint64(value); }
-	void pushFloat(float value) { _command->pushFloat(value); }
-	void pushDouble(double value) { _command->pushDouble(value); }
-	void pushString(std::string value) { _command->pushString(value); }
-	void pushBlob(BasePacket * pack) { _command->pushBlob(pack); }
-
-	void addToPool(DBThreadPool * pool)
-	{
-		pool->addTask(_dbTask);
-	}
-
-	void setBackfunc(std::function<void(Lua_RedisResult *)> backfunc)
-	{
-		_result->backfunc = backfunc;
+		pool->addTask(dbTask);
 	}
 
 private:
-	RedisCommand * _command;
-	DBRedisTask * _dbTask;
-	Lua_RedisResult * _result;
+	RedisCommand * m_command;
 };
 
 void luabind_redis(sol::state & lua)
@@ -118,7 +110,6 @@ void luabind_redis(sol::state & lua)
 		"pushDouble", &Lua_RedisCommand::pushDouble,
 		"pushString", &Lua_RedisCommand::pushString,
 		"pushBlob", &Lua_RedisCommand::pushBlob,
-		"setBackfunc", &Lua_RedisCommand::setBackfunc,
 		"addToPool", &Lua_RedisCommand::addToPool);
 
 	lua.new_usertype<Lua_RedisResult>("RedisResult",

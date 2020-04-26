@@ -170,3 +170,10 @@ void WebSocketPacket::moveData(WebSocketPacket * packet)
 	writeFrameHead(packet->getBodySize());
 	append(packet->getBodyData(), packet->getBodySize());
 }
+void WebSocketPacket::setPongPacket()
+{
+	if (wpos() >= sizeof(uint8))
+	{
+		setValue<uint8>(0, (uint8)PONG_FRAME);
+	}
+}

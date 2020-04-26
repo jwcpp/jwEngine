@@ -212,7 +212,10 @@ void WebSocketConnect::on_msgbuffer(MessageBuffer * buffer)
 					this->close();
 					break;
 				case PING_FRAME:
-					//TODO...
+				{
+					__m_readPacket->setPongPacket();
+					sendMsg(__m_readPacket);
+				}
 					break;
 				default:
 					__m_webevent->onMsg(this, __m_readPacket);
@@ -240,8 +243,8 @@ void WebSocketConnect::sendMsg(void * msg, uint32 len)
 
 	WebSocketPacket *pack = createPacket();
 
-	pack->append((uint8 *)msg, len);
 	pack->writeFrameHead(len);
+	pack->append((uint8 *)msg, len);
 
 	__m_sendPackets.push(pack);
 
