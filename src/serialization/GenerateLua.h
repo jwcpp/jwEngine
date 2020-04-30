@@ -10,6 +10,7 @@
 
 #include "Event.h"
 #include <string>
+#include <vector>
 class GenerateLua : public Event
 {
 public:
@@ -52,7 +53,7 @@ private:
 
 private:
 	std::string __m_file;
-
+	std::vector<std::string> __m_vecVar;
 	std::string __m_structName;
 	bool __m_isRead = false;
 	int __m_depth = 0;

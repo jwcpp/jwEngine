@@ -1,11 +1,6 @@
 require("types")
 testmsg = {}
 testmsg.__index = testmsg
-testmsg.id = 0
-testmsg.play = {}
-testmsg.array = {}
-testmsg.attrs = {}
-testmsg.vstr = {}
 function testmsg:read(buffer)
 	if 4 + buffer:rpos() > buffer:wpos() then return false end
 	self.id = buffer:getUint32();
@@ -15,27 +10,27 @@ function testmsg:read(buffer)
 	local temp_array = nil
 	if 4 + buffer:rpos() > buffer:wpos() then return false end
 	len_array = buffer:getInt32();
-	for i = 0, len_array - 1, 1 do
+	for i = 1, len_array, 1 do
 		if 4 + buffer:rpos() > buffer:wpos() then return false end
 		temp_array = buffer:getInt32();
-		self.array[#self.array+1] = temp_array
+		self.array[i] = temp_array
 	end
 	local len_attrs = 0
 	local temp_attrs = nil
 	if 4 + buffer:rpos() > buffer:wpos() then return false end
 	len_attrs = buffer:getInt32();
-	for i = 0, len_attrs - 1, 1 do
+	for i = 1, len_attrs, 1 do
 		temp_attrs = Attr:new()
 		if temp_attrs:read(buffer) == false then return false end;
-		self.attrs[#self.attrs+1] = temp_attrs
+		self.attrs[i] = temp_attrs
 	end
 	local len_vstr = 0
 	local temp_vstr = nil
 	if 4 + buffer:rpos() > buffer:wpos() then return false end
 	len_vstr = buffer:getInt32();
-	for i = 0, len_vstr - 1, 1 do
+	for i = 1, len_vstr, 1 do
 		temp_vstr = buffer:getString();
-		self.vstr[#self.vstr+1] = temp_vstr
+		self.vstr[i] = temp_vstr
 	end
 	return true;
 end
@@ -61,6 +56,11 @@ end
 function testmsg:new()
 	local o = {}
 	setmetatable(o, testmsg)
+	o.id = 0
+	o.play = {}
+	o.array = {}
+	o.attrs = {}
+	o.vstr = {}
 	return o
 end
 

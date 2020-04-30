@@ -1,8 +1,5 @@
 test_blob = {}
 test_blob.__index = test_blob
-test_blob.id = 0
-test_blob.str = ""
-test_blob.vec = {}
 function test_blob:read(buffer)
 	if 4 + buffer:rpos() > buffer:wpos() then return false end
 	self.id = buffer:getInt32();
@@ -30,6 +27,9 @@ end
 function test_blob:new()
 	local o = {}
 	setmetatable(o, test_blob)
+	o.id = 0
+	o.str = ""
+	o.vec = {}
 	return o
 end
 

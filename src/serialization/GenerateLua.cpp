@@ -38,6 +38,14 @@ void GenerateLua::onExitStruct()
 	__m_file.append("local o = {}\n");
 	setDepth(1);
 	__m_file.append("setmetatable(o, " + __m_structName + ")\n");
+	
+	for (int i = 0; i < __m_vecVar.size(); ++i)
+	{
+		setDepth(1);
+		__m_file.append("o." + __m_vecVar[i] + "\n");
+	}
+	__m_vecVar.clear();
+
 	setDepth(1);
 	__m_file.append("return o\n");
 
@@ -48,30 +56,30 @@ void GenerateLua::onExitStruct()
 
 void GenerateLua::onVariable(TypeInfo * tinfo, const char * varName, const char * exp)
 {
-	setDepth();
-
+	//setDepth();
+	std::string tempstr;
 	if (tinfo->type == 1)
 	{
-		__m_file.append(__m_structName + "." + std::string(varName) + " = {}");
+		tempstr.append(std::string(varName) + " = {}");
 	}
 	else
 	{
 
-		__m_file.append(__m_structName + "." + std::string(varName));
+		tempstr.append(varName);
 
 		if (exp && strlen(exp) > 0)
 		{
-			__m_file.append(" = ");
-			__m_file.append(exp);
+			tempstr.append(" = ");
+			tempstr.append(exp);
 		}
 		else
 		{
-			__m_file.append(" = ");
-			__m_file.append(getInitStr(tinfo));
+			tempstr.append(" = ");
+			tempstr.append(getInitStr(tinfo));
 		}
 	}
 
-	__m_file.append("\n");
+	__m_vecVar.push_back(tempstr);
 }
 
 void GenerateLua::onEnterRead()
