@@ -1,89 +1,69 @@
-#include "Define.h"
-
 #include "ShareMemAPI.h"
 #include <stdio.h>
 
-#ifdef SYSTEM_WIN
-#include <WinBase.h>
-#else
-#include <sys/types.h> 
-#include <sys/ipc.h> 
-#include <sys/shm.h> 
-#include <errno.h>
+#ifdef SYSTEM_LINUX
+#include <sys/types.h>
+#include <sys/ipc.h>
+#include <sys/shm.h>
 #endif
 
 namespace ShareMemAPI
 {
 
 
-	SMHandle		CreateShareMem(SM_KEY key, int Size)
+	SMHandle createShareMem(SM_KEY key, int size)
 	{
-			//CHAR keybuf[64];
-			//memset(keybuf,0,64);
-			//sprintf(keybuf,"./%d",key);
 #ifdef SYSTEM_LINUX
-			//key = ftok(keybuf,'w'); 
-			SMHandle hd = shmget(key, Size, IPC_CREAT | IPC_EXCL | 0666);
-		printf("handle = %d ,key = %d ,error: %d \r\n", hd, key, errno);
+		SMHandle hd = shmget(key, size, IPC_CREAT | IPC_EXCL | 0666);
 		return hd;
 #else
-		WCHAR keybuf[64];
-		memset(keybuf, 0, 64);
+		WCHAR keybuf[sizeof(key)];
+		memset(keybuf, 0, sizeof(key));
 		swprintf(keybuf, L"%d", key);
-		return  CreateFileMapping((HANDLE)0xFFFFFFFFFFFFFFFF, NULL, PAGE_READWRITE, 0, Size, keybuf);
+		return  CreateFileMapping((HANDLE)0xFFFFFFFFFFFFFFFF, NULL, PAGE_READWRITE, 0, size, keybuf);
 #endif
-			return SMHandle(-1);
-
 	}
 
-	SMHandle		OpenShareMem(SM_KEY key, int Size)
+	SMHandle openShareMem(SM_KEY key, int size)
 	{
-			//CHAR keybuf[64];
-			//memset(keybuf,0,64);
-			//sprintf(keybuf,"./%d",key);
 #ifdef SYSTEM_LINUX
-			//key = ftok(keybuf,'w'); 
-			SMHandle hd = shmget(key, Size, 0);
-		printf("handle = %d ,key = %d ,error: %d \r\n", hd, key, errno);
+		SMHandle hd = shmget(key, size, 0);
 		return hd;
 #else
-		WCHAR keybuf[64];
-		memset(keybuf, 0, 64);
+		WCHAR keybuf[sizeof(key)];
+		memset(keybuf, 0, sizeof(key));
 		swprintf(keybuf, L"%d", key);
 		return OpenFileMapping(FILE_MAP_ALL_ACCESS, TRUE, keybuf);
 #endif
-			return SMHandle(-1);
 	}
 
-	char*			MapShareMem(SMHandle handle)
+	char* mapShareMem(SMHandle handle)
 	{
-
 #ifdef SYSTEM_LINUX
-			return  (char*)shmat(handle, 0, 0);
+		return  (char*)shmat(handle, 0, 0);
 #else
-			return (char *)MapViewOfFile(handle, FILE_MAP_ALL_ACCESS, 0, 0, 0);
+		return (char *)MapViewOfFile(handle, FILE_MAP_ALL_ACCESS, 0, 0, 0);
 #endif
-			return 0;
-
+		return 0;
 	}
 
 
-	void			UnMapShareMem(char* MemoryPtr)
+	void unMapShareMem(char* memPtr)
 	{
 #ifdef SYSTEM_LINUX
-			shmdt(MemoryPtr);
+		shmdt(memPtr);
 #else
-			UnmapViewOfFile(MemoryPtr);
+		UnmapViewOfFile(memPtr);
 #endif
 	}
 
 
-	void			CloseShareMem(SMHandle handle)
+	void closeShareMem(SMHandle handle)
 	{
 #ifdef SYSTEM_LINUX
-			shmctl(handle, IPC_RMID, 0);
+		shmctl(handle, IPC_RMID, 0);
 #else
-			CloseHandle(handle);
+		CloseHandle(handle);
 #endif
 	}
 

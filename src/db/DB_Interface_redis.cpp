@@ -107,7 +107,16 @@ bool DBInterfaceRedis::ping()
 int DBInterfaceRedis::execute(RedisCommand * command, DBResult * result)
 {
 	std::vector<char *> temp;
-	redisReply *pRedisReply = (redisReply*)redisCommandArgv(m_context, command->length(), command->argv(temp), command->argvlen());
+	redisReply *pRedisReply = NULL;
+	
+	if (command->length() > 1)
+	{
+		pRedisReply = (redisReply*)redisCommandArgv(m_context, command->length(), command->argv(temp), command->argvlen());
+	}
+	else
+	{
+		pRedisReply = (redisReply*)redisCommand(m_context, command->tostr());
+	}
 
 	if (m_context->err)
 	{

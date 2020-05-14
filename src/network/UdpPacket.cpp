@@ -23,11 +23,6 @@ uint32 UdpPacket::getMsgType()
 {
 	return getValue<uint32>(0);
 }
-void UdpPacket::readHead()
-{
-	//start read data pos
-	_rpos = UDP_PACK_HEAD_SIZE;
-}
 
 void UdpPacket::writeHead(int msgtype)
 {

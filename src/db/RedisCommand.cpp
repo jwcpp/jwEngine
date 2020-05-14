@@ -84,3 +84,10 @@ const size_t * RedisCommand::argvlen()
 {
 	return (size_t *)m_len.data();
 }
+
+const char * RedisCommand::tostr()
+{
+	m_param[0].push_back(0);
+	const char * ret = (const char *)(m_param[0].data());
+	return ret;
+}

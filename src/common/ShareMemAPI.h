@@ -1,54 +1,25 @@
 #pragma once
 
-#if defined(SYSTEM_LINUX)
+#include "Define.h"
+
+#ifdef SYSTEM_LINUX
 typedef		int		SMHandle;
 #else
-typedef		void*	SMHandle;
+typedef		HANDLE	SMHandle;
 #endif
 
-//typedef	ULONG	SM_KEY;
 typedef unsigned long SM_KEY;
 
 namespace ShareMemAPI
 {
-	/*创建ShareMem 内存区
-	*
-	*	key   创建ShareMem 的关键值
-	*
-	*  Size  创建大小
-	*
-	*	返回 对应ShareMem保持值
-	*/
-	SMHandle		CreateShareMem(SM_KEY key, int Size);
-	/*打开ShareMem 内存区
-	*
-	* key   打开ShareMem 的关键值
-	*
-	* Size  打开大小
-	*
-	* 返回  对应ShareMem 保持值
-	*/
-	SMHandle		OpenShareMem(SM_KEY key, int Size);
+	SMHandle createShareMem(SM_KEY key, int size);
 
-	/*映射ShareMem 内存区
-	*
-	*	handle 映射ShareMem 的保持值
-	*
-	*  返回 ShareMem 的数据指针
-	*/
-	char*			MapShareMem(SMHandle handle);
+	SMHandle openShareMem(SM_KEY key, int size);
 
-	/*关闭映射 ShareMem 内存区
-	*
-	*	MemoryPtr			ShareMem 的数据指针
-	*
-	*
-	*/
-	void			UnMapShareMem(char* MemoryPtr);
+	char* mapShareMem(SMHandle handle);
 
-	/*	关闭ShareMem
-	* 	handle  需要关闭的ShareMem 保持值
-	*/
-	void			CloseShareMem(SMHandle handle);
+	void unMapShareMem(char* memPtr);
+
+	void closeShareMem(SMHandle handle);
 };
 

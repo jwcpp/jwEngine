@@ -33,10 +33,8 @@ public:
 	virtual int32  sendSize();
 	virtual char * sendStream();
 
-	void readHead();
 	void writeHead(int msgtype);
 	void writeComplete(uint32 size);
-	char * getData(){ return (char *)contents(); }
 
 protected:
 	void _fillHead();

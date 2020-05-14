@@ -55,10 +55,10 @@ uint32 KcpSessionBase::update(uint32 millisecond)
 	if (peeksize > 0)
 	{
 		UdpPacket * packet = _createPacket(peeksize);
-		if (ikcp_recv(__m_kcp, packet->getData(), peeksize) > 0)
+		if (ikcp_recv(__m_kcp, (char *)packet->contents(), peeksize) > 0)
 		{
 			packet->wpos(peeksize);
-			packet->readHead();
+			packet->rpos(UDP_PACK_HEAD_SIZE);
 			_onMsg(packet);
 		}
 		_recyclePacket(packet);
@@ -157,14 +157,13 @@ void KcpSession::_onMsg(UdpPacket * packet)
 void KcpSession::sendMsg(uint32 msgtype, UdpPacket * pack)
 {
 	pack->writeHead(msgtype);
-	send((const char *)pack->getData(), pack->wpos());
+	send(pack->sendStream(), pack->sendSize());
 }
 
 void KcpSession::sendMsg(uint32 msgtype, void * msg, uint32 len)
 {
-
 	UdpPacket *pack = _createPacket();
 	pack->append((uint8 *)msg, len);
-	pack->writeHead(msgtype);
-	send(pack->sendStream(), pack->sendSize());
+	sendMsg(msgtype, pack);
+	_recyclePacket(pack);
 }

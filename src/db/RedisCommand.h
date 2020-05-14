@@ -35,6 +35,7 @@ public:
 	int length();
 	const char ** argv(std::vector<char *> & vec);
 	const size_t * argvlen();
+	const char * tostr();
 
 private:
 	void append(const uint8 * p, int len);

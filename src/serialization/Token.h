@@ -29,7 +29,6 @@ private:
 	int read_num();
 	int read_var();
 	int symbol();
-	void nextline();
 	void read_long_string();
 private:
 	FBuffer * __m_pBuffer;
