@@ -25,12 +25,14 @@ void NetConnect::on_msgbuffer(MessageBuffer * buffer)
 	{
 		//create packet obj
 		mReadPacket = createPacket();
+		mReadPacket->wpos(0);
+		mReadPacket->vecResize(0);
 	}
 
 	while (buffer->GetActiveSize() > 0)
 	{
 		//read head
-		if (mReadPacket->rpos() < MSG_HEAD_SIZE)
+		if (mReadPacket->isHeadFull() == false)
 		{
 			uint32 rlen = mReadPacket->readHead(buffer->GetReadPointer(), buffer->GetActiveSize());
 			buffer->ReadCompleted(rlen);
@@ -52,7 +54,7 @@ void NetConnect::on_msgbuffer(MessageBuffer * buffer)
 			//new packet
 			if (mReadPacket->wpos() == mReadPacket->getMarkLen() + MSG_HEAD_SIZE)
 			{
-				_netevent->onMsg(this, mReadPacket);
+				_netevent->onMsg(this, mReadPacket->getMsgType(), mReadPacket);
 
 				// recycle packet
 				recyclePacket(mReadPacket);

@@ -46,7 +46,7 @@ public:
 
 	};
 
-	virtual void onMsg(NetConnect * conn, NetPacket * pack) {
+	virtual void onMsg(NetConnect * conn,int msgtype, NetPacket * pack) {
 		testmsg msg;
 		msg.read(pack);
 

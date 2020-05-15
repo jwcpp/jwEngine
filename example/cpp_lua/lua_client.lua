@@ -13,7 +13,7 @@ client.on_close = function(conn)
 	print("close")
 end
 
-client.on_msg = function(conn, pack)
+client.on_msg = function(conn, msgtype, pack)
 
 		msg = testmsg:new();
 		msg:read(pack);

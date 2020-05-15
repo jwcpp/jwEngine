@@ -11,6 +11,7 @@
 #include "PoolObject.h"
 
 #define WS_HEAD_SIZE 2
+#define WS_MAX_HEAD_SIZE 14
 
 /*
 
@@ -59,7 +60,6 @@ public:
 	uint8 getMask(){ return (__m_head[1] >> 7) & 0x01; }
 	uint8 getPayloadLen(){ return __m_head[1] & 0x7f; }
 
-	bool isHeadFull();
 	void writeFrameHead(int32 bodylen, WSFrameType ftype = BINARY_FRAME);
 	uint32 readFrameHead(const uint8 * p, uint32 size);
 	uint32 getMaskKey();
@@ -71,6 +71,7 @@ public:
 	// read msg call
 	virtual int32  getHeadSize();
 	virtual int32  getMarkLen();   // message head mark length
+	virtual bool isHeadFull();
 
 	// send msg call
 	virtual int32  sendSize();
@@ -85,7 +86,7 @@ private:
 	int32 calcHeadSize();
 private:
 	uint8 __m_head[WS_HEAD_SIZE];
-	uint8 __m_bodypos;
+	uint8 __m_headpos;
 	INCLUDE_POOL_OBJECT
 };
 

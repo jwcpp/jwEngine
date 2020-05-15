@@ -16,7 +16,7 @@ public:
 	virtual void onAccept(NetConnect * conn){};
 	virtual void onConnect(NetConnect * conn, int argv){};
 	virtual void onClose(NetConnect * conn){};
-	virtual void onMsg(NetConnect * conn, NetPacket * pack){};
+	virtual void onMsg(NetConnect * conn, int msgtype, NetPacket * pack){};
 
 };
 

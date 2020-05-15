@@ -31,7 +31,7 @@ public:
 		
 	};
 
-	virtual void onMsg(NetConnect * conn, NetPacket * pack){
+	virtual void onMsg(NetConnect * conn, int msgtype, NetPacket * pack){
 		std::string s;
 		(*pack) >> s;
 

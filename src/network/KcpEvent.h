@@ -15,5 +15,5 @@ public:
 	virtual void onAccept(KcpSession * conn){};
 	virtual void onConnect(KcpSession * conn){};
 	virtual void onClose(KcpSession * conn){};
-	virtual void onMsg(KcpSession * conn, UdpPacket * pack){};
+	virtual void onMsg(KcpSession * conn,int msgtype, UdpPacket * pack){};
 };

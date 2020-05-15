@@ -21,27 +21,30 @@ uint32 WebSocketPacket::readFrameHead(const uint8 * pData, uint32 size)
 	if (rsize > 0)
 	{
 		readsize = size >= rsize ? rsize : size;
-		append(pbuff, readsize);
+		memcpy(__m_head + _wpos, pbuff, readsize);
+		_wpos += readsize;
+
 		if (_wpos == WS_HEAD_SIZE)
 		{
-			*this >> __m_head[0];
-			*this >> __m_head[1];
-
 			pbuff += readsize;
 			size -= readsize;
 
-			__m_bodypos = calcHeadSize();
+			__m_headpos = WS_MAX_HEAD_SIZE - calcHeadSize();
+			_wpos = __m_headpos + WS_HEAD_SIZE;
+			this->_storage.resize(_wpos);
 		}
 	}
 
 	// 读包头后面部分
 	if (_wpos >= WS_HEAD_SIZE && size > 0)
 	{
-		rsize = getHeadSize() - _wpos;
+		rsize = WS_MAX_HEAD_SIZE - _wpos;
 		if (rsize > 0)
 		{
 			rsize = size >= rsize ? rsize : size;
+
 			append(pbuff, rsize);
+
 			readsize += rsize;
 		}
 	}
@@ -69,17 +72,12 @@ int32 WebSocketPacket::getMarkLen()
 
 bool WebSocketPacket::isHeadFull()
 {
-	if (_wpos < WS_HEAD_SIZE)
-		return false;
-	if (_wpos < getHeadSize())
-		return false;
-
-	return true;
+	return wpos() >= WS_MAX_HEAD_SIZE;
 }
 
 int32 WebSocketPacket::getHeadSize()
 {
-	return __m_bodypos;
+	return WS_MAX_HEAD_SIZE;
 }
 
 int32 WebSocketPacket::calcHeadSize()
@@ -109,35 +107,33 @@ void WebSocketPacket::writeFrameHead(int32 bodylen, WSFrameType frame_type)
 {
 
 	// 写入frame类型
-	*this << (uint8)frame_type;
+	put(__m_headpos, (uint8)frame_type);
 
 	if (bodylen <= 125)
 	{
-		*this << (uint8)bodylen;
+		put(__m_headpos + 1, (uint8)bodylen);
 	}
 	else if (bodylen <= 65535)
 	{
 		uint8 bytelength = 126;
-		*this << (uint8)bytelength;
-		*this << (uint16)bodylen;
+		put(__m_headpos + 1, (uint8)bytelength);
+		put(__m_headpos + 2, (uint16)bodylen);
 	}
 	else
 	{
 		uint8 bytelength = 127;
-		*this << bytelength;
-		ByteConverter::apply<uint32>((uint32 *)&bodylen);
-		*this << (uint64)bodylen;
+		put(__m_headpos + 1, (uint8)bytelength);
+		put(__m_headpos + 2, (uint64)bodylen);
 	}
 
-	__m_bodypos = wpos();
 }
 
 void WebSocketPacket::_fillHead()
 {
-	this->_storage.resize(0);
-	_wpos = 0;
-	_rpos = 0;
-	__m_bodypos = 0;
+	this->_storage.resize(WS_MAX_HEAD_SIZE);
+	_wpos = WS_MAX_HEAD_SIZE;
+	_rpos = WS_MAX_HEAD_SIZE;
+	__m_headpos = WS_MAX_HEAD_SIZE - WS_HEAD_SIZE;
 }
 
 uint32 WebSocketPacket::getMaskKey()
@@ -147,33 +143,38 @@ uint32 WebSocketPacket::getMaskKey()
 
 char * WebSocketPacket::getBodyData()
 {
-	return (char *)contents() + __m_bodypos;
+	return (char *)contents() + WS_MAX_HEAD_SIZE;
 }
 
 int32  WebSocketPacket::getBodySize()
 {
-	return wpos() - __m_bodypos;
+	return wpos() - WS_MAX_HEAD_SIZE;
 }
 
 int32  WebSocketPacket::sendSize()
 {
-	return wpos();
+	return wpos() - __m_headpos;
 }
 
 char * WebSocketPacket::sendStream()
 {
-	return (char *)contents();
+	return ((char *)contents()) + __m_headpos;
 }
 
 void WebSocketPacket::moveData(WebSocketPacket * packet)
 {
-	writeFrameHead(packet->getBodySize());
-	append(packet->getBodyData(), packet->getBodySize());
+	int len = packet->getBodySize();
+	BasePacket::moveData(packet);
+	
+	//memcpy(__m_head, packet->__m_head, WS_HEAD_SIZE);
+	//__m_headpos = packet->__m_headpos;
+
+	writeFrameHead(len);
 }
 void WebSocketPacket::setPongPacket()
 {
 	if (wpos() >= sizeof(uint8))
 	{
-		setValue<uint8>(0, (uint8)PONG_FRAME);
+		setValue<uint8>(__m_headpos, (uint8)PONG_FRAME);
 	}
 }

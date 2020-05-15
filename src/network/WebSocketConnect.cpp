@@ -168,6 +168,8 @@ void WebSocketConnect::on_msgbuffer(MessageBuffer * buffer)
 	{
 		//create packet obj
 		__m_readPacket = createPacket();
+		__m_readPacket->wpos(0);
+		__m_readPacket->vecResize(0);
 	}
 
 	while (buffer->GetActiveSize() > 0)
@@ -176,16 +178,10 @@ void WebSocketConnect::on_msgbuffer(MessageBuffer * buffer)
 		{
 			uint32 rlen = __m_readPacket->readFrameHead(buffer->GetReadPointer(), buffer->GetActiveSize());
 			buffer->ReadCompleted(rlen);
-
-			if (__m_readPacket->isHeadFull())
-			{
-				__m_readPacket->rpos(__m_readPacket->wpos());
-			}
 		}
-
-		if (__m_readPacket->isHeadFull())
+		else
 		{
-			int32 needsize = __m_readPacket->getMarkLen() + __m_readPacket->getHeadSize() - __m_readPacket->wpos();
+			int32 needsize = __m_readPacket->getMarkLen() + WS_MAX_HEAD_SIZE - __m_readPacket->wpos();
 			if (needsize > 0)
 			{
 				int32 wsize = buffer->GetActiveSize() >= needsize ? needsize : buffer->GetActiveSize();
@@ -197,7 +193,7 @@ void WebSocketConnect::on_msgbuffer(MessageBuffer * buffer)
 			}
 
 			//new packet
-			if (__m_readPacket->wpos() == __m_readPacket->getMarkLen() + __m_readPacket->getHeadSize())
+			if (__m_readPacket->wpos() == __m_readPacket->getMarkLen() + WS_MAX_HEAD_SIZE)
 			{
 
 				//解密

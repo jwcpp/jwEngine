@@ -27,14 +27,14 @@ protected:
 	virtual void onClose(KcpSession * conn) {
 		on_close(conn);
 	};
-	virtual void onMsg(KcpSession * conn, UdpPacket * pack) {
-		on_msg(conn, pack);
+	virtual void onMsg(KcpSession * conn, int msgtype, UdpPacket * pack) {
+		on_msg(conn, msgtype, pack);
 	};
 
 public:
 	std::function<void(KcpSession *)> on_accept;
 	std::function<void(KcpSession *)> on_close;
-	std::function<void(KcpSession *, UdpPacket *)> on_msg;
+	std::function<void(KcpSession *,int, UdpPacket *)> on_msg;
 };
 
 class Lua_KcpClient : public KcpClient, public KcpEvent
@@ -54,14 +54,14 @@ protected:
 	virtual void onClose(KcpSession * conn) {
 		on_close(conn);
 	};
-	virtual void onMsg(KcpSession * conn, UdpPacket * pack) {
-		on_msg(conn, pack);
+	virtual void onMsg(KcpSession * conn, int msgtype, UdpPacket * pack) {
+		on_msg(conn, msgtype, pack);
 	};
 
 public:
 	std::function<void(KcpSession *, int)> on_connect;
 	std::function<void(KcpSession *)> on_close;
-	std::function<void(KcpSession *, UdpPacket *)> on_msg;
+	std::function<void(KcpSession *, int, UdpPacket *)> on_msg;
 };
 
 void init_kcppacket_pool(int count)

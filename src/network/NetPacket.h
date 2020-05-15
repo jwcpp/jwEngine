@@ -21,12 +21,12 @@ public:
 	// read msg call
 	virtual int32  getHeadSize();
 	virtual int32  getMarkLen();   // message head mark length
+	virtual int getMsgType();
+	virtual bool isHeadFull();
 
 	// send msg call
 	virtual int32  sendSize();
 	virtual char * sendStream();
-
-	uint32 getMsgType();
 
 	void writeHead(int msgtype);
 	uint32 readHead(const uint8 * p, uint32 size);

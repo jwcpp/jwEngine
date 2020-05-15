@@ -34,7 +34,7 @@ public:
 
 	};
 
-	virtual void onMsg(KcpSession * conn, UdpPacket * pack){
+	virtual void onMsg(KcpSession * conn, int msgtype, UdpPacket * pack){
 		std::string s;
 		(*pack) >> s;
 

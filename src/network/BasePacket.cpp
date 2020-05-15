@@ -14,7 +14,6 @@ BasePacket::~BasePacket()
 
 void BasePacket::zero()
 {
-	_rpos = 0;
 	_fillHead();
 }
 
@@ -40,6 +39,15 @@ char * BasePacket::getBodyData()
 	return NULL;
 }
 
+const char * BasePacket::readPointer()
+{
+	return (const char *)(contents() + _rpos);
+}
+int32 BasePacket::activeSize()
+{
+	return _wpos - _rpos;
+}
+
 // read msg call
 int32  BasePacket::getHeadSize()
 {
@@ -50,6 +58,16 @@ int32  BasePacket::getHeadSize()
 int32  BasePacket::getMarkLen()
 {
 	return 0;
+}
+
+int BasePacket::getMsgType()
+{
+	return 0;
+}
+
+bool BasePacket::isHeadFull()
+{
+	return false;
 }
 
 // send msg call
@@ -63,6 +81,20 @@ char * BasePacket::sendStream()
 	return NULL;
 }
 
+int BasePacket::readPos()
+{
+	return rpos();
+}
+
+int BasePacket::writePos()
+{
+	return wpos();
+}
+
+void BasePacket::vecResize(int size)
+{
+	this->_storage.resize(size);
+}
 
 //------->get
 int8 BasePacket::getInt8() {
@@ -133,14 +165,4 @@ void BasePacket::pushDouble(double value) {
 }
 void BasePacket::pushString(std::string value) {
 	*this << value;
-}
-
-int BasePacket::readPos()
-{
-	return rpos();
-}
-
-int BasePacket::writePos()
-{
-	return wpos();
 }

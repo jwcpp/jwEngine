@@ -21,15 +21,22 @@ public:
 
 	virtual int32  getBodySize();
 	virtual char * getBodyData();
+	const char *   readPointer();
+	int32          activeSize();
 	
 	// read msg call
 	virtual int32  getHeadSize();
 	virtual int32  getMarkLen();   // message head mark length
+	virtual int getMsgType();
+	virtual bool isHeadFull();
 
 	// send msg call
 	virtual int32  sendSize();
 	virtual char * sendStream();
 
+	int readPos();
+	int writePos();
+	void vecResize(int size);
 public:
 
 	//------->get
@@ -57,10 +64,6 @@ public:
 	void pushFloat(float value);
 	void pushDouble(double value);
 	void pushString(std::string value);
-
-	int readPos();
-	int writePos();
-
 protected:
 	virtual void _fillHead();
 

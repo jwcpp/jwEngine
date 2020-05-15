@@ -11,7 +11,6 @@ class ByteBuffer
 {
 public:
 	static size_t const DEFAULT_SIZE = 0x1000;
-	static uint8 const InitialBitPos = 8;
 
 	// constructor
 	ByteBuffer() : _rpos(0), _wpos(0)

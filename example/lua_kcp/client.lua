@@ -12,7 +12,7 @@ client.on_close = function(conn)
 end
 
 count = 0
-client.on_msg = function(conn, pack)
+client.on_msg = function(conn, msgtype, pack)
 	local str = pack:getString()
 	--print(str)
 	conn:sendPacket(1, pack)

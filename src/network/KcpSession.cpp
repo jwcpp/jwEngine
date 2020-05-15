@@ -58,7 +58,6 @@ uint32 KcpSessionBase::update(uint32 millisecond)
 		if (ikcp_recv(__m_kcp, (char *)packet->contents(), peeksize) > 0)
 		{
 			packet->wpos(peeksize);
-			packet->rpos(UDP_PACK_HEAD_SIZE);
 			_onMsg(packet);
 		}
 		_recyclePacket(packet);
@@ -151,7 +150,7 @@ void KcpSession::_onMsg(UdpPacket * packet)
 {
 	__m_nTalkTime = XTime::iclock();
 	if (__m_kcpEvent)
-		__m_kcpEvent->onMsg(this, packet);
+		__m_kcpEvent->onMsg(this, packet->getMsgType(), packet);
 }
 
 void KcpSession::sendMsg(uint32 msgtype, UdpPacket * pack)

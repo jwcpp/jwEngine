@@ -27,14 +27,14 @@ protected:
 	virtual void onClose(NetConnect * conn) {
 		on_close(conn);
 	};
-	virtual void onMsg(NetConnect * conn, NetPacket * pack) {
-		on_msg(conn, pack);
+	virtual void onMsg(NetConnect * conn, int msgtype, NetPacket * pack) {
+		on_msg(conn, msgtype, pack);
 	};
 
 public:
 	std::function<void(NetConnect * )> on_accept;
 	std::function<void(NetConnect * )> on_close;
-	std::function<void(NetConnect * , NetPacket *)> on_msg;
+	std::function<void(NetConnect * , int, NetPacket *)> on_msg;
 };
 
 class Lua_NetClient : public NetClient, public NetEvent
@@ -54,14 +54,14 @@ protected:
 	virtual void onClose(NetConnect * conn) {
 		on_close(conn);
 	};
-	virtual void onMsg(NetConnect * conn, NetPacket * pack) {
-		on_msg(conn, pack);
+	virtual void onMsg(NetConnect * conn, int msgtype, NetPacket * pack) {
+		on_msg(conn, msgtype, pack);
 	};
 
 public:
 	std::function<void(NetConnect *, int)> on_connect;
 	std::function<void(NetConnect *)> on_close;
-	std::function<void(NetConnect *, NetPacket *)> on_msg;
+	std::function<void(NetConnect *, int, NetPacket *)> on_msg;
 };
 
 void init_netpacket_pool(int count)
