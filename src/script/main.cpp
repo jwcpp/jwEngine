@@ -19,6 +19,7 @@ extern void luabind_basepacket(sol::state & lua);
 extern void luabind_common(sol::state & lua);
 extern void luabind_csvpar(sol::state & lua);
 extern void luabind_json(sol::state & lua);
+extern void luabind_httpserver(sol::state & lua);
 
 int main(int argc, char* argv[])
 {
@@ -36,6 +37,7 @@ int main(int argc, char* argv[])
 	luabind_common(lua);
 	luabind_csvpar(lua);
 	luabind_json(lua);
+	luabind_httpserver(lua);
 
 	//lua.script_file(argv[1]);
 

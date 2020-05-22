@@ -3,7 +3,7 @@
 #include "WebSocketPacket.h"
 #include "WebSocketServer.h"
 #include "EventLoop.h"
-#include "PacketPool.h"
+#include "CommonPool.h"
 #include <stdio.h>
 
 extern int makeWSFrameDataHeader(int len, std::vector<unsigned char>& header);
@@ -128,7 +128,7 @@ public:
 
 int main()
 {
-	init_packet_pool<WebSocketPacket>(10);
+	CommPool::init<WebSocketPacket>(10);
 	EventLoop::Instance()->init();
 	IWebEvent wevent;
 	WebSocketServer server(EventLoop::Instance(), &wevent);

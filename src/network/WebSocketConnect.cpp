@@ -59,7 +59,7 @@
 
 #include "WebSocketEvent.h"
 #include "WebSocketPacket.h"
-#include "PacketPool.h"
+#include "CommonPool.h"
 
 WebSocketConnect::WebSocketConnect(WebSocketEvent * wevent, uint32 buffersize):
 	TcpSocket(buffersize),
@@ -163,17 +163,16 @@ void WebSocketConnect::on_msgbuffer(MessageBuffer * buffer)
 		__m_webevent->onHandshake(this);
 		return;
 	}
-	
-	if (!__m_readPacket)
-	{
-		//create packet obj
-		__m_readPacket = createPacket();
-		__m_readPacket->wpos(0);
-		__m_readPacket->vecResize(0);
-	}
 
 	while (buffer->GetActiveSize() > 0)
 	{
+		if (!__m_readPacket)
+		{
+			//create packet obj
+			__m_readPacket = createPacket();
+			__m_readPacket->wpos(0);
+		}
+
 		if (__m_readPacket->isHeadFull() == false)
 		{
 			uint32 rlen = __m_readPacket->readFrameHead(buffer->GetReadPointer(), buffer->GetActiveSize());
@@ -266,12 +265,12 @@ void WebSocketConnect::on_writecomplete()
 
 WebSocketPacket * WebSocketConnect::createPacket()
 {
-	WebSocketPacket * packet = create_packet<WebSocketPacket>();
+	WebSocketPacket * packet = CommPool::create<WebSocketPacket>();
 	return packet;
 }
 void WebSocketConnect::recyclePacket(WebSocketPacket * pack)
 {
-	reclaim_packet(pack);
+	CommPool::reclaim(pack);
 }
 
 bool WebSocketConnect::decodingDatas(WebSocketPacket* pPacket, uint32 msg_mask)

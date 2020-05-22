@@ -61,7 +61,9 @@ uint32 NetPacket::readHead(const uint8 * p, uint32 size)
 	}
 
 	rsize = size >= rsize ? rsize : size;
-	append(p, rsize);
+
+	put(wpos(), p, rsize);
+	_wpos += rsize;
 
 	return rsize;
 }

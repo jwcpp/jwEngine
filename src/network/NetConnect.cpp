@@ -1,6 +1,6 @@
 #include "NetConnect.h"
 #include "NetPacket.h"
-#include "PacketPool.h"
+#include "CommonPool.h"
 #include "NetEvent.h"
 
 NetConnect::NetConnect(NetEvent * nevent,uint32 buffersize) :
@@ -21,16 +21,15 @@ NetConnect::~NetConnect()
 
 void NetConnect::on_msgbuffer(MessageBuffer * buffer)
 {
-	if (!mReadPacket)
-	{
-		//create packet obj
-		mReadPacket = createPacket();
-		mReadPacket->wpos(0);
-		mReadPacket->vecResize(0);
-	}
-
 	while (buffer->GetActiveSize() > 0)
 	{
+		if (!mReadPacket)
+		{
+			//create packet obj
+			mReadPacket = createPacket();
+			mReadPacket->wpos(0);
+		}
+
 		//read head
 		if (mReadPacket->isHeadFull() == false)
 		{
@@ -97,13 +96,13 @@ void NetConnect::sendMsg(uint32 msgtype, void * msg, uint32 len)
 
 NetPacket * NetConnect::createPacket()
 {
-	NetPacket * packet = create_packet<NetPacket>();
+	NetPacket * packet = CommPool::create<NetPacket>();
 	return packet;
 }
 
 void NetConnect::recyclePacket(NetPacket * pack)
 {
-	reclaim_packet(pack);
+	CommPool::reclaim(pack);
 }
 
 void NetConnect::on_writecomplete()

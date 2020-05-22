@@ -6,7 +6,7 @@
 #include "WebSocketPacket.h"
 #include "WebSocketConnect.h"
 #include "EventLoop.h"
-#include "PacketPool.h"
+#include "CommonPool.h"
 
 class Lua_WebSocketServer : public WebSocketServer, public WebSocketEvent
 {
@@ -38,7 +38,7 @@ public:
 
 void init_wspacket_pool(int count)
 {
-	init_packet_pool<WebSocketPacket>(count);
+	CommPool::init<WebSocketPacket>(count);
 }
 
 

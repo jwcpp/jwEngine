@@ -26,7 +26,9 @@ void BasePacket::moveData(BasePacket * packet)
 
 void BasePacket::_fillHead()
 {
-
+	rpos(0);
+	wpos(0);
+	this->_storage.resize(0);
 }
 
 int32  BasePacket::getBodySize()
@@ -89,11 +91,6 @@ int BasePacket::readPos()
 int BasePacket::writePos()
 {
 	return wpos();
-}
-
-void BasePacket::vecResize(int size)
-{
-	this->_storage.resize(size);
 }
 
 //------->get

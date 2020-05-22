@@ -31,7 +31,6 @@ uint32 WebSocketPacket::readFrameHead(const uint8 * pData, uint32 size)
 
 			__m_headpos = WS_MAX_HEAD_SIZE - calcHeadSize();
 			_wpos = __m_headpos + WS_HEAD_SIZE;
-			this->_storage.resize(_wpos);
 		}
 	}
 
@@ -43,7 +42,8 @@ uint32 WebSocketPacket::readFrameHead(const uint8 * pData, uint32 size)
 		{
 			rsize = size >= rsize ? rsize : size;
 
-			append(pbuff, rsize);
+			put(wpos(), pbuff, rsize);
+			_wpos += rsize;
 
 			readsize += rsize;
 		}

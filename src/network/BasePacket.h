@@ -36,7 +36,6 @@ public:
 
 	int readPos();
 	int writePos();
-	void vecResize(int size);
 public:
 
 	//------->get

@@ -7,7 +7,7 @@
 #include "UdpPacket.h"
 #include "KcpSession.h"
 #include "EventLoop.h"
-#include "PacketPool.h"
+#include "CommonPool.h"
 
 class Lua_KcpServer : public KcpServer, public KcpEvent
 {
@@ -66,7 +66,7 @@ public:
 
 void init_kcppacket_pool(int count)
 {
-	init_packet_pool<UdpPacket>(count);
+	CommPool::init<UdpPacket>(count);
 }
 
 

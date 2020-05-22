@@ -7,7 +7,7 @@
 #include "NetPacket.h"
 #include "NetConnect.h"
 #include "EventLoop.h"
-#include "PacketPool.h"
+#include "CommonPool.h"
 
 class Lua_NetServer : public NetServer, public NetEvent
 {
@@ -66,7 +66,7 @@ public:
 
 void init_netpacket_pool(int count)
 {
-	init_packet_pool<NetPacket>(count);
+	CommPool::init<NetPacket>(count);
 }
 
 

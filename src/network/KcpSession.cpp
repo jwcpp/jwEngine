@@ -1,6 +1,6 @@
 #include "KcpSession.h"
 #include "UdpPacket.h"
-#include "PacketPool.h"
+#include "CommonPool.h"
 #include "KcpEvent.h"
 
 KcpSessionBase::KcpSessionBase():
@@ -133,7 +133,7 @@ void KcpSession::update()
 
 UdpPacket * KcpSession::_createPacket(int size)
 {
-	UdpPacket * packet = create_packet<UdpPacket>();
+	UdpPacket * packet = CommPool::create<UdpPacket>();
 	if (size > 0)
 	{
 		packet->initSize(size);
@@ -143,7 +143,7 @@ UdpPacket * KcpSession::_createPacket(int size)
 
 void KcpSession::_recyclePacket(UdpPacket * packet)
 {
-	reclaim_packet(packet);
+	CommPool::reclaim(packet);
 }
 
 void KcpSession::_onMsg(UdpPacket * packet)
