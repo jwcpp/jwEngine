@@ -170,7 +170,7 @@ struct testmsg
 - gcc version 9.3.0 测试通过
 
 ## 进一步了解
-更多使用示例请参考example目录，同时欢迎fork和贡献代码
+更多使用示例请参考[example](https://github.com/jwcpp/jwEngine/tree/master/example). 同时欢迎fork和贡献代码
 
 ## 建议
 有任何意见或框架调整的建议，请联系QQ:754420038
