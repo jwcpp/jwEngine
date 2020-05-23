@@ -1,3 +1,6 @@
+#include <map>
+#include <functional>
+#include <string_view>
 #include "HttpServer.h"
 #include "HttpConnect.h"
 #include "CommonPool.h"

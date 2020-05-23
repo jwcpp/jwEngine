@@ -114,7 +114,8 @@ project "engine"
 		"../dependencies/hiredis",
 		"../src/common",
 		"../src/network",
-		"../src/db"
+		"../src/db",
+		"../src/utils"
 	}
 	language "C++"
 	buildoptions {"-std=c++17"}
@@ -127,6 +128,8 @@ project "engine"
 	local codedir = "../src/db";
 	files { codedir.."/**.h",codedir.."/**.hpp", codedir.."/**.c", codedir.."/**.cc", codedir.."/**.cpp"}
 	local codedir = "../src/script";
+	files { codedir.."/**.h",codedir.."/**.hpp", codedir.."/**.c", codedir.."/**.cc", codedir.."/**.cpp"}
+	local codedir = "../src/utils";
 	files { codedir.."/**.h",codedir.."/**.hpp", codedir.."/**.c", codedir.."/**.cc", codedir.."/**.cpp"}
 	libdirs{"../libs"}
 	targetdir "../bin"

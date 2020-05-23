@@ -1,5 +1,6 @@
 #include "JsonReader.h"
 #include "Json.h"
+#include <cstring>
 
 using namespace jwEngine;
 
@@ -105,6 +106,7 @@ JBaseObj * JsonReader::readArray(JsonBuff * buff)
 	/*
 	[1,2,[33,44],{"num": 666}]
 	*/
+	JArray * jarr = NULL;
 	const char * pstr = buff->curr();
 	std::vector<JBaseObj *> objs;
 	while (*pstr != ']' && *pstr != '\0')
@@ -128,7 +130,7 @@ parser_pos:
 	else
 		goto fail;
 
-	auto jarr = new JArray;
+	jarr = new JArray;
 	for (auto & value : objs)
 	{
 		jarr->items.push_back(value);
@@ -151,6 +153,7 @@ JBaseObj * JsonReader::readObj(JsonBuff * buff)
 		"b": 20
 	}
 	*/
+	JSonObj * jobj = NULL;
 	const char * pstr = buff->curr();
 	std::map<std::string, JBaseObj *> objs;
 	while (*pstr != '}' && *pstr != '\0')
@@ -194,7 +197,7 @@ JBaseObj * JsonReader::readObj(JsonBuff * buff)
 	else
 		goto fail;
 
-	auto jobj = new JSonObj;
+	jobj = new JSonObj;
 	for (auto &[key, value] : objs)
 	{
 		jobj->maps[key] = value;

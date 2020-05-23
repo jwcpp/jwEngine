@@ -4,7 +4,7 @@
 #include <map>
 #include "HttpParam.h"
 
-HttpParam::HttpParam(std::string_view & str_v, char cut)
+HttpParam::HttpParam(std::string_view str_v, char cut)
 {
 	std::vector<std::string_view> equal;
 	splite(str_v, equal, cut);
@@ -24,7 +24,7 @@ HttpParam::HttpParam(std::string_view & str_v, char cut)
 }
 
 
-void HttpParam::splite(std::string_view & str_view, std::vector<std::string_view> & vec_str, char cut)
+void HttpParam::splite(std::string_view str_view, std::vector<std::string_view> & vec_str, char cut)
 {
 	std::string::size_type pos1 = 0, pos2;
 	while ((pos2 = str_view.find(cut, pos1)) != std::string_view::npos)

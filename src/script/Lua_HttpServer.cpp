@@ -1,11 +1,14 @@
 #include "sol/sol.hpp"
 
+#include <functional>
 #include <map>
+#include <string>
+#include <string_view>
 #include "HttpParam.h"
 #include "HttpServer.h"
 #include "HttpConnect.h"
 #include "EventLoop.h"
-#include <functional>
+
 class Lua_HttpServer : public HttpServer
 {
 public:
@@ -19,7 +22,7 @@ public:
 void luabind_httpserver(sol::state & lua)
 {
 	lua.new_usertype<HttpParam>("HttpParam",
-		sol::constructors<HttpParam(std::string_view &, char)>(),
+		sol::constructors<HttpParam(std::string_view, char)>(),
 		"find", &HttpParam::find,
 		"getStr", &HttpParam::getStr,
 		"getInt", &HttpParam::getInt,

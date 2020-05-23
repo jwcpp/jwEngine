@@ -1,9 +1,6 @@
 #pragma once
 #include "TcpServer.h"
 #include "HttpEvent.h"
-#include <map>
-#include <string>
-#include <functional>
 
 class EventLoop;
 class HttpServer : public TcpServer, public HttpEvent

@@ -10,9 +10,9 @@
 class HttpParam
 {
 public:
-	HttpParam(std::string_view & str_v, char cut = '&');
+	HttpParam(std::string_view str_v, char cut = '&');
 
-	static void splite(std::string_view & str_view, std::vector<std::string_view> & vec_str, char cut = '&');
+	static void splite(std::string_view str_view, std::vector<std::string_view> & vec_str, char cut = '&');
 
 	bool find(std::string_view key);
 	std::string_view getStr(std::string_view key);
