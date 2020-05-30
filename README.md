@@ -1,14 +1,14 @@
 # jwEngine
 一个跨平台的c++<->lua服务器快速解决方案，该框架即可快速响应服务器开发工作，设计思想：“让事情变得更简单”
 
-网络底层采用libuv（node.js底层库），异步io强势助力，单线程也能释放澎湃动力，跨平台支持epoll、iocp、ipv6。框架支持tcp、udp/kcp、websocket、http，使用了sol2将所有接口都导出到lua，可以选择用lua开发逻辑。
+网络底层采用libuv（node.js底层库），异步io助力使单线程也能释放澎湃动力，跨平台支持epoll、iocp、ipv6。框架支持tcp、udp/kcp、websocket、http，并保证了接口的一致性，使用了sol2将所有接口都导出到lua，可以选择用lua开发逻辑。
 
 使用modern c++开发，尽可能的使用std::move、std::string_view减少内存复制。
 
-该框架使用异步事件，不建议使用多线程，避免多线程带来的上下文切换和不完美代码，网络部分和逻辑部分使用一个主事件循环驱动。建议的方案是多进程单线程的横向扩展，按照业务控制各个进程的粒度，当然mysql和redis可以加入到线程池中。
+该框架使用异步事件，不建议使用多线程，避免多线程带来的上下文切换开销和代码美感，网络部分和逻辑部分使用一个主事件循环驱动。建议的方案是多进程单线程的横向扩展，按照业务控制各个进程的粒度，当然mysql和redis可以加入到线程池中。
 
 ## 创建一个tcp服务器
-只需要简单几行代码即可创建一个tcp高性能服务器，并自动处理数据包头和粘包，构建一个完好的NetPacket交给你。
+只需要简单几行代码即可创建一个tcp高性能服务器，并自动处理数据包头和粘包（其中包头包含消息长度和协议号），构建一个完好的NetPacket交给你。
 
 ```cpp
 class INetEvent : public NetEvent
@@ -30,11 +30,63 @@ int main()
   server.listen("127.0.0.1", 3001);
 
   EventLoop::Instance()->Run();
-
   return 0;
 }
 ```
-同样，你可以创建kcpServer和websocketServer，该框架保证了接口的一致性。
+## 创建一个kcp服务器
+c++的kcp服务器示例，快速构建你的帧同步服务器，保证消息的可靠性
+```cpp
+class KNetEvent : public KcpEvent
+{
+public:
+  virtual void onAccept(KcpSession * conn){};
+  virtual void onClose(KcpSession * conn){};
+  virtual void onMsg(KcpSession * conn, int msgtype, UdpPacket * pack){}
+  virtual void onUdpTimeout(KcpSession * s){}
+};
+
+int main()
+{
+  CommPool::init<UdpPacket>(10);
+
+  EventLoop::Instance()->init();
+
+  KNetEvent eve;
+  KcpServer server(EventLoop::Instance(), &eve);
+  server.start("127.0.0.1", 3001);
+
+  EventLoop::Instance()->Run();
+  return 0;
+}
+```
+
+## 创建一个websocket服务器
+自动完成解析websocket协议工作
+
+```cpp
+class IWebEvent : public WebSocketEvent
+{
+public:
+  virtual void onHandshake(WebSocketConnect * conn){};
+  virtual void onAccept(WebSocketConnect * conn){};
+  virtual void onClose(WebSocketConnect * conn){};
+  virtual void onMsg(WebSocketConnect * conn, WebSocketPacket * pack){};
+};
+
+int main()
+{
+  CommPool::init<WebSocketPacket>(10);
+
+  EventLoop::Instance()->init();
+
+  IWebEvent wevent;
+  WebSocketServer server(EventLoop::Instance(), &wevent);
+  server.listen("127.0.0.1", 8080);
+
+  EventLoop::Instance()->Run();
+  return 0;
+}
+```
 
 ## 创建一个http服务器
 http仅支持简单的get post请求
@@ -128,6 +180,10 @@ end
 
 event_init()
 exec()
+timer = UTimer:new()
+timer:start(function ()
+    pool:update()
+  end, 10, 10)
 event_run()
 ```
 
@@ -162,7 +218,7 @@ struct testmsg
   }
 }
 ```
-通过serialization工具进行字节解析、提取词法、语法匹配、错误定位，最终可以生成c++或者lua代码。倘若该工具无法满足你，你也可以非常轻松的接入protobuff。
+通过serialization工具可以生成c++或者lua代码，自动补全read()和write()函数，使得数据结构快速映射到SocketBuffer中。倘若该工具无法满足你，你也可以非常轻松的接入protobuff。
 
 ## 构建
 你需要一个modern c++17编译器
@@ -173,4 +229,4 @@ struct testmsg
 更多使用示例请参考[example](https://github.com/jwcpp/jwEngine/tree/master/example). 同时欢迎fork和贡献代码
 
 ## 建议
-有任何意见或框架调整的建议，请联系QQ:754420038
+有任何意见或bug，请联系QQ:754420038
