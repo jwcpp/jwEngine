@@ -5,7 +5,7 @@
 UdpServer::UdpServer(EventLoop * loop)
 {
 	_m_udp.data = this;
-	uv_udp_init(loop->GetLoop(), &_m_udp);
+	uv_udp_init(loop->getLoop(), &_m_udp);
 }
 
 

@@ -7,7 +7,7 @@
 #include "NetServer.h"
 #include "NetConnect.h"
 #include "NetPacket.h"
-#include "PacketPool.h"
+#include "CommonPool.h"
 
 #include "testmsg.h"
 
@@ -79,7 +79,7 @@ public:
 int main()
 {
 	//初始化tcp包内存池
-	init_packet_pool<NetPacket>(10);
+	CommPool::init<NetPacket>(10);
 
 	//初始化事件循环
 	INetEvent eve;
@@ -89,7 +89,7 @@ int main()
 	server.listen("127.0.0.1", 3001);
 
 	//开启事件循环
-	EventLoop::Instance()->Run();
+	EventLoop::Instance()->run();
 
 	system("pause");
 	return 0;

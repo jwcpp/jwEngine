@@ -11,7 +11,7 @@ public:
 	{
 		m_timer = (uv_timer_t *)malloc(sizeof(uv_timer_t));
 		m_timer->data = this;
-		uv_timer_init(EventLoop::Instance()->GetLoop(), m_timer);
+		uv_timer_init(EventLoop::Instance()->getLoop(), m_timer);
 	}
 
 	~UTimer()

@@ -96,8 +96,6 @@ int main()
 		}
 	});
 
-	EventLoop::Instance()->Run();
-
-	system("pause");
+	EventLoop::Instance()->run();
 	return 0;
 }

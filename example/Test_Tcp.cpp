@@ -17,14 +17,15 @@ public:
 	virtual void onAccept(NetConnect * conn){
 		if (conn)
 		{
-			conn->sendMsg(1, "12345\0", 6);
+			// 服务器通知有客户端连入
+			conn->sendMsg(1, "12345", 5);
 		}
 	};
 
 	virtual void onConnect(NetConnect * conn, int argv){
 		if (conn)
 		{
-			
+			// 客户端通知连接成功
 		}
 	};
 	virtual void onClose(NetConnect * conn){
@@ -62,7 +63,7 @@ int main()
 #endif
 
 	//开启事件循环
-	EventLoop::Instance()->Run();
+	EventLoop::Instance()->run();
 
 	system("pause");
 	return 0;

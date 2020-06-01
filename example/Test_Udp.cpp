@@ -18,16 +18,17 @@ public:
 	virtual void onAccept(KcpSession * conn){
 		if (conn)
 		{
-			
+			// 通知服务器有客户端连入
 		}
 	};
 
 	virtual void onConnect(KcpSession * conn){
 		if (conn)
 		{
+			// 通知客户端连接成功
 			int x = rand() % 100000;
 			std::string s(std::to_string(x));
-			conn->sendMsg(1, (void *)s.c_str(), s.length() + 1);
+			conn->sendMsg(1, (void *)s.c_str(), s.length());
 		}
 	};
 	virtual void onClose(KcpSession * conn){
@@ -74,7 +75,7 @@ int main()
 
 #endif
 
-	EventLoop::Instance()->Run();
+	EventLoop::Instance()->run();
 
 	system("pause");
 	return 0;

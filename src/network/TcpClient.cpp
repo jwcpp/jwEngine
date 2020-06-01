@@ -3,7 +3,7 @@
 #include "EventLoop.h"
 
 TcpClient::TcpClient(EventLoop * loop) :
-	mLoop(loop->GetLoop())
+	mLoop(loop->getLoop())
 {
 	
 }

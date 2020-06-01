@@ -5,23 +5,23 @@ void EventLoop::init()
 	mLoop = uv_default_loop();
 }
 
-int EventLoop::Run()
+int EventLoop::run()
 {
 	return uv_run(mLoop, UV_RUN_DEFAULT);
 }
 
-void EventLoop::Stop()
+void EventLoop::stop()
 {
 	uv_stop(mLoop);
 }
 
-void EventLoop::Exit()
+void EventLoop::exit()
 {
 	uv_loop_delete(mLoop);
 	mLoop = NULL;
 }
 
-uv_loop_t * EventLoop::GetLoop()
+uv_loop_t * EventLoop::getLoop()
 {
 	return mLoop;
 }

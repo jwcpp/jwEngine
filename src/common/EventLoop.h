@@ -9,10 +9,10 @@ class EventLoop : public Singleton<EventLoop>
 public:
 	void init();
 
-	int Run();
-	void Stop();
-	void Exit();
-	uv_loop_t* GetLoop();
+	int run();
+	void stop();
+	void exit();
+	uv_loop_t* getLoop();
 
 private:
 	uv_loop_t* mLoop;

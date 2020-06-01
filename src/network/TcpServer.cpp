@@ -3,7 +3,7 @@
 #include "EventLoop.h"
 
 TcpServer::TcpServer(EventLoop * loop) :
-	mLoop(loop->GetLoop())
+	mLoop(loop->getLoop())
 {
 	m_uv_tcp.data = this;
 	uv_tcp_init(mLoop, &m_uv_tcp);

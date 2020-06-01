@@ -36,7 +36,7 @@ int main()
 
 	while (1)
 	{
-		Tools::mySleep(10);
+		Tools::sleep(10);
 		Timer::update();
 	}
 

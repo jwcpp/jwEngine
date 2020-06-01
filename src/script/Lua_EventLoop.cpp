@@ -7,10 +7,10 @@ class EventLoop : public Singleton<EventLoop>
 public:
 	void init();
 
-	int Run();
-	void Stop();
-	void Exit();
-	uv_loop_t* GetLoop();
+	int run();
+	void stop();
+	void exit();
+	uv_loop_t* getLoop();
 
 private:
 	uv_loop_t* mLoop;
@@ -22,9 +22,9 @@ class Lua_EventLoop
 {
 public:
 	static void init() { EventLoop::Instance()->init(); }
-	static void run() { EventLoop::Instance()->Run(); }
-	static void stop() { EventLoop::Instance()->Stop(); }
-	static void exit() { EventLoop::Instance()->Exit(); }
+	static void run() { EventLoop::Instance()->run(); }
+	static void stop() { EventLoop::Instance()->stop(); }
+	static void exit() { EventLoop::Instance()->exit(); }
 };
 
 
