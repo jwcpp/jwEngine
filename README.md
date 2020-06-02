@@ -5,7 +5,7 @@
 
 使用modern c++开发，尽可能的使用std::move、std::string_view减少内存复制。
 
-该框架使用异步事件，不建议使用多线程，避免多线程带来的上下文切换开销和代码美感，网络部分和逻辑部分使用一个主事件循环驱动。建议的方案是多进程单线程的横向扩展，按照业务控制各个进程的粒度，当然mysql和redis可以加入到线程池中。
+该框架使用异步事件，不建议使用多线程，避免多线程上下文切换开销和破坏代码美感，网络部分和逻辑部分使用一个主事件循环驱动。建议的方案是多进程单线程的横向扩展，按照业务控制各个进程的粒度，当然mysql和redis可以加入到线程池中。
 
 ## 创建一个tcp服务器
 只需要简单几行代码即可创建一个tcp高性能服务器，并自动处理数据包头和粘包（其中包头包含消息长度和协议号），构建一个完好的NetPacket交给你。
@@ -29,7 +29,7 @@ int main()
   NetServer server(EventLoop::Instance(), &eve);
   server.listen("127.0.0.1", 3001);
 
-  EventLoop::Instance()->Run();
+  EventLoop::Instance()->run();
   return 0;
 }
 ```
@@ -55,7 +55,7 @@ int main()
   KcpServer server(EventLoop::Instance(), &eve);
   server.start("127.0.0.1", 3001);
 
-  EventLoop::Instance()->Run();
+  EventLoop::Instance()->run();
   return 0;
 }
 ```
@@ -83,7 +83,7 @@ int main()
   WebSocketServer server(EventLoop::Instance(), &wevent);
   server.listen("127.0.0.1", 8080);
 
-  EventLoop::Instance()->Run();
+  EventLoop::Instance()->run();
   return 0;
 }
 ```
@@ -142,7 +142,7 @@ int main()
     }
   });
 
-  EventLoop::Instance()->Run();
+  EventLoop::Instance()->run();
   return 0;
 }
 ```
