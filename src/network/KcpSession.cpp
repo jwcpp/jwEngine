@@ -98,7 +98,7 @@ KcpSession::KcpSession(KcpEvent * event_, uint32 timeout) :
 	__m_nTimeout(timeout),
 	__m_nUpdateTime(0)
 {
-	
+	__userdata = NULL;
 }
 
 KcpSession::~KcpSession()

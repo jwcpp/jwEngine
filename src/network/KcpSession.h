@@ -66,6 +66,9 @@ public:
 	void sendMsg(uint32 msgtype, void * msg, uint32 len);
 	void sendPacket(uint32 msgtype, UdpPacket * pack) { sendMsg(msgtype, pack); }
 	void sendData(uint32 msgtype, void * msg, uint32 len) { sendMsg(msgtype, msg, len); }
+
+	void setUserdata(void * userdata) { __userdata = userdata; }
+	void * getUserdata() { return __userdata; }
 protected:
 	virtual UdpPacket * _createPacket(int size = 0);
 	virtual void _recyclePacket(UdpPacket * packet);
@@ -77,4 +80,5 @@ private:
 	uint32     __m_nTimeout;
 	uint32     __m_nTalkTime;
 	uint32     __m_nUpdateTime;
+	void   *   __userdata;
 };

@@ -28,6 +28,7 @@ TcpSocket::TcpSocket(uint32 buffersize)
 	m_uv_tcp.data = this;
 	mWriteReq.req.data = this;
 	mBuffer.Resize(buffersize);
+	_userdata = NULL;
 }
 
 TcpSocket::~TcpSocket()

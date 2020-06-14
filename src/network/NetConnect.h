@@ -21,10 +21,6 @@ public:
 	void sendPacket(uint32 msgtype, NetPacket * pack) { sendMsg(msgtype, pack);}
 	void sendData(uint32 msgtype, void * msg, uint32 len) { sendMsg(msgtype, msg, len);}
 
-	
-	void setUserdata(void * userdata){ _userdata = userdata; }
-	void * getUserdata(){ return _userdata; }
-
 protected:
 
 	virtual void on_msgbuffer(MessageBuffer * buffer);
@@ -39,7 +35,6 @@ private:
 private:
 	NetPacket *  mReadPacket;
 	std::queue<NetPacket *> mSendPackets;
-	void * _userdata;
 	NetEvent * _netevent;
 };
 

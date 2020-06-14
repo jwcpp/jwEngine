@@ -40,6 +40,9 @@ public:
 	std::string remoteIP() const;
 	int remotePort() const;
 
+	void setUserdata(void * userdata) { _userdata = userdata; }
+	void * getUserdata() { return _userdata; }
+
 protected:
 
 	virtual void on_msgbuffer(MessageBuffer * buffer){};
@@ -57,6 +60,7 @@ private:
 	uv_tcp_t m_uv_tcp;
 	MessageBuffer mBuffer;
 	write_req_t mWriteReq;
+	void * _userdata;
 };
 
 
