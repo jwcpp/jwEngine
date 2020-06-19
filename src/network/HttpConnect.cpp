@@ -2,6 +2,7 @@
 #include "HttpConnect.h"
 #include "BasePacket.h"
 #include "http_parser.h"
+#include "CommonPool.h"
 
 /*
 -----------------
@@ -27,7 +28,6 @@ http_parser_settings http_settings;
 HttpConnect::HttpConnect()
 {
 	m_readPacket = new BasePacket();
-	m_writePacket = new BasePacket();
 	m_parser = (http_parser *)malloc(sizeof(http_parser));
 	m_url = (http_parser_url*)malloc(sizeof(http_parser_url));
 	m_parser->data = this;
@@ -51,27 +51,47 @@ HttpConnect::HttpConnect()
 HttpConnect::~HttpConnect()
 {
 	delete m_readPacket;
-	delete m_writePacket;
 	free(m_parser);
 	free(m_url);
+	release();
 }
 
 void HttpConnect::zero()
 {
 	m_readPacket->zero();
-	m_writePacket->zero();
 	m_residue = 0;
 	m_urlp = NULL;
 	m_content = NULL;
 }
 
+void HttpConnect::release()
+{
+	while (!m_writePackets.empty())
+	{
+		recyclePacket(m_writePackets.front());
+		m_writePackets.pop();
+	}
+}
+
 void HttpConnect::sendMsg(std::string_view sv)
 {
 	const char * p = sv.data();
-	m_writePacket->append(p, sv.size());
-	write((char *)p, sv.size());
+	BasePacket * pack = createPacket();
+	pack->append(p, sv.size());
+	m_writePackets.push(pack);
+	send_top_msg();
 }
 
+void HttpConnect::autoMsg(std::string_view sv, enum http_content_type type)
+{
+	static char buff[1024];
+	sprintf(buff, "HTTP/1.1 200 OK\r\nContent-Type: %s\r\nContent-Length: %d\r\n\r\n", getContentTypeStr(type), sv.size());
+	BasePacket * pack = createPacket();
+	pack->append(buff, strlen(buff));
+	pack->append((const uint8*)sv.data(), sv.size());
+	m_writePackets.push(pack);
+	send_top_msg();
+}
 
 const char * HttpConnect::getContentTypeStr(enum http_content_type type)
 {
@@ -92,13 +112,14 @@ const char * HttpConnect::getContentTypeStr(enum http_content_type type)
 	return ctype;
 }
 
-void HttpConnect::autoMsg(std::string_view sv, enum http_content_type type)
+BasePacket * HttpConnect::createPacket()
 {
-	static char buff[1024];
-	sprintf(buff, "HTTP/1.1 200 OK\r\nContent-Type: %s\r\nContent-Length: %d\r\n\r\n", getContentTypeStr(type), sv.size());
-	m_writePacket->append(buff, strlen(buff));
-	m_writePacket->append((const uint8*)sv.data(), sv.size());
-	write((char *)m_writePacket->contents(), m_writePacket->wpos());
+	BasePacket * packet = CommPool::create<BasePacket>();
+	return packet;
+}
+void HttpConnect::recyclePacket(BasePacket * pack)
+{
+	CommPool::reclaim(pack);
 }
 
 int HttpConnect::on_url(http_parser* _, const char *at, size_t length)
@@ -212,4 +233,22 @@ void HttpConnect::on_writecomplete()
 	{
 		this->close();
 	}
+	else
+	{
+		if (m_writePackets.empty())
+			return;
+
+		recyclePacket(m_writePackets.front());
+		m_writePackets.pop();
+		send_top_msg();
+	}
+}
+
+void HttpConnect::send_top_msg()
+{
+	if (m_writePackets.empty())
+		return;
+
+	BasePacket *pack = m_writePackets.front();
+	write((char *)pack->contents(), pack->wpos());
 }

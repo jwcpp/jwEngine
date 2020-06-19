@@ -72,6 +72,7 @@ WebSocketConnect::WebSocketConnect(WebSocketEvent * wevent, uint32 buffersize):
 
 WebSocketConnect::~WebSocketConnect()
 {
+	release();
 }
 
 /*
@@ -254,10 +255,10 @@ void WebSocketConnect::on_clsesocket()
 void WebSocketConnect::on_writecomplete()
 {
 	//write complete
-	if (__m_sendPackets.size() == 0)
+	if (__m_sendPackets.empty())
 		return;
 
-	recyclePacket(__m_sendPackets.back());
+	recyclePacket(__m_sendPackets.front());
 	__m_sendPackets.pop();
 	send_top_msg();
 }
@@ -285,10 +286,18 @@ bool WebSocketConnect::decodingDatas(WebSocketPacket* pPacket, uint32 msg_mask)
 
 void WebSocketConnect::send_top_msg()
 {
-	if (__m_sendPackets.size() == 0)
+	if (__m_sendPackets.empty())
 		return;
 
-	WebSocketPacket *tp = __m_sendPackets.back();
+	WebSocketPacket *tp = __m_sendPackets.front();
 	write(tp->sendStream(), tp->sendSize());
 }
 
+void WebSocketConnect::release()
+{
+	while (!__m_sendPackets.empty())
+	{
+		recyclePacket(__m_sendPackets.front());
+		__m_sendPackets.pop();
+	}
+}

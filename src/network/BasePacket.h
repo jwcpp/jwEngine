@@ -9,6 +9,7 @@
 #pragma once
 
 #include "ByteBuffer.h"
+#include "PoolObject.h"
 
 class BasePacket : public ByteBuffer
 {
@@ -17,6 +18,7 @@ public:
 	~BasePacket();
 
 	virtual void zero();
+	virtual void release();
 	virtual void moveData(BasePacket * packet);
 
 	virtual int32  getBodySize();
@@ -86,5 +88,7 @@ protected:
 	void setValue(uint32 pos, T t){
 		put(pos, t);
 	}
+
+	INCLUDE_POOL_OBJECT
 };
 

@@ -9,7 +9,6 @@
 #pragma once
 
 #include "BasePacket.h"
-#include "PoolObject.h"
 
 #define UDP_PACK_HEAD_SIZE sizeof(uint32)
 
@@ -38,7 +37,5 @@ public:
 
 protected:
 	void _fillHead();
-
-	INCLUDE_POOL_OBJECT
 };
 

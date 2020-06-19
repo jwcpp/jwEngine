@@ -21,6 +21,8 @@ public:
 	void sendPacket(uint32 msgtype, NetPacket * pack) { sendMsg(msgtype, pack);}
 	void sendData(uint32 msgtype, void * msg, uint32 len) { sendMsg(msgtype, msg, len);}
 
+	static NetPacket * createPacket();
+	static void recyclePacket(NetPacket * pack);
 protected:
 
 	virtual void on_msgbuffer(MessageBuffer * buffer);
@@ -28,10 +30,8 @@ protected:
 	virtual void on_writecomplete();
 
 private:
-	NetPacket * createPacket();
-	void recyclePacket(NetPacket * pack);
 	void send_top_msg();
-	
+	void release();
 private:
 	NetPacket *  mReadPacket;
 	std::queue<NetPacket *> mSendPackets;

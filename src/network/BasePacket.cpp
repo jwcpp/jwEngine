@@ -17,6 +17,11 @@ void BasePacket::zero()
 	_fillHead();
 }
 
+void BasePacket::release()
+{
+
+}
+
 void BasePacket::moveData(BasePacket * packet)
 {
 	rpos(packet->rpos());

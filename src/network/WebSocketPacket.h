@@ -8,7 +8,6 @@
 
 #pragma once
 #include "BasePacket.h"
-#include "PoolObject.h"
 
 #define WS_HEAD_SIZE 2
 #define WS_MAX_HEAD_SIZE 14
@@ -87,6 +86,5 @@ private:
 private:
 	uint8 __m_head[WS_HEAD_SIZE];
 	uint8 __m_headpos;
-	INCLUDE_POOL_OBJECT
 };
 

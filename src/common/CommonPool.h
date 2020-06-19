@@ -37,6 +37,7 @@ namespace CommPool
 	template<typename T>
 	void reclaim(T * obj)
 	{
+		obj->release();
 		CommonPool<T>::Instance()->objpool.reclaimObject(obj);
 	}
 

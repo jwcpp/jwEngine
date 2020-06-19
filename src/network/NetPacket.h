@@ -2,7 +2,6 @@
 #define MSG_PACKET_H
 
 #include "BasePacket.h"
-#include "PoolObject.h"
 
 #define MSG_LEN_POS  0
 #define MSG_TYPE_POS sizeof(uint32)
@@ -33,8 +32,6 @@ public:
 private:
 	
 	virtual void _fillHead();
-
-	INCLUDE_POOL_OBJECT
 };
 
 #endif

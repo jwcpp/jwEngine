@@ -30,6 +30,9 @@ public:
 	void sendMsg(void * msg, uint32 len);
 	void sendPacket(WebSocketPacket * pack) { sendMsg(pack); }
 	void sendData(void * msg, uint32 len) { sendMsg(msg, len); }
+
+	static WebSocketPacket * createPacket();
+	static void recyclePacket(WebSocketPacket * pack);
 protected:
 
 	virtual void on_msgbuffer(MessageBuffer * buffer);
@@ -37,10 +40,9 @@ protected:
 	virtual void on_writecomplete();
 
 private:
-	WebSocketPacket * createPacket();
-	void recyclePacket(WebSocketPacket * pack);
 	void send_top_msg();
 	bool decodingDatas(WebSocketPacket* pPacket, uint32 msg_mask);
+	void release();
 private:
 	std::string __m_strKey;
 	std::string __m_strHost;

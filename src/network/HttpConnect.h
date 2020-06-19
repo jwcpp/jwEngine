@@ -10,6 +10,7 @@
 #include "TcpSocket.h"
 #include "HttpEvent.h"
 #include "PoolObject.h"
+#include <queue>
 
 enum http_content_type
 {
@@ -34,6 +35,7 @@ public:
 	~HttpConnect();
 
 	void zero();
+	void release();
 	void setEvent(HttpEvent * e) { m_event = e; }
 	void sendMsg(std::string_view sv);
 	void autoMsg(std::string_view sv, enum http_content_type type = hct_text_html);
@@ -48,12 +50,16 @@ private:
 
 	bool parser(const char *, int);
 	void complete();
+
+	void send_top_msg();
+	BasePacket * createPacket();
+	void recyclePacket(BasePacket * pack);
 private:
 	HttpEvent * m_event = NULL;
 	http_parser * m_parser;
 	http_parser_url * m_url;
 	BasePacket * m_readPacket;
-	BasePacket * m_writePacket;
+	std::queue<BasePacket *> m_writePackets;
 	const char * m_urlp;	//url指针
 	const char * m_content;	//post数据指针
 	int m_residue;
