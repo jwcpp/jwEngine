@@ -1,3 +1,4 @@
+#include <string>
 #include "Typedef.h"
 
 std::map<std::string, TypeInfo> Typedef::typedef_; // typedef int32 ID

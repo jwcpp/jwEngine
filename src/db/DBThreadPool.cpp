@@ -5,6 +5,7 @@
 #include "hiredis.h"
 #include "DB_Interface_redis.h"
 #include "SqlPrepare.h"
+#include <functional>
 #include "DBThreadPool.h"
 
 

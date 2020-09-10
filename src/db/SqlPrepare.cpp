@@ -44,7 +44,7 @@ SqlPrepare::~SqlPrepare()
 
 	if (m_paramBind != NULL)
 	{
-		for (size_t i = 0; i < m_count; ++i)
+		for (int i = 0; i < m_count; ++i)
 		{
 			MYSQL_BIND* pBind = &m_paramBind[i];
 			free(pBind->buffer);
@@ -58,7 +58,7 @@ SqlPrepare::~SqlPrepare()
 
 	if (m_resultBind != NULL)
 	{
-		for (size_t i = 0; i < m_field; ++i)
+		for (int i = 0; i < m_field; ++i)
 		{
 			MYSQL_BIND* pBind = &m_resultBind[i];
 			free(pBind->buffer);
@@ -368,38 +368,38 @@ void SqlPrepare::allocateParamBuffer(MYSQL_BIND* bind)
 {
 	switch (bind->buffer_type)
 	{
-	case MYSQL_TYPE_TINY: // TINYINT
-		bind->buffer = new char[1]; // signed char
+	case MYSQL_TYPE_TINY:
+		bind->buffer = new char[1];
 		break;
-	case MYSQL_TYPE_SHORT: // SMALLINT
-		bind->buffer = new char[2]; // short int
+	case MYSQL_TYPE_SHORT:
+		bind->buffer = new char[2];
 		break;
-	case MYSQL_TYPE_LONG: // INT
-		bind->buffer = new char[4]; // int
+	case MYSQL_TYPE_LONG:
+		bind->buffer = new char[4];
 		break;
-	case MYSQL_TYPE_LONGLONG: // BIGINT
-		bind->buffer = new char[8]; // long long int
+	case MYSQL_TYPE_LONGLONG:
+		bind->buffer = new char[8];
 		break;
-	case MYSQL_TYPE_FLOAT: // FLOAT
-		bind->buffer = new char[4]; // float
+	case MYSQL_TYPE_FLOAT:
+		bind->buffer = new char[4];
 		break;
-	case MYSQL_TYPE_DOUBLE: // DOUBLE
-		bind->buffer = new char[8]; // double
+	case MYSQL_TYPE_DOUBLE:
+		bind->buffer = new char[8];
 		break;
-	case MYSQL_TYPE_TIME: // TIME
-	case MYSQL_TYPE_DATE: // DATE
-	case MYSQL_TYPE_DATETIME: // DATETIME
-	case MYSQL_TYPE_TIMESTAMP: // TIMESTAMP
-		bind->buffer = new char[sizeof(MYSQL_TIME)]; // MYSQL_TIME
+	case MYSQL_TYPE_TIME:
+	case MYSQL_TYPE_DATE:
+	case MYSQL_TYPE_DATETIME:
+	case MYSQL_TYPE_TIMESTAMP:
+		bind->buffer = new char[sizeof(MYSQL_TIME)];
 		break;
-	case MYSQL_TYPE_STRING: // (for non-binary data) TEXT, CHAR, VARCHAR
-	case MYSQL_TYPE_BLOB: // (for binary data) BLOB, BINARY, VARBINARY
-		bind->buffer = new char[bind->buffer_length]; // char[]
+	case MYSQL_TYPE_STRING:
+	case MYSQL_TYPE_BLOB:
+		bind->buffer = new char[bind->buffer_length];
 		break;
-	case MYSQL_TYPE_NULL: // NULL
+	case MYSQL_TYPE_NULL:
 		break;
 	default:
-		ERROR_LOG("_AllocateParamBuffer() failed: Unknown type for the param.");
+		ERROR_LOG("allocateParamBuffer() failed: Unknown type for the param.");
 	}
 }
 
@@ -411,64 +411,62 @@ void SqlPrepare::allocateResultBuffer(MYSQL_BIND* bind, MYSQL_FIELD *field)
 		bind->is_unsigned = field->flags & UNSIGNED_FLAG;
 		switch (bind->buffer_type)
 		{
-		case MYSQL_TYPE_TINY: // TINYINT
+		case MYSQL_TYPE_TINY:
 			bind->buffer_length = 1;
-			bind->buffer = new char[bind->buffer_length]; // signed char
+			bind->buffer = new char[bind->buffer_length];
 			break;
-		case MYSQL_TYPE_YEAR: // YEAR
-		case MYSQL_TYPE_SHORT: // SMALLINT
+		case MYSQL_TYPE_YEAR:
+		case MYSQL_TYPE_SHORT:
 			bind->buffer_length = 2;
-			bind->buffer = new char[bind->buffer_length]; // short int
+			bind->buffer = new char[bind->buffer_length];
 			break;
-		case MYSQL_TYPE_INT24: // MEDIUMINT
-		case MYSQL_TYPE_LONG: // INT
+		case MYSQL_TYPE_INT24:
+		case MYSQL_TYPE_LONG:
 			bind->buffer_length = 4;
-			bind->buffer = new char[bind->buffer_length]; // int
+			bind->buffer = new char[bind->buffer_length];
 			break;
-		case MYSQL_TYPE_LONGLONG: // BIGINT
+		case MYSQL_TYPE_LONGLONG:
 			bind->buffer_length = 8;
-			bind->buffer = new char[bind->buffer_length]; // long long int
+			bind->buffer = new char[bind->buffer_length];
 			break;
-		case MYSQL_TYPE_FLOAT: // FLOAT
+		case MYSQL_TYPE_FLOAT:
 			bind->buffer_length = 4;
-			bind->buffer = new char[bind->buffer_length]; // float
+			bind->buffer = new char[bind->buffer_length];
 			break;
-		case MYSQL_TYPE_DOUBLE: // DOUBLE
+		case MYSQL_TYPE_DOUBLE:
 			bind->buffer_length = 8;
-			bind->buffer = new char[bind->buffer_length]; // double
+			bind->buffer = new char[bind->buffer_length];
 			break;
-		case MYSQL_TYPE_NEWDECIMAL: // DECIMAL
+		case MYSQL_TYPE_NEWDECIMAL:
 			bind->buffer_length = 67;
-			bind->buffer = new char[bind->buffer_length]; // char[]
+			bind->buffer = new char[bind->buffer_length];
 			break;
 
-		case MYSQL_TYPE_TIME: // TIME
-		case MYSQL_TYPE_DATE: // DATE
-		case MYSQL_TYPE_DATETIME: // DATETIME
-		case MYSQL_TYPE_TIMESTAMP: // TIMESTAMP
+		case MYSQL_TYPE_TIME:
+		case MYSQL_TYPE_DATE:
+		case MYSQL_TYPE_DATETIME:
+		case MYSQL_TYPE_TIMESTAMP:
 			bind->buffer_length = sizeof(MYSQL_TIME);
-			bind->buffer = new char[bind->buffer_length]; // MYSQL_TIME
+			bind->buffer = new char[bind->buffer_length];
 			break;
-		case MYSQL_TYPE_STRING: // CHAR, BINARY
-		case MYSQL_TYPE_VAR_STRING: // VARCHAR, VARBINARY
+		case MYSQL_TYPE_STRING:
+		case MYSQL_TYPE_VAR_STRING:
 			bind->buffer_length = field->length;
-			bind->buffer = new char[bind->buffer_length]; // char[]
+			bind->buffer = new char[bind->buffer_length];
 			break;
-		case MYSQL_TYPE_TINY_BLOB: // TINYBLOB, TINYTEXT
-		case MYSQL_TYPE_BLOB: // BLOB, TEXT
-		case MYSQL_TYPE_MEDIUM_BLOB: // MEDIUMBLOB, MEDIUMTEXT
-		case MYSQL_TYPE_LONG_BLOB: // LONGBLOB, LONGTEXT
-			/// NOTE 文档中关于用mysql_stmt_fetch_column()得到大数据的方法在Debug模式下会因为buffer_length==0而触发assertion failure，所以申请一个小缓存。
+		case MYSQL_TYPE_TINY_BLOB:
+		case MYSQL_TYPE_BLOB:
+		case MYSQL_TYPE_MEDIUM_BLOB:
+		case MYSQL_TYPE_LONG_BLOB:
 			bind->buffer_length = 1;
-			bind->buffer = new char[bind->buffer_length]; // char[]
+			bind->buffer = new char[bind->buffer_length];
 			break;
-		case MYSQL_TYPE_BIT: // BIT
-			// Bit 按照bit(1)来读，作为bool类型用。
+		case MYSQL_TYPE_BIT:
 			bind->buffer_length = 1;
-			bind->buffer = new char[bind->buffer_length]; // bool_x
+			bind->buffer = new char[bind->buffer_length];
 			break;
 		default:
-			ERROR_LOG("_AllocateResultBuffer() failed: Unknown type for the result.");
+			ERROR_LOG("allocateResultBuffer() failed: Unknown type for the result.");
 		}
 	}
 	else
@@ -579,8 +577,10 @@ bool SqlPrepare::fetch()
 	case MYSQL_NO_DATA:
 		return false;
 
-	case 1: // Error
+	case 1: // the error
 	default:
 		ERROR_LOG(mysql_stmt_error(m_stmt));
 	}
+
+	return false;
 }

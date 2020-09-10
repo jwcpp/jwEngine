@@ -73,7 +73,7 @@ int RedisCommand::length()
 }
 const char ** RedisCommand::argv(std::vector<char *> & vec)
 {
-	for (int i = 0; i < m_param.size(); ++i)
+	for (uint32 i = 0; i < m_param.size(); ++i)
 	{
 		vec.push_back((char *)(m_param[i].data()));
 	}

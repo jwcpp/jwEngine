@@ -154,7 +154,7 @@ void HttpConnect::on_msgbuffer(MessageBuffer * buffer)
 				{
 					if (m_parser->method == HTTP_POST)
 					{
-						m_residue = m_parser->content_length;
+						m_residue = static_cast<int>(m_parser->content_length);
 					}
 					m_close = (http_should_keep_alive(m_parser) == 0);
 				}
@@ -204,7 +204,7 @@ void HttpConnect::complete()
 
 	if (m_parser->method == HTTP_POST)
 	{
-		std::string_view param(m_content, m_parser->content_length);
+		std::string_view param(m_content, static_cast<int>(m_parser->content_length));
 		if (m_event) m_event->onMsg(this, HTTP_POST, path, param);
 	}
 	else if (m_parser->method == HTTP_GET)
