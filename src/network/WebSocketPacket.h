@@ -54,6 +54,8 @@ public:
 	WebSocketPacket();
 	~WebSocketPacket();
 
+	virtual void zero();
+
 	uint8 getFin(){ return (__m_head[0] >> 7) & 0x01; }
 	uint8 getOpcode(){ return __m_head[0] & 0x0F; }
 	uint8 getMask(){ return (__m_head[1] >> 7) & 0x01; }
@@ -76,8 +78,6 @@ public:
 	virtual int32  sendSize();
 	virtual char * sendStream();
 
-
-	void _fillHead();
 	virtual void moveData(WebSocketPacket * packet);
 	void setPongPacket();
 

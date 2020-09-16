@@ -2,7 +2,14 @@
 
 NetPacket::NetPacket()
 {
-	_fillHead();
+	zero();
+}
+
+void NetPacket::zero()
+{
+	this->_storage.resize(MSG_HEAD_SIZE);
+	_wpos = MSG_HEAD_SIZE;
+	_rpos = MSG_HEAD_SIZE;
 }
 
 int32  NetPacket::getBodySize()
@@ -66,11 +73,4 @@ uint32 NetPacket::readHead(const uint8 * p, uint32 size)
 	_wpos += rsize;
 
 	return rsize;
-}
-
-void NetPacket::_fillHead()
-{
-	this->_storage.resize(MSG_HEAD_SIZE);
-	_wpos = MSG_HEAD_SIZE;
-	_rpos = MSG_HEAD_SIZE;
 }

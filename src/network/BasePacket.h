@@ -20,6 +20,7 @@ public:
 	virtual void zero();
 	virtual void release();
 	virtual void moveData(BasePacket * packet);
+	void shrink(int isize);
 
 	virtual int32  getBodySize();
 	virtual char * getBodyData();
@@ -66,7 +67,6 @@ public:
 	void pushDouble(double value);
 	void pushString(std::string value);
 protected:
-	virtual void _fillHead();
 
 	template<typename T>
 	T popValue() {

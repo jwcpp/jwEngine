@@ -18,6 +18,7 @@ public:
 	UdpPacket();
 	~UdpPacket();
 
+	virtual void zero();
 	void initSize(int size);
 
 	virtual int32  getBodySize();
@@ -34,8 +35,5 @@ public:
 
 	void writeHead(int msgtype);
 	void writeComplete(uint32 size);
-
-protected:
-	void _fillHead();
 };
 

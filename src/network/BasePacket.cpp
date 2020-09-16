@@ -4,7 +4,7 @@
 BasePacket::BasePacket()
 {
 	// Polymorphism cannot be implemented in constructors
-	_fillHead();
+	zero();
 }
 
 BasePacket::~BasePacket()
@@ -14,7 +14,9 @@ BasePacket::~BasePacket()
 
 void BasePacket::zero()
 {
-	_fillHead();
+	rpos(0);
+	wpos(0);
+	this->_storage.resize(0);
 }
 
 void BasePacket::release()
@@ -29,11 +31,17 @@ void BasePacket::moveData(BasePacket * packet)
 	_storage = packet->Move();
 }
 
-void BasePacket::_fillHead()
+void BasePacket::shrink(int isize)
 {
-	rpos(0);
-	wpos(0);
-	this->_storage.resize(0);
+	// shrink_to_fit()
+	// swap()
+
+	if (_storage.capacity() > isize)
+	{
+		std::vector<uint8> vec;
+		vec.reserve(isize);
+		_storage = std::move(vec);
+	}
 }
 
 int32  BasePacket::getBodySize()

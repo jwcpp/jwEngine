@@ -3,12 +3,20 @@
 
 WebSocketPacket::WebSocketPacket()
 {
-	_fillHead();
+	zero();
 }
 
 
 WebSocketPacket::~WebSocketPacket()
 {
+}
+
+void WebSocketPacket::zero()
+{
+	this->_storage.resize(WS_MAX_HEAD_SIZE);
+	_wpos = WS_MAX_HEAD_SIZE;
+	_rpos = WS_MAX_HEAD_SIZE;
+	__m_headpos = WS_MAX_HEAD_SIZE - WS_HEAD_SIZE;
 }
 
 uint32 WebSocketPacket::readFrameHead(const uint8 * pData, uint32 size)
@@ -126,14 +134,6 @@ void WebSocketPacket::writeFrameHead(int32 bodylen, WSFrameType frame_type)
 		put(__m_headpos + 2, (uint64)bodylen);
 	}
 
-}
-
-void WebSocketPacket::_fillHead()
-{
-	this->_storage.resize(WS_MAX_HEAD_SIZE);
-	_wpos = WS_MAX_HEAD_SIZE;
-	_rpos = WS_MAX_HEAD_SIZE;
-	__m_headpos = WS_MAX_HEAD_SIZE - WS_HEAD_SIZE;
 }
 
 uint32 WebSocketPacket::getMaskKey()

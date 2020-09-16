@@ -89,7 +89,7 @@ public:
 
 	int32 getTotalAllocs(){ return total_allocs_; }
 	int32 getObjCount(){ return obj_count_; }
-
+	OBJECTS & getObjs() { return objects_; }
 private:
 	int32 max_count;
 	int32 total_allocs_;

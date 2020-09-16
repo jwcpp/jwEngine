@@ -14,6 +14,8 @@ class NetPacket : public BasePacket
 public:
 	NetPacket();
 
+	virtual void zero();
+
 	virtual int32  getBodySize();
 	virtual char * getBodyData();
 
@@ -29,9 +31,6 @@ public:
 
 	void writeHead(int msgtype);
 	uint32 readHead(const uint8 * p, uint32 size);
-private:
-	
-	virtual void _fillHead();
 };
 
 #endif

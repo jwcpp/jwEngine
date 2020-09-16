@@ -3,12 +3,19 @@
 
 UdpPacket::UdpPacket()
 {
-	_fillHead();
+	zero();
 }
 
 
 UdpPacket::~UdpPacket()
 {
+}
+
+void UdpPacket::zero()
+{
+	this->_storage.resize(UDP_PACK_HEAD_SIZE);
+	_wpos = UDP_PACK_HEAD_SIZE;
+	_rpos = UDP_PACK_HEAD_SIZE;
 }
 
 void UdpPacket::initSize(int s)
@@ -27,13 +34,6 @@ int UdpPacket::getMsgType()
 void UdpPacket::writeHead(int msgtype)
 {
 	put<uint32>(0, msgtype);
-}
-
-void UdpPacket::_fillHead()
-{
-	this->_storage.resize(UDP_PACK_HEAD_SIZE);
-	_wpos = UDP_PACK_HEAD_SIZE;
-	_rpos = UDP_PACK_HEAD_SIZE;
 }
 
 void UdpPacket::writeComplete(uint32 size)

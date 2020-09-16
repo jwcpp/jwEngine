@@ -46,4 +46,10 @@ namespace CommPool
 	{
 		CommonPool<T>::Instance()->objpool.destroy();
 	}
+
+	template<typename T>
+	std::list<T*> & getobjs()
+	{
+		return CommonPool<T>::Instance()->objpool.getObjs();
+	}
 }
