@@ -42,8 +42,8 @@ void KcpClient::onMessage(const sockaddr * addr, const char * buff, ssize_t len)
 	if (len == SESSION_PACKET_SIZE && conv > 0 && code == SETUP_SESSION_CODE)
 	{
 		KcpSession * session = __m_kcpEvent->createConnect();
-		session->init(conv, addr, &_udp);
-		session->start();
+		uint32 ms = __m_kcpEvent->onKcp(session->init(conv, addr, &_udp));
+		session->start(ms);
 		__m_mapSessions[conv] = session;
 		__m_kcpEvent->onConnect(session);
 

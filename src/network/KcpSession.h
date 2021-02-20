@@ -28,14 +28,15 @@ public:
 	KcpSessionBase();
 	virtual ~KcpSessionBase();
 
-	void init(uint32 session_id, const sockaddr * addr, uv_udp_t * udp);
+	ikcpcb* init(uint32 session_id, const sockaddr * addr, uv_udp_t * udp);
 	void destory();
 	int send(const char * buf, int len);
 	int recv(const char * buf, long len);
 
 	uint32 update(uint32 millisecond);
 	uint32 getSessionId();
-
+	void flushKcp();
+	const ikcpcb* getKcp();
 protected:
 	virtual UdpPacket * _createPacket(int size) = 0;
 	virtual void _recyclePacket(UdpPacket * packet) = 0;
@@ -59,7 +60,7 @@ public:
 	KcpSession(KcpEvent * event_, uint32 timeout);
 	~KcpSession();
 
-	void start();
+	void start(uint32 ms);
 	void over();
 	void update();
 	void sendMsg(uint32 msgtype, UdpPacket * pack);

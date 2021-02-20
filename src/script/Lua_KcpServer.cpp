@@ -76,7 +76,8 @@ void luabind_kcpserver(sol::state & lua)
 
 	lua.new_usertype<KcpSession>("KcpSession",
 		"sendPacket", &KcpSession::sendPacket,
-		"sendData", &KcpSession::sendData);
+		"sendData", &KcpSession::sendData,
+		"flushKcp", &KcpSession::flushKcp);
 
 	lua.new_usertype<Lua_KcpClient>("KcpClient",
 		//sol::constructors<Lua_NetClient(EventLoop *)>(),

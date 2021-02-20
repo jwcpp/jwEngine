@@ -10,6 +10,7 @@ public:
 
 	virtual KcpSession * createConnect();
 	virtual void destroyConnect(KcpSession * conn);
+	virtual int onKcp(void* kcp);
 
 	virtual void onUdpTimeout(KcpSession * ){};  //连接超时，建议close该会话
 	virtual void onAccept(KcpSession * conn){};

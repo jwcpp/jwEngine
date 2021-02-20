@@ -15,14 +15,15 @@ KcpSessionBase::~KcpSessionBase()
 	
 }
 
-void KcpSessionBase::init(uint32 session_id, const sockaddr * addr, uv_udp_t * udp)
+ikcpcb* KcpSessionBase::init(uint32 session_id, const sockaddr * addr, uv_udp_t * udp)
 {
 	__m_kcp = ikcp_create(session_id, (void *)this);
 	__m_kcp->output = KcpSessionBase::__kcpOutCallback;
-	ikcp_nodelay(__m_kcp, 1, 10, 2, 1);
 
 	memcpy((void *)&__m_addr, (const void *)addr, sizeof(sockaddr));
 	__m_udp = udp;
+
+	return __m_kcp;
 }
 
 void KcpSessionBase::destory()
@@ -88,6 +89,16 @@ int KcpSessionBase::__udpSend(const char * buf, int len)
 	return uv_udp_try_send(__m_udp, &msg, 1, &__m_addr);
 }
 
+void KcpSessionBase::flushKcp()
+{
+	// 每次发送完调用flush，把数据刷出去，否则要下次update才出的去
+	if (__m_kcp) ikcp_flush(__m_kcp);
+}
+
+const ikcpcb* KcpSessionBase::getKcp()
+{
+	return __m_kcp;
+}
 
 //---------------------------------------------------------------
 
@@ -105,10 +116,10 @@ KcpSession::~KcpSession()
 {
 }
 
-void KcpSession::start()
+void KcpSession::start(uint32 ms)
 {
 	__m_nTalkTime = XTime::iclock();
-	__m_timer.start(std::bind(&KcpSession::update, this), 10, 10);
+	__m_timer.start(std::bind(&KcpSession::update, this), ms, ms);
 }
 
 void KcpSession::over()

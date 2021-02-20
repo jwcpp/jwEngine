@@ -47,8 +47,8 @@ void KcpServer::onMessage(const sockaddr * addr, const char * buff, ssize_t len)
 
 		//create new session
 		KcpSession * session = __m_kcpEvent->createConnect();
-		session->init(gSessionid, addr, &_m_udp);
-		session->start();
+		uint32 ms = __m_kcpEvent->onKcp(session->init(gSessionid, addr, &_m_udp));
+		session->start(ms);
 		__m_mapSessions[gSessionid] = session;
 
 		//send to client
