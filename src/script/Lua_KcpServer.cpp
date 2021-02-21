@@ -7,7 +7,6 @@
 #include "UdpPacket.h"
 #include "KcpSession.h"
 #include "EventLoop.h"
-#include "CommonPool.h"
 
 class Lua_KcpServer : public KcpServer, public KcpEvent
 {
@@ -64,15 +63,9 @@ public:
 	std::function<void(KcpSession *, int, UdpPacket *)> on_msg;
 };
 
-void init_kcppacket_pool(int count)
-{
-	CommPool::init<UdpPacket>(count);
-}
-
 
 void luabind_kcpserver(sol::state & lua)
 {
-	lua["init_kcppacket_pool"] = &init_kcppacket_pool;
 
 	lua.new_usertype<KcpSession>("KcpSession",
 		"sendPacket", &KcpSession::sendPacket,

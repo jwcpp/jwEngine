@@ -6,7 +6,6 @@
 #include "WebSocketPacket.h"
 #include "WebSocketConnect.h"
 #include "EventLoop.h"
-#include "CommonPool.h"
 
 class Lua_WebSocketServer : public WebSocketServer, public WebSocketEvent
 {
@@ -36,16 +35,8 @@ public:
 	std::function<void(WebSocketConnect *, WebSocketPacket *)> on_msg;
 };
 
-void init_wspacket_pool(int count)
-{
-	CommPool::init<WebSocketPacket>(count);
-}
-
-
 void luabind_websocket(sol::state & lua)
 {
-	lua["init_wspacket_pool"] = &init_wspacket_pool;
-
 	lua.new_usertype<WebSocketConnect>("WebSocketConnect",
 		"close", &WebSocketConnect::close,
 		"sendPacket", &WebSocketConnect::sendPacket,

@@ -7,7 +7,6 @@
 #include "NetPacket.h"
 #include "NetConnect.h"
 #include "EventLoop.h"
-#include "CommonPool.h"
 
 class Lua_NetServer : public NetServer, public NetEvent
 {
@@ -64,16 +63,8 @@ public:
 	std::function<void(NetConnect *, int, NetPacket *)> on_msg;
 };
 
-void init_netpacket_pool(int count)
-{
-	CommPool::init<NetPacket>(count);
-}
-
-
 void luabind_netserver(sol::state & lua)
 {
-	lua["init_netpacket_pool"] = &init_netpacket_pool;
-
 	lua.new_usertype<NetConnect>("NetConnect",
 		"close", &NetConnect::close,
 		"sendPacket", &NetConnect::sendPacket,
