@@ -11,8 +11,8 @@ class ObjectPool
 	typedef std::list<T*> OBJECTS;
 
 public:
-	ObjectPool(int32 maxcount = 0) :
-		max_count(maxcount), total_allocs_(0), obj_count_(0)
+	ObjectPool(int32 maxfreecount = 0) :
+		max_free(maxfreecount), obj_count_(0)
 	{
 		
 	}
@@ -23,7 +23,7 @@ public:
 
 	void init(int32 count)
 	{
-		max_count = count;
+		max_free = count;
 	}
 
 	void destroy()
@@ -37,7 +37,6 @@ public:
 
 		objects_.clear();
 		obj_count_ = 0;
-		total_allocs_ = 0;
 	}
 
 	T* createObject()
@@ -53,7 +52,6 @@ public:
 		
 		T* t = newObj();
 		t->setEnabledPoolObject(true);
-		++total_allocs_;
 		return t;
 	}
 
@@ -75,10 +73,9 @@ public:
 		}
 
 		obj->setEnabledPoolObject(false);
-		if (obj_count_ >= max_count)
+		if (obj_count_ >= max_free)
 		{
 			delete obj;
-			--total_allocs_;
 		}
 		else
 		{
@@ -87,12 +84,10 @@ public:
 		}
 	}
 
-	int32 getTotalAllocs(){ return total_allocs_; }
 	int32 getObjCount(){ return obj_count_; }
 	OBJECTS & getObjs() { return objects_; }
 private:
-	int32 max_count;
-	int32 total_allocs_;
+	int32 max_free;
 	int32 obj_count_;
 	OBJECTS objects_;
 };
