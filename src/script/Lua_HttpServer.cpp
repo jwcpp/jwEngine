@@ -28,7 +28,8 @@ void luabind_httpserver(sol::state & lua)
 		"getInt", &HttpParam::getInt,
 		"getFloat", &HttpParam::getFloat);
 
-	lua.new_usertype<HttpConnect>("HttpConnect",
+	lua.new_usertype<HttpConnect>("HttpConnect", 
+		sol::base_classes, sol::bases<TcpSocket>(),
 		"sendMsg", &HttpConnect::sendMsg,
 		"autoMsg", &HttpConnect::autoMsg);
 

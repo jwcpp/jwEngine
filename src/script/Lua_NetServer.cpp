@@ -66,6 +66,7 @@ public:
 void luabind_netserver(sol::state & lua)
 {
 	lua.new_usertype<NetConnect>("NetConnect",
+		sol::base_classes, sol::bases<TcpSocket>(),
 		"close", &NetConnect::close,
 		"sendPacket", &NetConnect::sendPacket,
 		"sendData", &NetConnect::sendData);

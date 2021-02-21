@@ -1,4 +1,5 @@
 #include "sol/sol.hpp"
+#include "TcpSocket.h"
 #include "BasePacket.h"
 
 void luabind_basepacket(sol::state & lua)
@@ -30,4 +31,11 @@ void luabind_basepacket(sol::state & lua)
 		
 		"wpos", &BasePacket::writePos,
 		"rpos", &BasePacket::readPos);
+
+
+	lua.new_usertype<TcpSocket>("TcpSocket",
+		"setUserdata", &TcpSocket::setUserdata,
+		"getUserdata", &TcpSocket::getUserdata,
+		"setUsernum", &TcpSocket::setUsernum,
+		"getUsernum", &TcpSocket::getUsernum);
 }

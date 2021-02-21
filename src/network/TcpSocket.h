@@ -42,7 +42,8 @@ public:
 
 	void setUserdata(void * userdata) { _userdata = userdata; }
 	void * getUserdata() { return _userdata; }
-
+	void setUsernum(uint32 num) { _userdata = (void*)num; }
+	uint32 getUsernum() { return (uint32)_userdata; }
 protected:
 
 	virtual void on_msgbuffer(MessageBuffer * buffer){};
