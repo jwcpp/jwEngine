@@ -165,7 +165,6 @@ void XLog::print(int level, std::string& str)
 {
 	//printf
 #ifdef SYSTEM_WIN
-
 	{
 		AutoLock templock(this);
 		switch (level)
@@ -179,13 +178,16 @@ void XLog::print(int level, std::string& str)
 				FOREGROUND_RED);
 			break;
 		default:
-			SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), FOREGROUND_RED | FOREGROUND_GREEN | FOREGROUND_BLUE);
+			break;
 		}
 
 		printf("%s", str.c_str());
 
 		//ÉèÖÃ»Ø°×É«
-		SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), FOREGROUND_RED | FOREGROUND_GREEN | FOREGROUND_BLUE);
+		if (level == LL_WARNING || level == LL_ERROR)
+		{
+			SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), FOREGROUND_RED | FOREGROUND_GREEN | FOREGROUND_BLUE);
+		}
 	}
 #else
 	switch (level)
