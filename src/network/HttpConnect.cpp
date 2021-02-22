@@ -15,6 +15,7 @@ POST /login HTTP/1.1\r\n
 Host: 127.0.0.1\r\n
 Connection: keep-alive\r\n
 Content-Length:10\r\n
+\r\n
 name=zs&pass=111
 
 -----------------
@@ -159,11 +160,17 @@ void HttpConnect::on_msgbuffer(MessageBuffer * buffer)
 					m_close = (http_should_keep_alive(m_parser) == 0);
 				}
 			}
-			else if (m_readPacket->wpos() >= 5120)
+			else
 			{
-				// Head is too big
-				close();
-				break;
+				m_readPacket->append(buffer->GetReadPointer(), buffer->GetActiveSize());
+				buffer->ReadCompleted(buffer->GetActiveSize());
+
+				if (m_readPacket->wpos() >= 0xffff)
+				{
+					// Head is too big
+					close();
+					break;
+				}
 			}
 		}
 		
