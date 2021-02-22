@@ -16,7 +16,7 @@ void WebSocketPacket::zero()
 	this->_storage.resize(WS_MAX_HEAD_SIZE);
 	_wpos = WS_MAX_HEAD_SIZE;
 	_rpos = WS_MAX_HEAD_SIZE;
-	__m_headpos = WS_MAX_HEAD_SIZE - WS_HEAD_SIZE;
+	__m_headpos = 0;
 }
 
 uint32 WebSocketPacket::readFrameHead(const uint8 * pData, uint32 size)
@@ -113,27 +113,29 @@ int32 WebSocketPacket::calcHeadSize()
 
 void WebSocketPacket::writeFrameHead(int32 bodylen, WSFrameType frame_type)
 {
-
-	// –¥»Îframe¿‡–Õ
-	put(__m_headpos, (uint8)frame_type);
-
+	uint8 bytelength = 0;
+	__m_headpos = WS_MAX_HEAD_SIZE;
 	if (bodylen <= 125)
 	{
-		put(__m_headpos + 1, (uint8)bodylen);
+		bytelength = (uint8)bodylen;
 	}
-	else if (bodylen <= 65535)
+	else if (bodylen <= 0xffff)
 	{
-		uint8 bytelength = 126;
-		put(__m_headpos + 1, (uint8)bytelength);
-		put(__m_headpos + 2, (uint16)bodylen);
+		bytelength = 126;
+		__m_headpos = __m_headpos - 2;
+		put(__m_headpos, (uint16)bodylen);
 	}
 	else
 	{
-		uint8 bytelength = 127;
-		put(__m_headpos + 1, (uint8)bytelength);
-		put(__m_headpos + 2, (uint64)bodylen);
+		bytelength = 127;
+		__m_headpos = __m_headpos - 8;
+		put(__m_headpos, (uint64)bodylen);
 	}
+	--__m_headpos;
+	put(__m_headpos, (uint8)bytelength);
 
+	--__m_headpos;
+	put(__m_headpos, (uint8)frame_type);
 }
 
 uint32 WebSocketPacket::getMaskKey()
@@ -165,9 +167,6 @@ void WebSocketPacket::moveData(WebSocketPacket * packet)
 {
 	int len = packet->getBodySize();
 	BasePacket::moveData(packet);
-	
-	//memcpy(__m_head, packet->__m_head, WS_HEAD_SIZE);
-	//__m_headpos = packet->__m_headpos;
 
 	writeFrameHead(len);
 }
