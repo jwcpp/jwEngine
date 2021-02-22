@@ -154,6 +154,15 @@ void XLog::writeFile(int level, const char * filename, const char * func, int ro
 	wstr.append(logstr);
 	wstr.append("\n");
 
+	print(level, wstr);
+
+	AutoLock templock(this);
+	currsize += fprintf(file, "%s", wstr.c_str());
+	fflush(file);
+}
+
+void XLog::print(int level, std::string& str)
+{
 	//printf
 #ifdef SYSTEM_WIN
 
@@ -173,7 +182,7 @@ void XLog::writeFile(int level, const char * filename, const char * func, int ro
 			SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), FOREGROUND_RED | FOREGROUND_GREEN | FOREGROUND_BLUE);
 		}
 
-		printf("%s", wstr.c_str());
+		printf("%s", str.c_str());
 
 		//ÉèÖÃ»Ø°×É«
 		SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), FOREGROUND_RED | FOREGROUND_GREEN | FOREGROUND_BLUE);
@@ -182,19 +191,15 @@ void XLog::writeFile(int level, const char * filename, const char * func, int ro
 	switch (level)
 	{
 	case LL_WARNING:
-		printf("\033[1;33;40m%s\033[0m", wstr.c_str());
+		printf("\033[1;33;40m%s\033[0m", str.c_str());
 		break;
 	case LL_ERROR:
-		printf("\033[1;31;40m%s\033[0m", wstr.c_str());
+		printf("\033[1;31;40m%s\033[0m", str.c_str());
 		break;
 	default:
-		printf("%s", wstr.c_str());
+		printf("%s", str.c_str());
 	}
 #endif
-
-	AutoLock templock(this);
-	currsize += fprintf(file, "%s", wstr.c_str());
-	fflush(file);
 }
 
 

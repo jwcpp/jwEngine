@@ -26,6 +26,7 @@ public:
 private:
 	void writeFile(int level, const char * filename, const char * func, int line, const char * logstr);
 	void closefile();
+	void print(int level, std::string& str);
 private:
 	FILE * file;
 	std::string logdir;
