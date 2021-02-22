@@ -83,36 +83,35 @@ void XLog::writeFile(int level, const char * filename, const char * func, int ro
 {
 	const struct tm * tm_ = XTime::getTMStruct();
 
-	AutoLock(this);
-
-	bool newfile = (file == NULL);
-	if (tm_->tm_mday != writeday)
 	{
-		writeday = tm_->tm_mday;
-		char dirname[16];
-		sprintf(dirname, "%d-%.2d-%.2d/", tm_->tm_year + 1900, tm_->tm_mon + 1, tm_->tm_mday);
+		AutoLock templock(this);
 
-		currdir = logdir;
-		currdir.append(dirname);
-		currdir.append(childdir);
-		XFile::createDirectory(currdir.c_str());
+		bool newfile = (file == NULL);
+		if (tm_->tm_mday != writeday)
+		{
+			writeday = tm_->tm_mday;
+			char dirname[16];
+			sprintf(dirname, "%d-%.2d-%.2d/", tm_->tm_year + 1900, tm_->tm_mon + 1, tm_->tm_mday);
 
-		newfile = true;
-	}
+			currdir = logdir;
+			currdir.append(dirname);
+			currdir.append(childdir);
+			XFile::createDirectory(currdir.c_str());
 
-	if (newfile || currsize >= maxsize)
-	{
-		closefile();
-		char dirname[16];
-		sprintf(dirname, "%.2d.%.2d.%.2d.log", tm_->tm_hour, tm_->tm_min, tm_->tm_sec);
-		std::string filepath = currdir;
-		filepath.append(dirname);
-		file = fopen(filepath.c_str(), "a+");
-	}
+			newfile = true;
+		}
 
-	if (!file)
-	{
-		return;
+		if (newfile || currsize >= maxsize)
+		{
+			closefile();
+			char dirname[16];
+			sprintf(dirname, "%.2d.%.2d.%.2d.log", tm_->tm_hour, tm_->tm_min, tm_->tm_sec);
+			std::string filepath = currdir;
+			filepath.append(dirname);
+			file = fopen(filepath.c_str(), "a+");
+		}
+
+		if (!file)return;
 	}
 
 	std::string wstr;
@@ -157,34 +156,31 @@ void XLog::writeFile(int level, const char * filename, const char * func, int ro
 
 	//printf
 #ifdef SYSTEM_WIN
-	switch (level)
+
 	{
-	case LL_INFO:
-		SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), FOREGROUND_INTENSITY |
-			FOREGROUND_GREEN);
-		break;
-	case LL_WARNING:
-		SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), FOREGROUND_INTENSITY |
-			FOREGROUND_RED | FOREGROUND_GREEN);
-		break;
-	case LL_ERROR:
-		SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), FOREGROUND_INTENSITY |
-			FOREGROUND_RED);
-		break;
-	default:
+		AutoLock templock(this);
+		switch (level)
+		{
+		case LL_WARNING:
+			SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), FOREGROUND_INTENSITY |
+				FOREGROUND_RED | FOREGROUND_GREEN);
+			break;
+		case LL_ERROR:
+			SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), FOREGROUND_INTENSITY |
+				FOREGROUND_RED);
+			break;
+		default:
+			SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), FOREGROUND_RED | FOREGROUND_GREEN | FOREGROUND_BLUE);
+		}
+
+		printf("%s", wstr.c_str());
+
+		//设置回白色
 		SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), FOREGROUND_RED | FOREGROUND_GREEN | FOREGROUND_BLUE);
 	}
-
-	printf("%s", wstr.c_str());
-
-	//设置回白色
-	SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), FOREGROUND_RED | FOREGROUND_GREEN | FOREGROUND_BLUE);
 #else
 	switch (level)
 	{
-	case LL_INFO:
-		printf("\033[1;32;40m%s\033[0m", wstr.c_str());
-		break;
 	case LL_WARNING:
 		printf("\033[1;33;40m%s\033[0m", wstr.c_str());
 		break;
@@ -196,6 +192,7 @@ void XLog::writeFile(int level, const char * filename, const char * func, int ro
 	}
 #endif
 
+	AutoLock templock(this);
 	currsize += fprintf(file, "%s", wstr.c_str());
 	fflush(file);
 }
