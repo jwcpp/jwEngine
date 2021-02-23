@@ -1,0 +1,16 @@
+syntax = "proto3";
+
+message Role
+{
+	int32 id = 1;
+	string name = 2;
+	int32 money = 3;
+	repeated int32 tasks = 4;
+}
+
+message Family
+{
+	string name = 1;
+	int32 lv = 2;
+	repeated Role roles = 3; 
+}

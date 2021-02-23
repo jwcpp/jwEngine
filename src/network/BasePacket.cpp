@@ -46,12 +46,12 @@ void BasePacket::shrink(int isize)
 
 int32  BasePacket::getBodySize()
 {
-	return 0;
+	return wpos();
 }
 
 char * BasePacket::getBodyData()
 {
-	return NULL;
+	return (char*)(contents());
 }
 
 const char * BasePacket::readPointer()
@@ -67,6 +67,11 @@ void BasePacket::setWriteSize(int size)
 {
 	_storage.resize(size);
 	wpos(size);
+}
+
+std::string_view BasePacket::getBodyStr()
+{
+	return std::string_view(getBodyData(), getBodySize());
 }
 
 // read msg call

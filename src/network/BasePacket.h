@@ -27,6 +27,7 @@ public:
 	const char *   readPointer();
 	int32          activeSize();
 	virtual void setWriteSize(int size);
+	std::string_view getBodyStr();
 	
 	// read msg call
 	virtual int32  getHeadSize();

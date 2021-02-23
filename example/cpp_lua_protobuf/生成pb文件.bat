@@ -1,0 +1,1 @@
+protoc -o ./server/msgtest.pb msgtest.proto

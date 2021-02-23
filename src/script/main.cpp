@@ -8,6 +8,7 @@ extern "C" {
 #include <stdlib.h>
 
 #include "sol/sol.hpp"
+#include "pb.h"
 
 extern void luabind_netserver(sol::state & lua);
 extern void luabind_kcpserver(sol::state & lua);
@@ -21,6 +22,15 @@ extern void luabind_csvpar(sol::state & lua);
 extern void luabind_json(sol::state & lua);
 extern void luabind_httpserver(sol::state & lua);
 extern void luabind_pool(sol::state& lua);
+
+
+void init_lua_pb(lua_State* L)
+{
+	luaL_requiref(L, "pb", luaopen_pb, 0);
+	luaL_requiref(L, "pb.slice", luaopen_pb_slice, 0);
+	luaL_requiref(L, "pb.buffer", luaopen_pb_buffer, 0);
+	luaL_requiref(L, "pb.conv", luaopen_pb_conv, 0);
+}
 
 int main(int argc, char* argv[])
 {
@@ -42,6 +52,7 @@ int main(int argc, char* argv[])
 	luabind_pool(lua);
 
 	//lua.script_file(argv[1]);
+	init_lua_pb(lua.lua_state());
 
 	if (luaL_dofile(lua.lua_state(), argv[1]) == 1) {
 		if (lua_isstring(lua.lua_state(), -1)) {
