@@ -16,16 +16,16 @@ XLog commonlog;
 class XLog::AutoLock
 {
 public:
-	AutoLock(XLog * log) :_log(log)
+	AutoLock(SpinLock* lock) :_lock(lock)
 	{
-		log->_lock.lock(); 
+		_lock->lock();
 	}
 	~AutoLock()
 	{ 
-		_log->_lock.unlock();
+		_lock->unlock();
 	}
 
-	XLog * _log;
+	SpinLock* _lock;
 };
 
 XLog::XLog():
@@ -84,7 +84,7 @@ void XLog::writeFile(int level, const char * filename, const char * func, int ro
 	const struct tm * tm_ = XTime::getTMStruct();
 
 	{
-		AutoLock templock(this);
+		AutoLock templock(&_lock);
 
 		bool newfile = (file == NULL);
 		if (tm_->tm_mday != writeday)
@@ -156,7 +156,7 @@ void XLog::writeFile(int level, const char * filename, const char * func, int ro
 
 	print(level, wstr);
 
-	AutoLock templock(this);
+	AutoLock templock(&_lock);
 	currsize += fprintf(file, "%s", wstr.c_str());
 	fflush(file);
 }
@@ -166,7 +166,8 @@ void XLog::print(int level, std::string& str)
 	//printf
 #ifdef SYSTEM_WIN
 	{
-		AutoLock templock(this);
+		static SpinLock slock;
+		AutoLock templock(&slock);
 		switch (level)
 		{
 		case LL_WARNING:
