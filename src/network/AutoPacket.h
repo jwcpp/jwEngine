@@ -20,6 +20,13 @@ public:
 		return obj;
 	}
 
+	template<typename MSG>
+	T* writeProto(MSG & msg)
+	{
+		msg.SerializeToArray(pack.GetMsgBody(), msg.ByteSize());
+		return obj;
+	}
+
 private:
 
 	T* obj;
