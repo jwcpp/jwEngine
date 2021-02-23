@@ -51,6 +51,13 @@ char * UdpPacket::getBodyData()
 	return (char *)(contents() + UDP_PACK_HEAD_SIZE);
 }
 
+void UdpPacket::setWriteSize(int size)
+{
+	size += UDP_PACK_HEAD_SIZE;
+	_storage.resize(size);
+	wpos(size);
+}
+
 // read msg call
 int32  UdpPacket::getHeadSize()
 {

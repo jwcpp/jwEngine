@@ -68,6 +68,7 @@ public:
 
 	virtual int32  getBodySize();
 	virtual char * getBodyData();
+	virtual void setWriteSize(int size);
 
 	// read msg call
 	virtual int32  getHeadSize();

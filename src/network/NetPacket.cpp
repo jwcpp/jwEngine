@@ -22,6 +22,13 @@ char * NetPacket::getBodyData()
 	return (char *)(contents() + MSG_HEAD_SIZE);
 }
 
+void NetPacket::setWriteSize(int size)
+{
+	size += MSG_HEAD_SIZE;
+	_storage.resize(size);
+	wpos(size);
+}
+
 // read msg call
 int32  NetPacket::getHeadSize()
 {

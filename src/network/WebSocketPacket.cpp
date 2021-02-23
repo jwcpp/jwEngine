@@ -153,6 +153,13 @@ int32  WebSocketPacket::getBodySize()
 	return wpos() - WS_MAX_HEAD_SIZE;
 }
 
+void WebSocketPacket::setWriteSize(int size)
+{
+	size += WS_MAX_HEAD_SIZE;
+	_storage.resize(size);
+	wpos(size);
+}
+
 int32  WebSocketPacket::sendSize()
 {
 	return wpos() - __m_headpos;

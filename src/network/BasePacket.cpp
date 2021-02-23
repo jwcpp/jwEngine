@@ -63,6 +63,12 @@ int32 BasePacket::activeSize()
 	return _wpos - _rpos;
 }
 
+void BasePacket::setWriteSize(int size)
+{
+	_storage.resize(size);
+	wpos(size);
+}
+
 // read msg call
 int32  BasePacket::getHeadSize()
 {

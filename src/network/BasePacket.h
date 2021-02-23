@@ -26,6 +26,7 @@ public:
 	virtual char * getBodyData();
 	const char *   readPointer();
 	int32          activeSize();
+	virtual void setWriteSize(int size);
 	
 	// read msg call
 	virtual int32  getHeadSize();
