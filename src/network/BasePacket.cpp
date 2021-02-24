@@ -73,7 +73,7 @@ void BasePacket::setWriteSize(int size)
 
 std::string_view BasePacket::readData()
 {
-	return std::string_view(getBodyData(), getBodySize());
+	return std::string_view(readPointer(), getBodySize());
 }
 
 void BasePacket::writeData(std::string_view sv)
