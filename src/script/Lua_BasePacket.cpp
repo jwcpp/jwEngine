@@ -29,6 +29,7 @@ void luabind_basepacket(sol::state & lua)
 		"pushDouble", &BasePacket::pushDouble,
 		"pushString", &BasePacket::pushString,
 		
+		"moveData", & BasePacket::moveData,
 		"wpos", &BasePacket::writePos,
 		"rpos", &BasePacket::readPos,
 		"readData", &BasePacket::readData,

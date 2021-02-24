@@ -56,6 +56,7 @@ public:
 
 	virtual void zero();
 	virtual int32  getHeadSize();
+	virtual void moveData(BasePacket* packet);
 
 	uint8 getFin(){ return (__m_head[0] >> 7) & 0x01; }
 	uint8 getOpcode(){ return __m_head[0] & 0x0F; }
@@ -74,9 +75,7 @@ public:
 	virtual int32  sendSize();
 	virtual char * sendStream();
 
-	virtual void moveData(WebSocketPacket * packet);
 	void setPongPacket();
-
 private:
 	int32 calcHeadSize();
 private:

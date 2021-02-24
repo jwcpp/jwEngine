@@ -24,6 +24,16 @@ int32 WebSocketPacket::getHeadSize()
 	return WS_MAX_HEAD_SIZE;
 }
 
+void WebSocketPacket::moveData(BasePacket* packet)
+{
+	if (packet->getHeadSize() != getHeadSize()) return;
+
+	int len = packet->getBodySize();
+	BasePacket::moveData(packet);
+
+	writeFrameHead(len);
+}
+
 uint32 WebSocketPacket::readFrameHead(const uint8 * pData, uint32 size)
 {
 	int readsize = 0;
@@ -153,13 +163,6 @@ char * WebSocketPacket::sendStream()
 	return ((char *)contents()) + __m_headpos;
 }
 
-void WebSocketPacket::moveData(WebSocketPacket * packet)
-{
-	int len = packet->getBodySize();
-	BasePacket::moveData(packet);
-
-	writeFrameHead(len);
-}
 void WebSocketPacket::setPongPacket()
 {
 	if (wpos() >= sizeof(uint8))
