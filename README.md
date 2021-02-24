@@ -218,7 +218,13 @@ struct testmsg
   }
 }
 ```
-通过serialization工具可以生成c++或者lua代码，自动补全read()和write()函数，使得数据结构快速映射到SocketBuffer中。倘若该工具无法满足你，你也可以非常轻松的接入protobuff。
+通过serialization工具可以将协议的描述文件生成c++和lua代码，自动生成read()和write()的函数实现，使得数据结构快速映射到SocketBuffer中。
+
+目前serialization序列化工具为实验性，可能是脆弱的，建议使用更强大的protobuf。该项目已集成lua-protobuf，使得c++和lua之间的协议无缝衔接。
+
+lua-protobuf的开源地址：[lua-protobuf](https://github.com/starwing/lua-protobuf)
+
+这个示例展示了c++客户端和lua服务器之间的通讯：[快速搭建服务器Demo](https://github.com/jwcpp/jwEngine/tree/master/example/cpp_lua_protobuf)
 
 ## 构建
 你需要一个modern c++17编译器
