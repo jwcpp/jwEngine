@@ -27,6 +27,7 @@ public:
 	const char * getBodyData();
 	const char * readPointer();
 	void setWriteSize(int size);
+	int32 activeSize();
 	// lua call blob
 	std::string_view readData();
 	void writeData(std::string_view sv);

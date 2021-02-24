@@ -71,9 +71,14 @@ void BasePacket::setWriteSize(int size)
 	wpos(size);
 }
 
+int32 BasePacket::activeSize()
+{
+	return _wpos - _rpos;
+}
+
 std::string_view BasePacket::readData()
 {
-	return std::string_view(readPointer(), getBodySize());
+	return std::string_view(readPointer(), activeSize());
 }
 
 void BasePacket::writeData(std::string_view sv)
