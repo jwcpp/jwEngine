@@ -28,7 +28,7 @@ public:
 			// 通知客户端连接成功
 			int x = rand() % 100000;
 			std::string s(std::to_string(x));
-			conn->sendMsg(1, (void *)s.c_str(), s.length());
+			conn->sendMsg(1, s.c_str(), s.length());
 		}
 	};
 	virtual void onClose(KcpSession * conn){

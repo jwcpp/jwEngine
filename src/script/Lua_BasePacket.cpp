@@ -31,7 +31,8 @@ void luabind_basepacket(sol::state & lua)
 		
 		"wpos", &BasePacket::writePos,
 		"rpos", &BasePacket::readPos,
-		"getBody", &BasePacket::getBodyStr);
+		"readData", &BasePacket::readData,
+		"writeData", &BasePacket::writeData);
 
 
 	lua.new_usertype<TcpSocket>("TcpSocket",

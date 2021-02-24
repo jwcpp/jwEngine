@@ -18,6 +18,11 @@ void UdpPacket::zero()
 	_rpos = UDP_PACK_HEAD_SIZE;
 }
 
+int32  UdpPacket::getHeadSize()
+{
+	return UDP_PACK_HEAD_SIZE;
+}
+
 void UdpPacket::initSize(int s)
 {
 	if (s > size())
@@ -39,29 +44,6 @@ void UdpPacket::writeHead(int msgtype)
 void UdpPacket::writeComplete(uint32 size)
 {
 	_wpos += size;
-}
-
-int32  UdpPacket::getBodySize()
-{
-	return wpos() - UDP_PACK_HEAD_SIZE;
-}
-
-char * UdpPacket::getBodyData()
-{
-	return (char *)(contents() + UDP_PACK_HEAD_SIZE);
-}
-
-void UdpPacket::setWriteSize(int size)
-{
-	size += UDP_PACK_HEAD_SIZE;
-	_storage.resize(size);
-	wpos(size);
-}
-
-// read msg call
-int32  UdpPacket::getHeadSize()
-{
-	return UDP_PACK_HEAD_SIZE;
 }
 
 int32  UdpPacket::getMarkLen()

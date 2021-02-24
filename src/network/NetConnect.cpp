@@ -82,12 +82,12 @@ void NetConnect::sendMsg(uint32 msgtype, NetPacket * pack)
 	send_top_msg();
 }
 
-void NetConnect::sendMsg(uint32 msgtype, void * msg, uint32 len)
+void NetConnect::sendMsg(uint32 msgtype, const char* msg, uint32 len)
 {
 
 	NetPacket *pack = createPacket();
 
-	pack->append((uint8 *)msg, len);
+	pack->append(msg, len);
 	pack->writeHead(msgtype);
 
 	mSendPackets.push(pack);

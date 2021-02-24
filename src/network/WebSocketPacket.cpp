@@ -19,6 +19,11 @@ void WebSocketPacket::zero()
 	__m_headpos = 0;
 }
 
+int32 WebSocketPacket::getHeadSize()
+{
+	return WS_MAX_HEAD_SIZE;
+}
+
 uint32 WebSocketPacket::readFrameHead(const uint8 * pData, uint32 size)
 {
 	int readsize = 0;
@@ -83,11 +88,6 @@ bool WebSocketPacket::isHeadFull()
 	return wpos() >= WS_MAX_HEAD_SIZE;
 }
 
-int32 WebSocketPacket::getHeadSize()
-{
-	return WS_MAX_HEAD_SIZE;
-}
-
 int32 WebSocketPacket::calcHeadSize()
 {
 	uint32 headlen = WS_HEAD_SIZE;
@@ -141,23 +141,6 @@ void WebSocketPacket::writeFrameHead(int32 bodylen, WSFrameType frame_type)
 uint32 WebSocketPacket::getMaskKey()
 {
 	return getValue<uint32>(getHeadSize() - 4);
-}
-
-char * WebSocketPacket::getBodyData()
-{
-	return (char *)contents() + WS_MAX_HEAD_SIZE;
-}
-
-int32  WebSocketPacket::getBodySize()
-{
-	return wpos() - WS_MAX_HEAD_SIZE;
-}
-
-void WebSocketPacket::setWriteSize(int size)
-{
-	size += WS_MAX_HEAD_SIZE;
-	_storage.resize(size);
-	wpos(size);
 }
 
 int32  WebSocketPacket::sendSize()

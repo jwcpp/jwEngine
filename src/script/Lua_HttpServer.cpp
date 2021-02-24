@@ -30,7 +30,7 @@ void luabind_httpserver(sol::state & lua)
 
 	lua.new_usertype<HttpConnect>("HttpConnect", 
 		sol::base_classes, sol::bases<TcpSocket>(),
-		"sendMsg", &HttpConnect::sendMsg,
+		"sendMsg", &HttpConnect::sendData,
 		"autoMsg", &HttpConnect::autoMsg);
 
 	lua.new_usertype<Lua_HttpServer>("HttpServer",

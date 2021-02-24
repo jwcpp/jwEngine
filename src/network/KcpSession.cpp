@@ -170,10 +170,10 @@ void KcpSession::sendMsg(uint32 msgtype, UdpPacket * pack)
 	send(pack->sendStream(), pack->sendSize());
 }
 
-void KcpSession::sendMsg(uint32 msgtype, void * msg, uint32 len)
+void KcpSession::sendMsg(uint32 msgtype, const char* msg, uint32 len)
 {
 	UdpPacket *pack = _createPacket();
-	pack->append((uint8 *)msg, len);
+	pack->append(msg, len);
 	sendMsg(msgtype, pack);
 	_recyclePacket(pack);
 }

@@ -24,14 +24,9 @@ public:
 	int accept(uv_stream_t *server){ return uv_accept(server, (uv_stream_t*)getUvTcp()); }
 
 	void clear();
-
 	void close();
-
 	void on_read_start();
-
 	int write(char * data, uint32 len);
-
-	uv_tcp_t * getUvTcp(){ return &m_uv_tcp;}
 
 	//static void createConnect(uv_loop_t * loop, const char * ip, int port, std::function<void(std::shared_ptr<TcpSocket> &)> cb, bool ipv6 = false);
 
@@ -39,7 +34,7 @@ public:
 	int localPort() const;
 	std::string remoteIP() const;
 	int remotePort() const;
-
+	uv_tcp_t* getUvTcp() { return &m_uv_tcp; }
 	void setUserdata(void * userdata) { _userdata = userdata; }
 	void * getUserdata() { return _userdata; }
 	void setUsernum(uint32 num) { _userdata = (void*)num; }

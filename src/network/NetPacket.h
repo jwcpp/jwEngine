@@ -15,13 +15,9 @@ public:
 	NetPacket();
 
 	virtual void zero();
-
-	virtual int32  getBodySize();
-	virtual char * getBodyData();
-	virtual void setWriteSize(int size);
+	virtual int32  getHeadSize();
 
 	// read msg call
-	virtual int32  getHeadSize();
 	virtual int32  getMarkLen();   // message head mark length
 	virtual int getMsgType();
 	virtual bool isHeadFull();

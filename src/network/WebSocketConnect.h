@@ -27,9 +27,10 @@ public:
 	void respondHandshake(std::string & msg);
 
 	void sendMsg(WebSocketPacket * pack);
-	void sendMsg(void * msg, uint32 len);
+	void sendMsg(const char * msg, uint32 len);
+	// lua call
 	void sendPacket(WebSocketPacket * pack) { sendMsg(pack); }
-	void sendData(void * msg, uint32 len) { sendMsg(msg, len); }
+	void sendData(std::string_view view) { sendMsg(view.data(), view.size()); }
 
 	static WebSocketPacket * createPacket();
 	static void recyclePacket(WebSocketPacket * pack);

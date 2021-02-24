@@ -64,9 +64,10 @@ public:
 	void over();
 	void update();
 	void sendMsg(uint32 msgtype, UdpPacket * pack);
-	void sendMsg(uint32 msgtype, void * msg, uint32 len);
+	void sendMsg(uint32 msgtype, const char * msg, uint32 len);
+	// lua call
 	void sendPacket(uint32 msgtype, UdpPacket * pack) { sendMsg(msgtype, pack); }
-	void sendData(uint32 msgtype, void * msg, uint32 len) { sendMsg(msgtype, msg, len); }
+	void sendData(uint32 msgtype, std::string_view sv) { sendMsg(msgtype, sv.data(), sv.size()); }
 
 	void setUserdata(void * userdata) { __userdata = userdata; }
 	void * getUserdata() { return __userdata; }

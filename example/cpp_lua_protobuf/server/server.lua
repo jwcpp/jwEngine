@@ -22,13 +22,13 @@ end
 
 server.on_msg = function(conn, msgtype, pack)
 	-- 从二进制数据解析出实际消息
-    local msg = assert(pb.decode("Family", pack:getBody()))
+    local msg = assert(pb.decode("Family", pack:readData()))
     print(serpent.block(msg))
 
 	---------------> return data to 
 
 	local data = assert(pb.encode("Family", msg))
-	conn:sendProto(111, data);
+	conn:sendMsg(111, data);
 end
 
 server:listen("127.0.0.1", 3001, false)

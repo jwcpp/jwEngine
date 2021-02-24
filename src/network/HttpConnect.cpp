@@ -74,13 +74,16 @@ void HttpConnect::release()
 	}
 }
 
-void HttpConnect::sendMsg(std::string_view sv)
+void HttpConnect::sendMsg(const char* msg, int32 len)
 {
-	const char * p = sv.data();
-	BasePacket * pack = createPacket();
-	pack->append(p, sv.size());
+	BasePacket* pack = createPacket();
+	pack->append(msg, len);
 	m_writePackets.push(pack);
 	send_top_msg();
+}
+void HttpConnect::sendData(std::string_view sv)
+{
+	sendMsg(sv.data(), sv.size());
 }
 
 void HttpConnect::autoMsg(std::string_view sv, enum http_content_type type)

@@ -19,14 +19,10 @@ public:
 	~UdpPacket();
 
 	virtual void zero();
+	virtual int32  getHeadSize();
 	void initSize(int size);
 
-	virtual int32  getBodySize();
-	virtual char * getBodyData();
-	virtual void setWriteSize(int size);
-
 	// read msg call
-	virtual int32  getHeadSize();
 	virtual int32  getMarkLen();   // message head mark length
 	virtual int getMsgType();
 

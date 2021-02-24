@@ -22,15 +22,16 @@ public:
 	virtual void moveData(BasePacket * packet);
 	void shrink(int isize);
 
-	virtual int32  getBodySize();
-	virtual char * getBodyData();
-	const char *   readPointer();
-	int32          activeSize();
-	virtual void setWriteSize(int size);
-	std::string_view getBodyStr();
+	virtual int32  getHeadSize();
+	int32  getBodySize();
+	const char * getBodyData();
+	const char * readPointer();
+	void setWriteSize(int size);
+	// lua call blob
+	std::string_view readData();
+	void writeData(std::string_view sv);
 	
 	// read msg call
-	virtual int32  getHeadSize();
 	virtual int32  getMarkLen();   // message head mark length
 	virtual int getMsgType();
 	virtual bool isHeadFull();

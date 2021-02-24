@@ -12,24 +12,6 @@ void NetPacket::zero()
 	_rpos = MSG_HEAD_SIZE;
 }
 
-int32  NetPacket::getBodySize()
-{
-	return wpos() - MSG_HEAD_SIZE;
-}
-
-char * NetPacket::getBodyData()
-{
-	return (char *)(contents() + MSG_HEAD_SIZE);
-}
-
-void NetPacket::setWriteSize(int size)
-{
-	size += MSG_HEAD_SIZE;
-	_storage.resize(size);
-	wpos(size);
-}
-
-// read msg call
 int32  NetPacket::getHeadSize()
 {
 	return MSG_HEAD_SIZE;

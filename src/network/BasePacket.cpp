@@ -44,40 +44,41 @@ void BasePacket::shrink(int isize)
 	}
 }
 
-int32  BasePacket::getBodySize()
+int32  BasePacket::getHeadSize()
 {
-	return wpos();
+	return 0;
 }
 
-char * BasePacket::getBodyData()
+int32  BasePacket::getBodySize()
 {
-	return (char*)(contents());
+	return wpos() - getHeadSize();
+}
+
+const char * BasePacket::getBodyData()
+{
+	return (const char*)(contents() + getHeadSize());
 }
 
 const char * BasePacket::readPointer()
 {
 	return (const char *)(contents() + _rpos);
 }
-int32 BasePacket::activeSize()
-{
-	return _wpos - _rpos;
-}
 
 void BasePacket::setWriteSize(int size)
 {
+	size += getHeadSize();
 	_storage.resize(size);
 	wpos(size);
 }
 
-std::string_view BasePacket::getBodyStr()
+std::string_view BasePacket::readData()
 {
 	return std::string_view(getBodyData(), getBodySize());
 }
 
-// read msg call
-int32  BasePacket::getHeadSize()
+void BasePacket::writeData(std::string_view sv)
 {
-	return 0;
+	append(sv.data(), sv.size());
 }
 
 // message head mark length

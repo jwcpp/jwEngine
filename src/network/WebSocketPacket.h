@@ -55,6 +55,7 @@ public:
 	~WebSocketPacket();
 
 	virtual void zero();
+	virtual int32  getHeadSize();
 
 	uint8 getFin(){ return (__m_head[0] >> 7) & 0x01; }
 	uint8 getOpcode(){ return __m_head[0] & 0x0F; }
@@ -65,13 +66,7 @@ public:
 	uint32 readFrameHead(const uint8 * p, uint32 size);
 	uint32 getMaskKey();
 
-
-	virtual int32  getBodySize();
-	virtual char * getBodyData();
-	virtual void setWriteSize(int size);
-
 	// read msg call
-	virtual int32  getHeadSize();
 	virtual int32  getMarkLen();   // message head mark length
 	virtual bool isHeadFull();
 

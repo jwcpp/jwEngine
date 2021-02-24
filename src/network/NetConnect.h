@@ -17,10 +17,10 @@ public:
 
 	// write data to socket
 	void sendMsg(uint32 msgtype, NetPacket * pack);
-	void sendMsg(uint32 msgtype, void * msg, uint32 len);
+	void sendMsg(uint32 msgtype, const char * msg, uint32 len);
+	// lua call
 	void sendPacket(uint32 msgtype, NetPacket * pack) { sendMsg(msgtype, pack);}
-	void sendData(uint32 msgtype, void * msg, uint32 len) { sendMsg(msgtype, msg, len);}
-	void sendProto(uint32 msgtype, std::string_view view) { sendMsg(msgtype, (void *)view.data(), view.size()); }
+	void sendData(uint32 msgtype, std::string_view view) { sendMsg(msgtype, view.data(), view.size()); }
 
 	static NetPacket * createPacket();
 	static void recyclePacket(NetPacket * pack);

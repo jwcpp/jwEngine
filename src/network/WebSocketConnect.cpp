@@ -234,13 +234,13 @@ void WebSocketConnect::sendMsg(WebSocketPacket * pack)
 	send_top_msg();
 }
 
-void WebSocketConnect::sendMsg(void * msg, uint32 len)
+void WebSocketConnect::sendMsg(const char * msg, uint32 len)
 {
 
 	WebSocketPacket *pack = createPacket();
 
 	pack->writeFrameHead(len);
-	pack->append((uint8 *)msg, len);
+	pack->append(msg, len);
 
 	__m_sendPackets.push(pack);
 

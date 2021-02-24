@@ -69,8 +69,7 @@ void luabind_netserver(sol::state & lua)
 		sol::base_classes, sol::bases<TcpSocket>(),
 		"close", &NetConnect::close,
 		"sendPacket", &NetConnect::sendPacket,
-		"sendData", &NetConnect::sendData,
-		"sendProto", &NetConnect::sendProto);
+		"sendMsg", &NetConnect::sendData);
 
 	lua.new_usertype<Lua_NetClient>("NetClient",
 		//sol::constructors<Lua_NetClient(EventLoop *)>(),

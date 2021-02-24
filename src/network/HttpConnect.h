@@ -37,7 +37,9 @@ public:
 	void zero();
 	void release();
 	void setEvent(HttpEvent * e) { m_event = e; }
-	void sendMsg(std::string_view sv);
+	void sendMsg(const char* msg, int32 len);
+	// lua call
+	void sendData(std::string_view sv);
 	void autoMsg(std::string_view sv, enum http_content_type type = hct_text_html);
 	static const char *getContentTypeStr(enum http_content_type type);
 protected:
