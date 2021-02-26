@@ -37,6 +37,7 @@ public:
 	uint32 getSessionId();
 	void flushKcp();
 	const ikcpcb* getKcp();
+	void setStream();
 protected:
 	virtual UdpPacket * _createPacket(int size) = 0;
 	virtual void _recyclePacket(UdpPacket * packet) = 0;
@@ -63,6 +64,7 @@ public:
 	void start(uint32 ms);
 	void over();
 	void update();
+	void updateKcp();
 	void sendMsg(uint32 msgtype, UdpPacket * pack);
 	void sendMsg(uint32 msgtype, const char * msg, uint32 len);
 	// lua call

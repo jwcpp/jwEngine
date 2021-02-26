@@ -66,8 +66,9 @@ void KcpServer::onMessage(const sockaddr * addr, const char * buff, ssize_t len)
 		if (it != __m_mapSessions.end())
 		{
 			KcpSession * session = it->second;
-			if (session->recv(buff, len) != 0)
-			{
+			if (session->recv(buff, len) == 0){
+				session->updateKcp();
+			}else{
 				release(session);
 				__m_mapSessions.erase(it);
 			}

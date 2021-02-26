@@ -100,6 +100,12 @@ const ikcpcb* KcpSessionBase::getKcp()
 	return __m_kcp;
 }
 
+void KcpSessionBase::setStream()
+{
+	// 设置成流模式后，上层逻辑需要处理消息包的边界
+	if (__m_kcp) __m_kcp->stream = 1;
+}
+
 //---------------------------------------------------------------
 
 #include "XTime.h"
@@ -142,6 +148,12 @@ void KcpSession::update()
 	}
 }
 
+void KcpSession::updateKcp()
+{
+	uint32 currt = XTime::iclock();
+	__m_nUpdateTime = KcpSessionBase::update(currt);
+}
+
 UdpPacket * KcpSession::_createPacket(int size)
 {
 	UdpPacket * packet = CommPool::create<UdpPacket>();
@@ -168,6 +180,7 @@ void KcpSession::sendMsg(uint32 msgtype, UdpPacket * pack)
 {
 	pack->writeHead(msgtype);
 	send(pack->sendStream(), pack->sendSize());
+	flushKcp();
 }
 
 void KcpSession::sendMsg(uint32 msgtype, const char* msg, uint32 len)
