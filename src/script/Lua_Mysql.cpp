@@ -9,7 +9,7 @@
 class Lua_SqlResult
 {
 public:
-	Lua_SqlResult(SqlPrepare * pre)
+	Lua_SqlResult(std::shared_ptr<SqlPrepare> pre)
 	{
 		m_sqlPre = pre;
 	}
@@ -34,15 +34,16 @@ public:
 	}
 
 private:
-	SqlPrepare * m_sqlPre;
+	std::shared_ptr<SqlPrepare> m_sqlPre;
 };
 
 class Lua_SqlCommand
 {
 public:
-	Lua_SqlCommand(const char * sql)
+	Lua_SqlCommand(const char * sql):
+		m_sqlPre(new SqlPrepare(sql))
 	{
-		m_sqlPre = new SqlPrepare(sql);
+
 	}
 
 	~Lua_SqlCommand()
@@ -50,24 +51,19 @@ public:
 		
 	}
 
-	void addToPool(DBThreadPool * pool, std::function<void(Lua_SqlResult *)> backfunc)
+	void addToPool(DBThreadPool * pool, std::function<void(const char *, Lua_SqlResult *)> backfunc)
 	{
-		SqlPrepare * sqlPre = m_sqlPre;
-		DBSqlTask * dbTask = new DBSqlTask(sqlPre);
+		std::shared_ptr<DBSqlTask> dbTask(new DBSqlTask(m_sqlPre));
 
 		// back func
-		dbTask->complete_back(
-			[sqlPre, dbTask, backfunc]() {
+		dbTask->backfunc = [backfunc](const char* err, std::shared_ptr<SqlPrepare> sqlPre) {
 
 			if (backfunc != nullptr)
 			{
 				Lua_SqlResult _result(sqlPre);
-				backfunc(&_result);
+				backfunc(err, &_result);
 			}
-			delete sqlPre;
-			delete dbTask;
-		}
-		);
+		};
 		pool->addTask(dbTask);
 	}
 
@@ -86,7 +82,7 @@ public:
 	void pushBlob(BasePacket * packet) { m_sqlPre->pushBlob(packet); }
 
 private:
-	SqlPrepare * m_sqlPre;
+	std::shared_ptr<SqlPrepare> m_sqlPre;
 };
 
 

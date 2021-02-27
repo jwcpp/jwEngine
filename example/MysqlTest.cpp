@@ -56,35 +56,42 @@ int __main()
 	return 0;
 }
 
-
+#include <functional>
 #include "DBThreadPool.h"
 int main()
 {
 	DBConfig config;
 	config.dbname = "jw_test";
-	config.pswd = "1111";
+	config.pswd = "111111";
 	config.ip = "127.0.0.1";
 	DBThreadPool pool(config);
-
-	SqlPrepare * pre = new SqlPrepare("select * from test where id = ?");
-	pre->pushInt32(1);
-
-	DBSqlTask * task = new DBSqlTask(pre);
-	task->complete_back([pre, task]() {
-		while (pre->fetch())
-		{
-			int id = pre->getInt32();
-			int num = pre->getInt32();
-			std::string name = pre->getString();
-			printf("id:%d, num:%d, name:%s\n", id, num, name.c_str());
-		}
-
-		delete pre;
-		delete task;
-	});
-
 	pool.create(1);
-	pool.addTask(task);
+
+	{
+		std::shared_ptr<SqlPrepare> pre(new SqlPrepare("select * from test where id = ?"));
+		pre->pushInt32(1);
+
+		std::shared_ptr<DBSqlTask> task(new DBSqlTask(pre));
+		task->backfunc = [](const char* error, std::shared_ptr<SqlPrepare> pre) {
+
+			if (error)
+			{
+				printf("%s\n", error);
+			}
+			else
+			{
+				while (pre->fetch())
+				{
+					int id = pre->getInt32();
+					int num = pre->getInt32();
+					std::string name = pre->getString();
+					printf("id:%d, num:%d, name:%s\n", id, num, name.c_str());
+				}
+			}
+		};
+
+		pool.addTask(task);
+	}
 
 	while (1)
 	{

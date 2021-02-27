@@ -6,14 +6,19 @@ config.port = 6379
 pool = DBThreadPool:new(config)
 pool:create(1)
 
-func = function(result)
-			while(result:fetch())
-			do
-				local str = result:getString()
-				-- errorLog(str)
-				print(str)
-			end
-		end
+func = function(err, result)
+	if err then
+		print(err)
+		return
+	end
+
+	while(result:fetch())
+	do
+		local str = result:getString()
+		-- errorLog(str)
+		print(str)
+	end
+end
 
 function exec()
 	local command = RedisCommand:new("lrange")

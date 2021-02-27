@@ -23,7 +23,7 @@ struct DBConfig
 
 class DB_Interface;
 class RedisCommand;
-class DBResult;
+class RedisResult;
 class SqlPrepare;
 
 class DBTask : public Task
@@ -32,37 +32,41 @@ public:
 	DBTask();
 	~DBTask();
 
-	void complete_back(std::function<void()> backfunc);
 	void dbi(DB_Interface * dbi);
-	virtual void complete();
 
 protected:
 	DB_Interface * _dbi;
-	std::function<void()> _complete_back;
+	int _ret;
+	std::string _error;
 };
 
 class DBSqlTask : public DBTask
 {
 public:
-	DBSqlTask(SqlPrepare * pre);
+	DBSqlTask(std::shared_ptr<SqlPrepare> pre);
 	~DBSqlTask();
 
 	virtual void process();
-
+	virtual void complete();
+public:
+	std::function<void(const char*, std::shared_ptr<SqlPrepare>)> backfunc;
 private:
-	SqlPrepare * _pre;
+	std::shared_ptr<SqlPrepare> _pre;
 };
 
 class DBRedisTask : public DBTask
 {
 public:
-	DBRedisTask(RedisCommand * command, DBResult * result);
+	DBRedisTask(std::shared_ptr<RedisCommand> command, std::shared_ptr <RedisResult> result);
 	~DBRedisTask();
 
 	virtual void process();
+	virtual void complete();
+public:
+	std::function<void(const char*, std::shared_ptr<RedisResult>)> backfunc;
 private:
-	RedisCommand * _command;
-	DBResult * _result;
+	std::shared_ptr<RedisCommand> _command;
+	std::shared_ptr<RedisResult> _result;
 };
 
 class DBThread : public CThread
@@ -73,7 +77,7 @@ public:
 	virtual void onStart();
 	virtual void onEnd();
 
-	virtual void run(Task * task);
+	virtual void run(TaskPtr task);
 
 private:
 	DB_Interface * m_db;
@@ -86,7 +90,7 @@ public:
 	~DBThreadPool();
 	virtual CThread* createThread();
 	virtual void deleteThread(CThread * t);
-	virtual void completeTask(Task * task);
+	virtual void completeTask(TaskPtr task);
 
 	const DBConfig * getConfig();
 

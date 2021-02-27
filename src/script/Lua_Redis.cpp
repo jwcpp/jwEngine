@@ -10,9 +10,10 @@
 class Lua_RedisResult
 {
 public:
-	Lua_RedisResult(RedisResult * result)
+	Lua_RedisResult(std::shared_ptr<RedisResult> result):
+		m_result(result)
 	{
-		m_result = result;
+
 	}
 
 	//get
@@ -42,15 +43,15 @@ public:
 	}
 
 private:
-	RedisResult * m_result;
+	std::shared_ptr<RedisResult> m_result;
 };
 
 class Lua_RedisCommand
 {
 public:
-	Lua_RedisCommand(const char * cmd)
+	Lua_RedisCommand(const char * cmd):
+		m_command(new RedisCommand(cmd))
 	{
-		m_command = new RedisCommand(cmd);
 		
 	}
 
@@ -67,31 +68,24 @@ public:
 	void pushString(std::string value) { m_command->pushString(value); }
 	void pushBlob(BasePacket * pack) { m_command->pushBlob(pack); }
 
-	void addToPool(DBThreadPool * pool, std::function<void(Lua_RedisResult *)> backfunc)
+	void addToPool(DBThreadPool * pool, std::function<void(const char* , Lua_RedisResult *)> backfunc)
 	{
-		RedisCommand * command = m_command;
-		RedisResult * result = new RedisResult;
-		DBRedisTask * dbTask = new DBRedisTask(command, result);
+		std::shared_ptr<DBRedisTask> dbTask(new DBRedisTask(m_command, std::make_shared<RedisResult>()));
 
 		// back func
-		dbTask->complete_back(
-			[command, result, dbTask, backfunc]() {
+		dbTask->backfunc = [backfunc](const char * err, std::shared_ptr<RedisResult> result) {
 
 			if (backfunc != nullptr)
 			{
 				Lua_RedisResult _result(result);
-				backfunc(&_result);
+				backfunc(err, &_result);
 			}
-			delete command;
-			delete result;
-			delete dbTask;
-		}
-		);
+		};
 		pool->addTask(dbTask);
 	}
 
 private:
-	RedisCommand * m_command;
+	std::shared_ptr<RedisCommand> m_command;
 };
 
 void luabind_redis(sol::state & lua)

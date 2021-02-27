@@ -483,14 +483,12 @@ int SqlPrepare::prepare(MYSQL * mysql)
 	if (!m_stmt)
 	{
 		sql_stmt_lock.unlock();
-		ERROR_LOG("mysql_stmt_init return null");
 		return -1;
 	}
 
 	if (mysql_stmt_prepare(m_stmt, m_sql.data(), static_cast<unsigned long>(m_sql.length())))
 	{
 		sql_stmt_lock.unlock();
-		ERROR_LOG("errno:%d, error:%s", mysql_stmt_errno(m_stmt),mysql_stmt_error(m_stmt));
 		return -1;
 	}
 	sql_stmt_lock.unlock();
@@ -511,7 +509,6 @@ int SqlPrepare::prepare(MYSQL * mysql)
 		MYSQL_RES * resultMetadata = mysql_stmt_result_metadata(m_stmt);
 		if (!resultMetadata)
 		{
-			ERROR_LOG(mysql_stmt_error(m_stmt));
 			return -1;
 		}
 
@@ -529,7 +526,6 @@ int SqlPrepare::prepare(MYSQL * mysql)
 
 		if (mysql_stmt_bind_result(m_stmt, m_resultBind))
 		{
-			ERROR_LOG(mysql_stmt_error(m_stmt));
 			return -1;
 		}
 	}
@@ -542,7 +538,6 @@ int SqlPrepare::execute()
 	{
 		if (mysql_stmt_bind_param(m_stmt, m_paramBind))
 		{
-			ERROR_LOG(mysql_stmt_error(m_stmt));
 			return -1;
 		}
 	}
@@ -551,14 +546,12 @@ int SqlPrepare::execute()
 	if (mysql_stmt_execute(m_stmt))
 	{
 		sql_stmt_lock.unlock();
-		ERROR_LOG(mysql_stmt_error(m_stmt));
 		return -1;
 	}
 
 	if (mysql_stmt_store_result(m_stmt))
 	{
 		sql_stmt_lock.unlock();
-		ERROR_LOG(mysql_stmt_error(m_stmt));
 		return -1;
 	}
 	sql_stmt_lock.unlock();

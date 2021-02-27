@@ -23,20 +23,9 @@ void DBTask::dbi(DB_Interface * dbi)
 	_dbi = dbi;
 }
 
-void DBTask::complete_back(std::function<void()> backfunc)
-{
-	_complete_back = backfunc;
-}
-
-void DBTask::complete()
-{
-	if (_complete_back != nullptr)
-		_complete_back();
-}
-
 //------------------------------------------------
 
-DBSqlTask::DBSqlTask(SqlPrepare * pre):
+DBSqlTask::DBSqlTask(std::shared_ptr<SqlPrepare> pre):
 	_pre(pre)
 {
 
@@ -49,14 +38,28 @@ DBSqlTask::~DBSqlTask()
 
 void DBSqlTask::process()
 {
-	_pre->prepare(static_cast<DBInterfaceMysql *>(_dbi)->mysql());
-	_pre->execute();
+	_ret = _pre->prepare(static_cast<DBInterfaceMysql *>(_dbi)->mysql());
+	if (_ret >= 0) _ret = _pre->execute();
+	if (_ret < 0)
+	{
+		_error = _dbi->getError();
+	}
 }
 
+void DBSqlTask::complete()
+{
+	const char* str = NULL;
+	if (_ret < 0) str = _error.c_str();
+	if (backfunc)
+	{
+		backfunc(str, _pre);
+		backfunc = nullptr;
+	}
+}
 
 //------------------------------------------------
 
-DBRedisTask::DBRedisTask(RedisCommand * command, DBResult * result)
+DBRedisTask::DBRedisTask(std::shared_ptr<RedisCommand> command, std::shared_ptr <RedisResult> result)
 {
 	_command = command;
 	_result = result;
@@ -69,7 +72,20 @@ DBRedisTask::~DBRedisTask()
 
 void DBRedisTask::process()
 {
-	static_cast<DBInterfaceRedis *>(_dbi)->execute(_command, _result);
+	DBResult* result = (DBResult*)(_result.get());
+	_ret = static_cast<DBInterfaceRedis *>(_dbi)->execute(_command.get(), result);
+	if (_ret < 0) _error = _dbi->getError();
+}
+
+void DBRedisTask::complete()
+{
+	const char* str = NULL;
+	if (_ret < 0) str = _error.c_str();
+	if (backfunc)
+	{
+		backfunc(str, _result);
+		backfunc = nullptr;
+	}
 }
 
 //------------------------------------------------
@@ -110,9 +126,9 @@ void DBThread::onEnd()
 	}
 }
 
-void DBThread::run(Task * task)
+void DBThread::run(TaskPtr task)
 {
-	static_cast<DBTask*>(task)->dbi(m_db);
+	static_cast<DBTask*>(task.get())->dbi(m_db);
 	CThread::run(task);
 }
 
@@ -136,7 +152,7 @@ void DBThreadPool::deleteThread(CThread * t)
 	delete t;
 }
 
-void DBThreadPool::completeTask(Task * task)
+void DBThreadPool::completeTask(TaskPtr task)
 {
 }
 

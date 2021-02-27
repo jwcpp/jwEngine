@@ -120,7 +120,6 @@ int DBInterfaceRedis::execute(RedisCommand * command, DBResult * result)
 
 	if (m_context->err)
 	{
-		ERROR_LOG("DBInterfaceRedis::execute: errno=%d, error=%s\n", m_context->err, m_context->errstr);
 		return -1;
 	}
 	//freeReplyObject(pRedisReply);

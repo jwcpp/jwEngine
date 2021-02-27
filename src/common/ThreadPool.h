@@ -13,6 +13,8 @@ namespace Thread
 		virtual void complete() = 0;
 	};
 
+	typedef std::shared_ptr<Task> TaskPtr;
+
 	class ThreadPool;
 	class CThread
 	{
@@ -22,7 +24,7 @@ namespace Thread
 		static void backfunc(CThread * t);
 		void stop();
 
-		virtual void run(Task * task);
+		virtual void run(TaskPtr task);
 
 	protected:
 		virtual void onStart() {};
@@ -44,19 +46,19 @@ namespace Thread
 		void create(int count);
 		void exit();
 
-		void addTask(Task * task);
+		void addTask(TaskPtr task);
 		void update();
 	protected:
-		virtual CThread* createThread() { return NULL; }
+		virtual CThread* createThread() = 0;
 		virtual void deleteThread(CThread * t) = 0;
-		virtual void completeTask(Task * task) = 0;
+		virtual void completeTask(TaskPtr task) = 0;
 	private:
-		Task * popWaitTask();
+		TaskPtr popWaitTask();
 
 	private:
 		std::vector<CThread *> _threads;
-		TQueue<Task *> _waitTasks;
-		TQueue<Task *> _completeTasks;
+		TQueue<TaskPtr> _waitTasks;
+		TQueue<TaskPtr> _completeTasks;
 	};
 }
 

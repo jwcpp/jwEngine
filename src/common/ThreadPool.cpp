@@ -26,7 +26,7 @@ void CThread::backfunc(CThread * t)
 	t->onStart();
 	while (t->_isrun)
 	{
-		Task * task = t->_pool->popWaitTask();
+		TaskPtr task = t->_pool->popWaitTask();
 		if (task)
 		{
 			t->run(task);
@@ -42,7 +42,7 @@ void CThread::stop()
 	_thread.join();
 }
 
-void CThread::run(Task * task)
+void CThread::run(TaskPtr task)
 {
 	task->process();
 };
@@ -80,13 +80,14 @@ void ThreadPool::exit()
 	_threads.clear();
 }
 
-void ThreadPool::addTask(Task * task)
+void ThreadPool::addTask(TaskPtr task)
 {
 	_waitTasks.push(task);
 }
-Task * ThreadPool::popWaitTask()
+
+TaskPtr ThreadPool::popWaitTask()
 {
-	Task * task;
+	TaskPtr task;
 	if (!_waitTasks.tryPop(task))
 		return NULL;
 	return task;
@@ -94,7 +95,7 @@ Task * ThreadPool::popWaitTask()
 
 void ThreadPool::update()
 {
-	Task * task;
+	TaskPtr task;
 	if (!_completeTasks.tryPop(task))
 		return;
 
