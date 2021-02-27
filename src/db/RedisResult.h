@@ -50,6 +50,7 @@ public:
 	// string type
 	RedisResult &operator>>(std::string& value);
 	int readBlob(BasePacket * packet);
+	std::string_view getStream();
 private:
 	redisReply * m_reply;
 	int pos;

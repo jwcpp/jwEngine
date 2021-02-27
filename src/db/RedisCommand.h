@@ -25,6 +25,7 @@ public:
 	void pushDouble(double value);
 	void pushString(std::string value);
 	void pushBlob(BasePacket * packet);
+	void pushData(std::string_view sv); // lua call
 
 	template<class T>
 	void pushValue(T t)

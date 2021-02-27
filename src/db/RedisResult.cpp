@@ -100,3 +100,10 @@ int RedisResult::readBlob(BasePacket * packet)
 	}
 	return len;
 }
+
+std::string_view RedisResult::getStream()
+{
+	int len;
+	const char * p = getData(len);
+	return std::string_view(p, len);
+}

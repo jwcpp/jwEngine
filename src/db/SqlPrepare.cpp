@@ -207,9 +207,17 @@ void SqlPrepare::pushString(std::string value)
 
 void SqlPrepare::pushBlob(BasePacket * packet)
 {
-	MYSQL_BIND* pBind = &m_paramBind[m_widx++];
+	write(packet->contents(), packet->writePos());
+}
 
-	int len = packet->writePos();
+void SqlPrepare::pushData(std::string_view sv)
+{
+	write((void *)sv.data(), sv.size());
+}
+
+void SqlPrepare::write(void* pData, int len)
+{
+	MYSQL_BIND* pBind = &m_paramBind[m_widx++];
 
 	pBind->buffer_length = *pBind->length = len;
 	pBind->buffer_type = MYSQL_TYPE_BLOB;
@@ -217,9 +225,8 @@ void SqlPrepare::pushBlob(BasePacket * packet)
 
 	if (pBind->buffer == NULL)
 		allocateParamBuffer(pBind);
-	memcpy(pBind->buffer, packet->contents(), len);
+	memcpy(pBind->buffer, pData, len);
 }
-
 
 int8 SqlPrepare::getInt8()
 {
@@ -339,30 +346,55 @@ std::string SqlPrepare::getString()
 
 int SqlPrepare::readBlob(BasePacket * packet)
 {
+	packet->resize(fieldLen());
+	return read(packet->contents());
+}
+
+std::string SqlPrepare::getData()
+{
+	std::string retstr;
+	int len = fieldLen();
+	if (len > 0)
+	{
+		retstr.resize(len);
+		read(retstr.data());
+	}
+	return retstr;
+}
+
+int SqlPrepare::fieldLen()
+{
+	MYSQL_BIND* pBind = &m_resultBind[m_ridx];
+	if (*pBind->is_null)
+	{
+		return 0;
+	}
+	return *pBind->length;
+}
+
+int SqlPrepare::read(void * pData)
+{
 	MYSQL_BIND* pBind = &m_resultBind[m_ridx];
 	if (*pBind->is_null)
 	{
 		return 0;
 	}
 
-	packet->resize(*pBind->length);
-
-	void *tmp = pBind->buffer;
-	pBind->buffer = packet->contents();
+	void* tmp = pBind->buffer;
+	pBind->buffer = pData;
 	pBind->buffer_length = *pBind->length;
 	if (mysql_stmt_fetch_column(m_stmt, pBind, m_ridx++, 0))
 	{
 		pBind->buffer = tmp;
 		pBind->buffer_length = 1;
-		ERROR_LOG("mysql_stmt_fetch_column() failed: %s",mysql_stmt_error(m_stmt));
+		ERROR_LOG("mysql_stmt_fetch_column() failed: %s", mysql_stmt_error(m_stmt));
 		return 0;
 	}
 	pBind->buffer = tmp;
 	pBind->buffer_length = 1;
-	
+
 	return *pBind->length;
 }
-
 
 void SqlPrepare::allocateParamBuffer(MYSQL_BIND* bind)
 {

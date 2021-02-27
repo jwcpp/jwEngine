@@ -29,6 +29,9 @@ public:
 	void pushDouble(double value);
 	void pushString(std::string value);
 	void pushBlob(BasePacket * packet);
+	void pushData(std::string_view sv); // lua call
+	
+	void write(void* pData, int len);
 
 	//get
 	int8 getInt8();
@@ -43,6 +46,10 @@ public:
 	double getDouble();
 	std::string getString();
 	int readBlob(BasePacket * packet);
+	std::string getData(); // lua call
+
+	int fieldLen();
+	int read(void * pData);
 
 	int prepare(MYSQL * mysql);
 	int execute();

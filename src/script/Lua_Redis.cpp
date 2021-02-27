@@ -29,6 +29,7 @@ public:
 	double getDouble() { return getValue<double>(); }
 	std::string getString() { return getValue<std::string>(); }
 	int readBlob(BasePacket * packet) { return m_result->readBlob(packet); }
+	std::string_view getData() { return m_result->getStream(); }
 
 	bool fetch() {
 		return m_result->fetch();
@@ -67,6 +68,7 @@ public:
 	void pushDouble(double value) { m_command->pushDouble(value); }
 	void pushString(std::string value) { m_command->pushString(value); }
 	void pushBlob(BasePacket * pack) { m_command->pushBlob(pack); }
+	void pushData(std::string sv) { m_command->pushData(sv); }
 
 	void addToPool(DBThreadPool * pool, std::function<void(const char* , Lua_RedisResult *)> backfunc)
 	{
@@ -104,6 +106,7 @@ void luabind_redis(sol::state & lua)
 		"pushDouble", &Lua_RedisCommand::pushDouble,
 		"pushString", &Lua_RedisCommand::pushString,
 		"pushBlob", &Lua_RedisCommand::pushBlob,
+		"pushData", &Lua_RedisCommand::pushData,
 		"addToPool", &Lua_RedisCommand::addToPool);
 
 	lua.new_usertype<Lua_RedisResult>("RedisResult",
@@ -119,5 +122,6 @@ void luabind_redis(sol::state & lua)
 		"getDouble", &Lua_RedisResult::getDouble,
 		"getString", &Lua_RedisResult::getString,
 		"readBlob", &Lua_RedisResult::readBlob,
+		"getData", &Lua_RedisResult::getData,
 		"fetch", &Lua_RedisResult::fetch);
 }

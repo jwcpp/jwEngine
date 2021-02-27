@@ -27,6 +27,7 @@ public:
 	double getDouble() { return m_sqlPre->getDouble(); }
 	std::string getString() { return m_sqlPre->getString(); }
 	int readBlob(BasePacket * packet) { return m_sqlPre->readBlob(packet); }
+	std::string getData() { return m_sqlPre->getData(); } // lua call
 
 	bool fetch()
 	{
@@ -80,6 +81,7 @@ public:
 	void pushDouble(double value) { m_sqlPre->pushDouble(value); }
 	void pushString(std::string value) { m_sqlPre->pushString(value); }
 	void pushBlob(BasePacket * packet) { m_sqlPre->pushBlob(packet); }
+	void pushData(std::string_view sv) { m_sqlPre->pushData(sv); } // lua call
 
 private:
 	std::shared_ptr<SqlPrepare> m_sqlPre;
@@ -117,6 +119,7 @@ void luabind_mysql(sol::state & lua)
 		"pushDouble", &Lua_SqlCommand::pushDouble,
 		"pushString", &Lua_SqlCommand::pushString,
 		"pushBlob", &Lua_SqlCommand::pushBlob,
+		"pushData", &Lua_SqlCommand::pushData,
 		"addToPool", &Lua_SqlCommand::addToPool);
 
 	lua.new_usertype<Lua_SqlResult>("SqlResult",
@@ -132,5 +135,6 @@ void luabind_mysql(sol::state & lua)
 		"getDouble", &Lua_SqlResult::getDouble,
 		"getString", &Lua_SqlResult::getString,
 		"readBlob", &Lua_SqlResult::readBlob,
+		"getData", &Lua_SqlResult::getData,
 		"fetch", &Lua_SqlResult::fetch);
 }

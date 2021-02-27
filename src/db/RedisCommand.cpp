@@ -57,6 +57,10 @@ void RedisCommand::pushBlob(BasePacket * packet)
 	append((const uint8*)packet->contents(), packet->writePos());
 }
 
+void RedisCommand::pushData(std::string_view sv)
+{
+	append((const uint8*)sv.data(), sv.size());
+}
 
 void RedisCommand::append(const uint8 * p, int len)
 {
