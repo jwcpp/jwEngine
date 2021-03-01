@@ -8,7 +8,6 @@ pb.loadfile("msgtest.pb")
 
 -- init
 event_init()
-init_netpacket_pool(100)
 
 -- create server
 server = NetServer:new()

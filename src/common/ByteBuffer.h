@@ -6,6 +6,13 @@
 #include <string>
 #include <vector>
 #include <cstring>
+#include "PoolObject.h"
+
+class CBuffer : public PoolObject, public std::vector<uint8> {
+public:
+	void zero() {}
+	void release() {}
+};
 
 class ByteBuffer
 {
@@ -13,60 +20,23 @@ public:
 	static size_t const DEFAULT_SIZE = 0x1000;
 
 	// constructor
-	ByteBuffer() : _rpos(0), _wpos(0)
-	{
-		_storage.reserve(DEFAULT_SIZE);
-	}
-
-	ByteBuffer(size_t reserve) : _rpos(0), _wpos(0)
-	{
-		_storage.reserve(reserve);
-	}
-
-	ByteBuffer(ByteBuffer&& buf) : _rpos(buf._rpos), _wpos(buf._wpos),_storage(buf.Move()) { }
-
-	ByteBuffer(ByteBuffer const& right) : _rpos(right._rpos), _wpos(right._wpos), _storage(right._storage) { }
-
-	ByteBuffer(size_t r, size_t w, std::vector<uint8>&& vec) : _rpos(r), _wpos(w), _storage(vec){ }
-
-	std::vector<uint8>&& Move()
-	{
-		_rpos = 0;
-		_wpos = 0;
-		return std::move(_storage);
-	}
-
-	ByteBuffer& operator=(ByteBuffer const& right)
-	{
-		if (this != &right)
-		{
-			_rpos = right._rpos;
-			_wpos = right._wpos;
-			_storage = right._storage;
-		}
-
-		return *this;
-	}
-
-	ByteBuffer& operator=(ByteBuffer&& right)
-	{
-		if (this != &right)
-		{
-			_rpos = right._rpos;
-			_wpos = right._wpos;
-			_storage = right.Move();
-		}
-
-		return *this;
-	}
-
-	virtual ~ByteBuffer() { }
+	ByteBuffer();
+	ByteBuffer(size_t reserve);
+	ByteBuffer(ByteBuffer&& buf);
+	ByteBuffer(ByteBuffer const& right);
+	virtual ~ByteBuffer();
+	ByteBuffer& operator=(ByteBuffer const& right);
+	ByteBuffer& operator=(ByteBuffer&& right);
+	
+	CBuffer* createBuffer();
+	void swapBuffer(ByteBuffer& right);
+	CBuffer& storage() { return *_storage; }
 
 	void clear()
 	{
 		_rpos = 0;
 		_wpos = 0;
-		_storage.clear();
+		_storage->clear();
 	}
 
 	template <typename T>
@@ -236,12 +206,12 @@ public:
 
 	uint8& operator[](size_t const pos)
 	{
-		return _storage[pos];
+		return (*_storage)[pos];
 	}
 
 	uint8 const& operator[](size_t const pos) const
 	{
-		return _storage[pos];
+		return (*_storage)[pos];
 	}
 
 	size_t rpos() const { return _rpos; }
@@ -285,7 +255,7 @@ public:
 	template <typename T>
 	T read(size_t pos) const
 	{
-		T val = *((T const*)&_storage[pos]);
+		T val = *((T const*)&(*_storage)[pos]);
 		EndianConvert(val);
 		return val;
 	}
@@ -299,7 +269,7 @@ public:
 
 	void read(uint8 *dest, size_t len)
 	{
-		std::memcpy(dest, &_storage[_rpos], len);
+		std::memcpy(dest, &(*_storage)[_rpos], len);
 		_rpos += len;
 	}
 
@@ -308,7 +278,7 @@ public:
 		if (!length)
 			return std::string();
 
-		std::string str((char const*)&_storage[_rpos], length);
+		std::string str((char const*)&(*_storage)[_rpos], length);
 		_rpos += length;
 		return str;
 	}
@@ -329,20 +299,20 @@ public:
 
 	uint8* contents()
 	{
-		return _storage.data();
+		return _storage->data();
 	}
 
 	uint8 const* contents() const
 	{
-		return _storage.data();
+		return _storage->data();
 	}
 
-	size_t size() const { return _storage.size(); }
-	bool empty() const { return _storage.empty(); }
+	size_t size() const { return _storage->size(); }
+	bool empty() const { return _storage->empty(); }
 
 	void resize(size_t newsize)
 	{
-		_storage.resize(newsize, 0);
+		_storage->resize(newsize, 0);
 		_rpos = 0;
 		_wpos = size();
 	}
@@ -350,7 +320,7 @@ public:
 	void reserve(size_t ressize)
 	{
 		if (ressize > size())
-			_storage.reserve(ressize);
+			_storage->reserve(ressize);
 	}
 
 	void append(const char *src, size_t cnt)
@@ -376,7 +346,8 @@ public:
 
 protected:
 	size_t _rpos, _wpos;
-	std::vector<uint8> _storage;
+	//std::vector<uint8> _storage;
+	CBuffer* _storage;
 };
 
 /// @todo Make a ByteBuffer.cpp and move all this inlining to it.

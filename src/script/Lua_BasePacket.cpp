@@ -1,9 +1,18 @@
 #include "sol/sol.hpp"
 #include "TcpSocket.h"
 #include "BasePacket.h"
+#include "ByteBuffer.h"
+#include "CommonPool.h"
+
+void init_buffer_pool(int count)
+{
+	CommPool::init<CBuffer>(count);
+}
 
 void luabind_basepacket(sol::state & lua)
 {
+	lua["init_buffer_pool"] = &init_buffer_pool;
+
 	lua.new_usertype<BasePacket>("BasePacket",
 		"getInt8", &BasePacket::getInt8,
 		"getUint8", &BasePacket::getUint8,

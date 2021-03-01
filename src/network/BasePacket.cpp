@@ -16,7 +16,7 @@ void BasePacket::zero()
 {
 	rpos(0);
 	wpos(0);
-	this->_storage.resize(0);
+	this->storage().resize(0);
 }
 
 void BasePacket::release()
@@ -28,7 +28,8 @@ void BasePacket::moveData(BasePacket * packet)
 {
 	rpos(packet->rpos());
 	wpos(packet->wpos());
-	_storage = packet->Move();
+	swapBuffer(*packet);
+	packet->zero();
 }
 
 void BasePacket::shrink(int isize)
@@ -36,11 +37,11 @@ void BasePacket::shrink(int isize)
 	// shrink_to_fit()
 	// swap()
 
-	if (_storage.capacity() > isize)
+	if (_storage->capacity() > isize)
 	{
 		std::vector<uint8> vec;
 		vec.reserve(isize);
-		_storage = std::move(vec);
+		_storage->swap(vec);
 	}
 }
 
@@ -67,7 +68,7 @@ const char * BasePacket::readPointer()
 void BasePacket::setWriteSize(int size)
 {
 	size += getHeadSize();
-	_storage.resize(size);
+	_storage->resize(size);
 	wpos(size);
 }
 

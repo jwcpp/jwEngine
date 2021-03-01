@@ -3,7 +3,6 @@
 #include "WebSocketPacket.h"
 #include "WebSocketServer.h"
 #include "EventLoop.h"
-#include "CommonPool.h"
 #include "Tools.h"
 #include <stdio.h>
 
@@ -39,7 +38,6 @@ public:
 
 int main()
 {
-	CommPool::init<WebSocketPacket>(10);
 	EventLoop::Instance()->init();
 
 	IWebEvent wevent;

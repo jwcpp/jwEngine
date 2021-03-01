@@ -266,12 +266,11 @@ void WebSocketConnect::on_writecomplete()
 
 WebSocketPacket * WebSocketConnect::createPacket()
 {
-	WebSocketPacket * packet = CommPool::create<WebSocketPacket>();
-	return packet;
+	return new WebSocketPacket;
 }
 void WebSocketConnect::recyclePacket(WebSocketPacket * pack)
 {
-	CommPool::reclaim(pack);
+	delete pack;
 }
 
 bool WebSocketConnect::decodingDatas(WebSocketPacket* pPacket, uint32 msg_mask)

@@ -98,13 +98,12 @@ void NetConnect::sendMsg(uint32 msgtype, const char* msg, uint32 len)
 
 NetPacket * NetConnect::createPacket()
 {
-	NetPacket * packet = CommPool::create<NetPacket>();
-	return packet;
+	return new NetPacket;
 }
 
 void NetConnect::recyclePacket(NetPacket * pack)
 {
-	CommPool::reclaim(pack);
+	delete pack;
 }
 
 void NetConnect::on_writecomplete()

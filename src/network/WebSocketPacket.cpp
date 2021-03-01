@@ -13,7 +13,7 @@ WebSocketPacket::~WebSocketPacket()
 
 void WebSocketPacket::zero()
 {
-	this->_storage.resize(WS_MAX_HEAD_SIZE);
+	this->storage().resize(WS_MAX_HEAD_SIZE);
 	_wpos = WS_MAX_HEAD_SIZE;
 	_rpos = WS_MAX_HEAD_SIZE;
 	__m_headpos = 0;

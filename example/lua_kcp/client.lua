@@ -1,5 +1,4 @@
 event_init()
-init_kcppacket_pool(10)
 
 -- create server
 client = KcpClient:new()

@@ -1,6 +1,5 @@
 -- init
 event_init()
-init_wspacket_pool(10)
 
 -- create server
 server = WebSocketServer:new()

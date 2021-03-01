@@ -4,7 +4,6 @@
 #include "KcpEvent.h"
 #include "KcpSession.h"
 #include "UdpPacket.h"
-#include "CommonPool.h"
 #include <time.h>
 
 class KNetEvent : public KcpEvent
@@ -58,7 +57,6 @@ int main()
 {
 	srand((int)time(0));
 	EventLoop::Instance()->init();
-	CommPool::init<UdpPacket>(10);
 
 	//初始化事件循环
 	KNetEvent eve;

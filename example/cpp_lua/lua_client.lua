@@ -1,7 +1,6 @@
 require("testmsg")
 
 event_init()
-init_netpacket_pool(10)
 
 -- create server
 client = NetClient:new()

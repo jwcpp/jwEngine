@@ -118,12 +118,11 @@ const char * HttpConnect::getContentTypeStr(enum http_content_type type)
 
 BasePacket * HttpConnect::createPacket()
 {
-	BasePacket * packet = CommPool::create<BasePacket>();
-	return packet;
+	return new BasePacket;
 }
 void HttpConnect::recyclePacket(BasePacket * pack)
 {
-	CommPool::reclaim(pack);
+	delete pack;
 }
 
 int HttpConnect::on_url(http_parser* _, const char *at, size_t length)

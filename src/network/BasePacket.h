@@ -82,7 +82,7 @@ protected:
 	template<typename T>
 	T getValue(uint32 pos){
 		T value;
-		std::memcpy(&value, &_storage[pos], sizeof(T));
+		std::memcpy(&value, &(*_storage)[pos], sizeof(T));
 		EndianConvert(value);
 
 		return value;

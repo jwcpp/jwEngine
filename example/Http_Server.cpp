@@ -59,13 +59,9 @@ const char * failing = ""
 
 
 #include "XFile.h"
-#include "CommonPool.h"
 
 int main()
 {
-	// init connect pool
-	CommPool::init<HttpConnect>(10);
-	
 	EventLoop::Instance()->init();
 	HttpServer server(EventLoop::Instance());
 	server.listen("127.0.0.1", 80);

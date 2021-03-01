@@ -11,7 +11,7 @@ class ObjectPool
 	typedef std::list<T*> OBJECTS;
 
 public:
-	ObjectPool(int32 maxfreecount = 0) :
+	ObjectPool(int32 maxfreecount = 0x200) :
 		max_free(maxfreecount), obj_count_(0)
 	{
 		

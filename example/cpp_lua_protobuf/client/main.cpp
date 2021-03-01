@@ -7,8 +7,7 @@
 #include "NetClient.h"
 #include "NetConnect.h"
 #include "NetPacket.h"
-#include "CommonPool.h"
-#include "AutoPacket.h"
+#include "ProtoPacket.h"
 #include "msgtest.pb.h"
 
 class INetEvent : public NetEvent
@@ -37,8 +36,9 @@ public:
 		role2->add_tasks(201);
 		role2->add_tasks(202);
 
-		AutoPacket<NetPacket> apk;
-		conn->sendMsg(111, apk.writeProto<Family>(family));
+		NetPacket pack;
+		writeProto(&pack, family);
+		conn->sendMsg(111, &pack);
 	};
 	virtual void onClose(NetConnect * conn){
 		
@@ -71,9 +71,6 @@ public:
 
 int main()
 {
-	//初始化tcp包内存池
-	CommPool::init<NetPacket>(100);
-
 	//初始化事件循环
 	INetEvent eve;
 	EventLoop::Instance()->init();

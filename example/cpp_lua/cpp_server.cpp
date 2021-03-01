@@ -7,7 +7,6 @@
 #include "NetServer.h"
 #include "NetConnect.h"
 #include "NetPacket.h"
-#include "CommonPool.h"
 
 #include "testmsg.h"
 
@@ -78,8 +77,6 @@ public:
 
 int main()
 {
-	//初始化tcp包内存池
-	CommPool::init<NetPacket>(10);
 
 	//初始化事件循环
 	INetEvent eve;

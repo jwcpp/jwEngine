@@ -156,7 +156,7 @@ void KcpSession::updateKcp()
 
 UdpPacket * KcpSession::_createPacket(int size)
 {
-	UdpPacket * packet = CommPool::create<UdpPacket>();
+	UdpPacket * packet = new UdpPacket;
 	if (size > 0)
 	{
 		packet->initSize(size);
@@ -166,7 +166,7 @@ UdpPacket * KcpSession::_createPacket(int size)
 
 void KcpSession::_recyclePacket(UdpPacket * packet)
 {
-	CommPool::reclaim(packet);
+	delete packet;
 }
 
 void KcpSession::_onMsg(UdpPacket * packet)

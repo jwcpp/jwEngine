@@ -13,7 +13,7 @@ UdpPacket::~UdpPacket()
 
 void UdpPacket::zero()
 {
-	this->_storage.resize(UDP_PACK_HEAD_SIZE);
+	this->_storage->resize(UDP_PACK_HEAD_SIZE);
 	_wpos = UDP_PACK_HEAD_SIZE;
 	_rpos = UDP_PACK_HEAD_SIZE;
 }
@@ -27,7 +27,7 @@ void UdpPacket::initSize(int s)
 {
 	if (s > size())
 	{
-		this->_storage.resize(s);
+		this->_storage->resize(s);
 	}
 }
 

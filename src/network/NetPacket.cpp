@@ -7,7 +7,7 @@ NetPacket::NetPacket()
 
 void NetPacket::zero()
 {
-	this->_storage.resize(MSG_HEAD_SIZE);
+	this->_storage->resize(MSG_HEAD_SIZE);
 	_wpos = MSG_HEAD_SIZE;
 	_rpos = MSG_HEAD_SIZE;
 }
