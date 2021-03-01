@@ -21,8 +21,6 @@ public:
 
 int main()
 {
-  CommPool::init<NetPacket>(100);
-
   EventLoop::Instance()->init();
 
   INetEvent eve;
@@ -47,8 +45,6 @@ public:
 
 int main()
 {
-  CommPool::init<UdpPacket>(10);
-
   EventLoop::Instance()->init();
 
   KNetEvent eve;
@@ -75,8 +71,6 @@ public:
 
 int main()
 {
-  CommPool::init<WebSocketPacket>(10);
-
   EventLoop::Instance()->init();
 
   IWebEvent wevent;
@@ -120,8 +114,6 @@ const char * failing = ""
 
 int main()
 {
-  CommPool::init<HttpConnect>(10);
-
   EventLoop::Instance()->init();
   HttpServer server(EventLoop::Instance());
   server.listen("127.0.0.1", 80);
@@ -160,7 +152,7 @@ config.port = 3306
 pool = DBThreadPool:new(config)
 pool:create(1)
 
-func = function(result)
+func = function(err, result)
   while(result:fetch())
   do
     local id = result:getInt32()
@@ -235,4 +227,4 @@ lua-protobuf的开源地址：[lua-protobuf](https://github.com/starwing/lua-pro
 更多使用示例请参考[example](https://github.com/jwcpp/jwEngine/tree/master/example). 同时欢迎fork和贡献代码
 
 ## 建议
-有任何意见或bug，请联系QQ:754420038
+有任何意见或bug，统一解决QQ群:458421068
