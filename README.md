@@ -226,5 +226,4 @@ lua-protobuf的开源地址：[lua-protobuf](https://github.com/starwing/lua-pro
 ## 进一步了解
 更多使用示例请参考[example](https://github.com/jwcpp/jwEngine/tree/master/example). 同时欢迎fork和贡献代码
 
-## 建议
-有任何意见或bug，统一解决QQ群:458421068
+有任何建议、BUG、疑问，统一解决QQ群:458421068
