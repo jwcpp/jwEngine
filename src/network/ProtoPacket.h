@@ -1,7 +1,5 @@
 #pragma once
 
-#include "CommonPool.h"
-
 template<typename T, typename MSG>
 void readProto(T* buff, MSG & msg)
 {
