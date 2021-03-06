@@ -1,0 +1,4 @@
+Storage directory of protobuf header file
+
+Attach include directory: ..\dependencies
+#include <google/protobuf/xxxx.h>
