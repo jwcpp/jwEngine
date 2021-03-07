@@ -53,6 +53,6 @@ public:
 	std::string_view getStream();
 private:
 	redisReply * m_reply;
-	int pos;
+	uint32 pos;
 };
 
