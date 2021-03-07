@@ -1,0 +1,1 @@
+mysql -uroot -p111111 <sql.sql
