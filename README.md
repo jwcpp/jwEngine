@@ -27,8 +27,7 @@ int main()
   NetServer server(EventLoop::Instance(), &eve);
   server.listen("127.0.0.1", 3001);
 
-  EventLoop::Instance()->run();
-  return 0;
+  return EventLoop::Instance()->run();
 }
 ```
 ## 创建一个kcp服务器
@@ -51,8 +50,7 @@ int main()
   KcpServer server(EventLoop::Instance(), &eve);
   server.start("127.0.0.1", 3001);
 
-  EventLoop::Instance()->run();
-  return 0;
+  return EventLoop::Instance()->run();
 }
 ```
 
@@ -77,8 +75,7 @@ int main()
   WebSocketServer server(EventLoop::Instance(), &wevent);
   server.listen("127.0.0.1", 8080);
 
-  EventLoop::Instance()->run();
-  return 0;
+  return EventLoop::Instance()->run();
 }
 ```
 
@@ -134,8 +131,7 @@ int main()
     }
   });
 
-  EventLoop::Instance()->run();
-  return 0;
+  return EventLoop::Instance()->run();
 }
 ```
 ## mysql和线程池
