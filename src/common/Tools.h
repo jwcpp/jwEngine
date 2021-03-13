@@ -6,7 +6,7 @@ class Tools
 public:
 	static void encrypt(char * buf, char * key);
 	static std::string format(const char * format, ...);
-	static void sleep(int millionseconds);
+	static void sleep(int ms);
 	static unsigned long getCurrentThreadID();
 	static int binarySearch(int arr[], int len, int findX);
 	static std::string gbkToUtf8(const char *src_str);

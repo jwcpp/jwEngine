@@ -84,7 +84,7 @@ void XTime::getTimeval(struct timeval * tp)
 	gettimeofday(tp, NULL);
 }
 
-/** @brief 获取毫秒时间戳 */
+// msec
 int64 XTime::milliStamp()
 {
 	struct timeval tv;
@@ -92,7 +92,7 @@ int64 XTime::milliStamp()
 	return tv.tv_sec * 1000 + tv.tv_usec / 1000;
 }
 
-/** @brief 获取微秒时间戳 */
+// usec
 int64 XTime::microStamp()
 {
 	struct timeval tv;
@@ -100,7 +100,7 @@ int64 XTime::microStamp()
 	return tv.tv_sec * 1000000 + tv.tv_usec;
 }
 
-/** @brief 获取时间戳 */
+// sec
 time_t XTime::stamp()
 {
 	struct timeval tv;
@@ -110,5 +110,5 @@ time_t XTime::stamp()
 
 uint32 XTime::iclock()
 {
-	return (uint32)(std::clock() * 1000 / CLOCKS_PER_SEC);
+	return (uint32)((double)std::clock() / CLOCKS_PER_SEC * 1000);
 }

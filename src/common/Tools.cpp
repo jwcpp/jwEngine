@@ -35,12 +35,12 @@ std::string Tools::format(const char * format, ...)
 }
 
 
-void Tools::sleep(int millionseconds)
+void Tools::sleep(int ms)
 {
 #if defined(SYSTEM_WIN)
-	Sleep(millionseconds);
+	Sleep(ms);
 #else
-	sleep(millionseconds);
+	::usleep(ms * 1000);
 #endif
 }
 

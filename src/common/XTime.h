@@ -17,9 +17,8 @@
 class XTime
 {
 public:
-	/** @brief 判断是否是闰年 */
+	// leap year
 	static bool isLeapYear(int year);
-	/** @brief 某年某月一共有多少天 */
 	static int yearMonthDays(int year, int month);
 
 	static const struct tm * getTMStruct();
@@ -27,13 +26,11 @@ public:
 	static std::string format(const char * fmt = "%Y-%m-%d %H:%M:%S");
 
 	static void getTimeval(struct timeval * tp);
-	/** @brief 获取毫秒时间戳 */
+	// msec
 	static int64 milliStamp();
-
-	/** @brief 获取微秒时间戳 */
+	// usec
 	static int64 microStamp();
-
-	/** @brief 获取时间戳 */
+	// sec
 	static time_t stamp();
 
 	static uint32 iclock();
