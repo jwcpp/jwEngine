@@ -74,6 +74,11 @@ class BaseBuffer:
 class NetPacket(BaseBuffer):
 	def __init__(self):
 		BaseBuffer.__init__(self, 8)
+	
+	def receive(self, buff):
+		self.rpos = 8
+		self.wpos = len(buff)
+		self.buff = buff
 
 	def setHead(self, msgtype):
 		struct.pack_into('I',self.buff,0, self.wpos - 8)
