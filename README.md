@@ -210,9 +210,16 @@ struct testmsg
 
 目前serialization序列化工具为实验性，可能是脆弱的，建议使用更强大的protobuf。该项目已集成lua-protobuf，使得c++和lua之间的协议无缝衔接。
 
-lua-protobuf的开源地址：[lua-protobuf](https://github.com/starwing/lua-protobuf)
-
 这个示例展示了c++客户端和lua服务器之间的通讯：[快速搭建服务器Demo](https://github.com/jwcpp/jwEngine/tree/master/example/cpp_lua_protobuf)
+
+## 集成的开源库
+[libuv](https://github.com/libuv/libuv)  
+[sol2](https://github.com/ThePhD/sol2)  
+[concurrentqueue](https://github.com/cameron314/concurrentqueue)  
+[lua](https://github.com/lua/lua)  
+[hiredis](https://github.com/redis/hiredis)  
+[kcp](https://github.com/skywind3000/kcp)  
+[lua-protobuf](https://github.com/starwing/lua-protobuf)  
 
 ## 构建
 你需要一个modern c++17编译器
