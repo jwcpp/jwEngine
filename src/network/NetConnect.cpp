@@ -17,8 +17,6 @@ NetConnect::~NetConnect()
 		recyclePacket(mReadPacket);
 		mReadPacket = NULL;
 	}
-
-	release();
 }
 
 void NetConnect::on_msgbuffer(MessageBuffer * buffer)
@@ -77,9 +75,7 @@ void NetConnect::sendMsg(uint32 msgtype, NetPacket * pack)
 	packet->moveData(pack);
 	packet->writeHead(msgtype);
 
-	mSendPackets.push(packet);
-
-	send_top_msg();
+	TcpSocket::write(packet);
 }
 
 void NetConnect::sendMsg(uint32 msgtype, const char* msg, uint32 len)
@@ -90,48 +86,11 @@ void NetConnect::sendMsg(uint32 msgtype, const char* msg, uint32 len)
 	pack->append(msg, len);
 	pack->writeHead(msgtype);
 
-	mSendPackets.push(pack);
-
-	send_top_msg();
+	TcpSocket::write(pack);
 }
 
 
-NetPacket * NetConnect::createPacket()
+NetPacket* NetConnect::createPacket()
 {
 	return new NetPacket;
-}
-
-void NetConnect::recyclePacket(NetPacket * pack)
-{
-	delete pack;
-}
-
-void NetConnect::on_writecomplete()
-{
-	if (mSendPackets.empty())
-		return;
-
-	//write complete
-	recyclePacket(mSendPackets.front());
-	mSendPackets.pop();
-
-	send_top_msg();
-}
-
-void NetConnect::send_top_msg()
-{
-	if (mSendPackets.empty())
-		return;
-
-	NetPacket *tp = mSendPackets.front();
-	write(tp->sendStream(), tp->sendSize());
-}
-
-void NetConnect::release()
-{
-	while (!mSendPackets.empty())
-	{
-		recyclePacket(mSendPackets.front());
-		mSendPackets.pop();
-	}
 }

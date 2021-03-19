@@ -72,7 +72,11 @@ WebSocketConnect::WebSocketConnect(WebSocketEvent * wevent, uint32 buffersize):
 
 WebSocketConnect::~WebSocketConnect()
 {
-	release();
+	if (__m_readPacket)
+	{
+		recyclePacket(__m_readPacket);
+		__m_readPacket = NULL;
+	}
 }
 
 /*
@@ -158,7 +162,7 @@ void WebSocketConnect::on_msgbuffer(MessageBuffer * buffer)
 		}
 
 		respondHandshake(__m_handshakeMsg);
-		write((char *)__m_handshakeMsg.data(), __m_handshakeMsg.size() - 1);
+		TcpSocketBase::write((char *)__m_handshakeMsg.data(), __m_handshakeMsg.size() - 1);
 
 		__m_isHandshake = true;
 		__m_webevent->onHandshake(this);
@@ -230,8 +234,8 @@ void WebSocketConnect::sendMsg(WebSocketPacket * pack)
 {
 	WebSocketPacket * packet = createPacket();
 	packet->moveData(pack);
-	__m_sendPackets.push(packet);
-	send_top_msg();
+	
+	TcpSocket::write(packet);
 }
 
 void WebSocketConnect::sendMsg(const char * msg, uint32 len)
@@ -242,9 +246,7 @@ void WebSocketConnect::sendMsg(const char * msg, uint32 len)
 	pack->writeFrameHead(len);
 	pack->append(msg, len);
 
-	__m_sendPackets.push(pack);
-
-	send_top_msg();
+	TcpSocket::write(pack);
 }
 
 void WebSocketConnect::on_clsesocket()
@@ -252,25 +254,9 @@ void WebSocketConnect::on_clsesocket()
 	__m_webevent->onClose(this);
 }
 
-void WebSocketConnect::on_writecomplete()
-{
-	//write complete
-	if (__m_sendPackets.empty())
-		return;
-
-	recyclePacket(__m_sendPackets.front());
-	__m_sendPackets.pop();
-	send_top_msg();
-}
-
-
-WebSocketPacket * WebSocketConnect::createPacket()
+WebSocketPacket* WebSocketConnect::createPacket()
 {
 	return new WebSocketPacket;
-}
-void WebSocketConnect::recyclePacket(WebSocketPacket * pack)
-{
-	delete pack;
 }
 
 bool WebSocketConnect::decodingDatas(WebSocketPacket* pPacket, uint32 msg_mask)
@@ -281,22 +267,4 @@ bool WebSocketConnect::decodingDatas(WebSocketPacket* pPacket, uint32 msg_mask)
 	}
 
 	return true;
-}
-
-void WebSocketConnect::send_top_msg()
-{
-	if (__m_sendPackets.empty())
-		return;
-
-	WebSocketPacket *tp = __m_sendPackets.front();
-	write(tp->sendStream(), tp->sendSize());
-}
-
-void WebSocketConnect::release()
-{
-	while (!__m_sendPackets.empty())
-	{
-		recyclePacket(__m_sendPackets.front());
-		__m_sendPackets.pop();
-	}
 }

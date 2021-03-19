@@ -9,7 +9,7 @@
 #include <string>
 
 
-class TcpSocket
+class TcpSocketBase
 {
 	typedef struct {
 		uv_write_t req;
@@ -17,8 +17,8 @@ class TcpSocket
 	} write_req_t;
 
 public:
-	TcpSocket(uint32 buffersize = MESSAGE_BUFFER_SIZE);
-	virtual ~TcpSocket();
+	TcpSocketBase(uint32 buffersize = MESSAGE_BUFFER_SIZE);
+	virtual ~TcpSocketBase();
 
 	int init_uv_tcp(uv_loop_t * loop){ return uv_tcp_init(loop, getUvTcp()); }
 	int accept(uv_stream_t *server){ return uv_accept(server, (uv_stream_t*)getUvTcp()); }
@@ -57,6 +57,30 @@ private:
 	MessageBuffer mBuffer;
 	write_req_t mWriteReq;
 	void * _userdata;
+};
+
+#include <queue>
+class BasePacket;
+class TcpSocket : public TcpSocketBase
+{
+public:
+	TcpSocket(uint32 buffersize = MESSAGE_BUFFER_SIZE);
+	~TcpSocket();
+
+	virtual void zero();
+	virtual void release();
+
+protected:
+
+	void write(BasePacket * packet);
+	
+	BasePacket* createPacket();
+	virtual void recyclePacket(BasePacket * packet);
+	virtual void on_writecomplete();
+private:
+	void send_top_msg();
+private:
+	std::queue<BasePacket*> mSendPackets;
 };
 
 

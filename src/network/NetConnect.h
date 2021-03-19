@@ -2,7 +2,6 @@
 #define NET_CONNECT_H
 
 #include "TcpSocket.h"
-#include <queue>
 
 class NetPacket;
 class NetEvent;
@@ -22,20 +21,14 @@ public:
 	void sendPacket(uint32 msgtype, NetPacket * pack) { sendMsg(msgtype, pack);}
 	void sendData(uint32 msgtype, std::string_view view) { sendMsg(msgtype, view.data(), view.size()); }
 
-	static NetPacket * createPacket();
-	static void recyclePacket(NetPacket * pack);
 protected:
+	NetPacket* createPacket();
+	//virtual void recyclePacket(BasePacket* pack);
 
 	virtual void on_msgbuffer(MessageBuffer * buffer);
 	virtual void on_clsesocket();
-	virtual void on_writecomplete();
-
-private:
-	void send_top_msg();
-	void release();
 private:
 	NetPacket *  mReadPacket;
-	std::queue<NetPacket *> mSendPackets;
 	NetEvent * _netevent;
 };
 

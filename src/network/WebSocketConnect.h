@@ -9,7 +9,6 @@
 #pragma once
 
 #include <string>
-#include <queue>
 #include "TcpServer.h"
 
 class WebSocketEvent;
@@ -32,18 +31,16 @@ public:
 	void sendPacket(WebSocketPacket * pack) { sendMsg(pack); }
 	void sendData(std::string_view view) { sendMsg(view.data(), view.size()); }
 
-	static WebSocketPacket * createPacket();
-	static void recyclePacket(WebSocketPacket * pack);
+	WebSocketPacket* createPacket();
+	//virtual void recyclePacket(BasePacket* pack);
 protected:
 
 	virtual void on_msgbuffer(MessageBuffer * buffer);
 	virtual void on_clsesocket();
-	virtual void on_writecomplete();
 
 private:
-	void send_top_msg();
+
 	bool decodingDatas(WebSocketPacket* pPacket, uint32 msg_mask);
-	void release();
 private:
 	std::string __m_strKey;
 	std::string __m_strHost;
@@ -51,6 +48,5 @@ private:
 	bool __m_isHandshake;
 	WebSocketEvent * __m_webevent;
 	WebSocketPacket * __m_readPacket;
-	std::queue<WebSocketPacket *> __m_sendPackets;
 };
 

@@ -106,12 +106,12 @@ bool BasePacket::isHeadFull()
 // send msg call
 int32  BasePacket::sendSize()
 {
-	return 0;
+	return wpos();
 }
 
 char * BasePacket::sendStream()
 {
-	return NULL;
+	return (char *)contents();
 }
 
 int BasePacket::readPos()

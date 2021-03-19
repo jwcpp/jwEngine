@@ -23,7 +23,7 @@ class TcpConnect : public uv_tcp_t
 */
 
 
-TcpSocket::TcpSocket(uint32 buffersize)
+TcpSocketBase::TcpSocketBase(uint32 buffersize)
 {
 	m_uv_tcp.data = this;
 	mWriteReq.req.data = this;
@@ -31,17 +31,17 @@ TcpSocket::TcpSocket(uint32 buffersize)
 	_userdata = NULL;
 }
 
-TcpSocket::~TcpSocket()
+TcpSocketBase::~TcpSocketBase()
 {
 
 }
 
-void TcpSocket::clear()
+void TcpSocketBase::clear()
 {
 	mBuffer.Reset();
 }
 
-void TcpSocket::close()
+void TcpSocketBase::close()
 {
 	uv_close((uv_handle_t *)getUvTcp(), on_uv_close);
 }
@@ -89,12 +89,12 @@ void TcpSocket::close()
 //	
 //}
 
-void TcpSocket::on_read_start()
+void TcpSocketBase::on_read_start()
 {
 	uv_read_start((uv_stream_t *)getUvTcp(), alloc_buffer, echo_read);
 }
 
-std::string TcpSocket::localIP() const
+std::string TcpSocketBase::localIP() const
 {
 	sockaddr_storage addr;
 	int addr_len = sizeof(addr);
@@ -111,7 +111,7 @@ std::string TcpSocket::localIP() const
 	return endpoint;
 }
 
-int TcpSocket::localPort() const
+int TcpSocketBase::localPort() const
 {
 	sockaddr_storage addr;
 	int addr_len = sizeof(addr);
@@ -130,7 +130,7 @@ int TcpSocket::localPort() const
 	return 0;
 }
 
-std::string TcpSocket::remoteIP() const
+std::string TcpSocketBase::remoteIP() const
 {
 	sockaddr_storage addr;
 	int addr_len = sizeof(addr);
@@ -147,7 +147,7 @@ std::string TcpSocket::remoteIP() const
 	return endpoint;
 }
 
-int TcpSocket::remotePort() const
+int TcpSocketBase::remotePort() const
 {
 	sockaddr_storage addr;
 	int addr_len = sizeof(addr);
@@ -167,22 +167,22 @@ int TcpSocket::remotePort() const
 }
 
 
-int TcpSocket::write(char * data, uint32 len)
+int TcpSocketBase::write(char * data, uint32 len)
 {
 	mWriteReq.buf.base = data;
 	mWriteReq.buf.len = len;
 	return uv_write((uv_write_t*)&mWriteReq, (uv_stream_t *)getUvTcp(), &mWriteReq.buf, 1, echo_write);
 }
 
-void TcpSocket::alloc_buffer(uv_handle_t *handle, size_t suggested_size, uv_buf_t *buf) {
+void TcpSocketBase::alloc_buffer(uv_handle_t *handle, size_t suggested_size, uv_buf_t *buf) {
 
-	TcpSocket * self = (TcpSocket *)handle->data;
+	TcpSocketBase* self = (TcpSocketBase*)handle->data;
 
 	buf->base = (char *)self->mBuffer.GetBasePointer();
 	buf->len = self->mBuffer.GetBufferSize();
 }
 
-void TcpSocket::echo_read(uv_stream_t *tcp, ssize_t nread, const uv_buf_t *buf) {
+void TcpSocketBase::echo_read(uv_stream_t *tcp, ssize_t nread, const uv_buf_t *buf) {
 
 	if (nread < 0) {
 		if (nread != UV_EOF)
@@ -196,19 +196,19 @@ void TcpSocket::echo_read(uv_stream_t *tcp, ssize_t nread, const uv_buf_t *buf) 
 		return;
 	}
 
-	TcpSocket * self = (TcpSocket *)tcp->data;
+	TcpSocketBase* self = (TcpSocketBase*)tcp->data;
 	self->mBuffer.WriteCompleted(nread);
 	self->on_msgbuffer(&self->mBuffer);
 	self->mBuffer.Reset();
 }
 
-void TcpSocket::on_uv_close(uv_handle_t* handle)
+void TcpSocketBase::on_uv_close(uv_handle_t* handle)
 {
-	TcpSocket * self = (TcpSocket *)handle->data;
+	TcpSocketBase* self = (TcpSocketBase*)handle->data;
 	self->on_clsesocket();
 }
 
-void TcpSocket::echo_write(uv_write_t *req, int status) {
+void TcpSocketBase::echo_write(uv_write_t *req, int status) {
 	if (status) {
 		ERROR_LOG("Write error %s\n", uv_strerror(status));
 	}
@@ -219,6 +219,72 @@ void TcpSocket::echo_write(uv_write_t *req, int status) {
 	uv_write((uv_write_t*)req, client, &req->buf, 1, echo_write);
 	*/
 
-	TcpSocket * self = (TcpSocket *)(((write_req_t *)req)->req.data);
+	TcpSocketBase* self = (TcpSocketBase*)(((write_req_t *)req)->req.data);
 	self->on_writecomplete();
+}
+
+
+
+#include "BasePacket.h"
+
+TcpSocket::TcpSocket(uint32 buffersize):
+	TcpSocketBase(buffersize)
+{
+	
+}
+
+TcpSocket::~TcpSocket()
+{
+	release();
+}
+
+void TcpSocket::write(BasePacket* packet)
+{
+	mSendPackets.push(packet);
+	send_top_msg();
+}
+
+BasePacket* TcpSocket::createPacket()
+{
+	return new BasePacket;
+}
+
+void TcpSocket::recyclePacket(BasePacket* packet)
+{
+	delete packet;
+}
+
+void TcpSocket::on_writecomplete()
+{
+	if (mSendPackets.empty())
+		return;
+
+	//write complete
+	recyclePacket(mSendPackets.front());
+	mSendPackets.pop();
+
+	send_top_msg();
+}
+
+void TcpSocket::send_top_msg()
+{
+	if (mSendPackets.empty())
+		return;
+
+	BasePacket* pack = mSendPackets.front();
+	TcpSocketBase::write(pack->sendStream(), pack->sendSize());
+}
+
+void TcpSocket::zero()
+{
+
+}
+
+void TcpSocket::release()
+{
+	while (!mSendPackets.empty())
+	{
+		recyclePacket(mSendPackets.front());
+		mSendPackets.pop();
+	}
 }
