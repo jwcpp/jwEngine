@@ -12,8 +12,6 @@ public:
 
 	~NetConnect();
 
-	void close(){ TcpSocket::close(); }
-
 	// write data to socket
 	void sendMsg(uint32 msgtype, NetPacket * pack);
 	void sendMsg(uint32 msgtype, const char * msg, uint32 len);

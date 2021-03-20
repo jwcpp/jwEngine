@@ -46,6 +46,11 @@ void luabind_basepacket(sol::state & lua)
 
 
 	lua.new_usertype<TcpSocket>("TcpSocket",
+		"close", &TcpSocket::close,
+		"localIP", &TcpSocket::localIP,
+		"localPort", &TcpSocket::localPort,
+		"remoteIP", &TcpSocket::remoteIP,
+		"remotePort", &TcpSocket::remotePort,
 		"setUserdata", &TcpSocket::setUserdata,
 		"getUserdata", &TcpSocket::getUserdata,
 		"setUsernum", &TcpSocket::setUsernum,

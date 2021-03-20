@@ -39,7 +39,6 @@ void luabind_websocket(sol::state & lua)
 {
 	lua.new_usertype<WebSocketConnect>("WebSocketConnect",
 		sol::base_classes, sol::bases<TcpSocket>(),
-		"close", &WebSocketConnect::close,
 		"sendPacket", &WebSocketConnect::sendPacket,
 		"sendMsg", &WebSocketConnect::sendData);
 
