@@ -11,3 +11,9 @@ if jobj then
 else
 	print("parser error:" .. json_error(buff))
 end
+
+local json = require "jsonlib/json"
+
+local tab = json.decode(str) -- json to lua table
+local jstr = json.encode(tab) -- lua table to json
+print(jstr)
