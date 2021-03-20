@@ -58,6 +58,7 @@ HttpConnect::~HttpConnect()
 
 void HttpConnect::zero()
 {
+	TcpSocket::zero();
 	m_readPacket->zero();
 	m_residue = 0;
 	m_urlp = NULL;

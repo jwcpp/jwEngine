@@ -1,34 +1,12 @@
 #include "XLog.h"
 #include "TcpSocket.h"
 
-/*
-如果父类没有虚函数，子类有虚函数，父类和子类的地址不一样。
-子类前面4字节是虚表指针，子地址+4 = 父地址
-uv_tcp_t * tcp = this;
-(uint32)tcp != (uint32)this;
-
-可能有问题：
-class TcpConnect : public uv_tcp_t
-{
-	virtual void go(){}
-}
-
-没问题：
-class TcpConnect : public uv_tcp_t
-{
-	virtual void go(){}
-	uv_tcp_t tcp;
-}
-
-*/
-
 
 TcpSocketBase::TcpSocketBase(uint32 buffersize)
 {
 	m_uv_tcp.data = this;
 	m_write_t.data = this;
 	mBuffer.Resize(buffersize);
-	_userdata = NULL;
 }
 
 TcpSocketBase::~TcpSocketBase()
@@ -228,7 +206,7 @@ void TcpSocketBase::echo_write(uv_write_t *req, int status) {
 TcpSocket::TcpSocket(uint32 buffersize):
 	TcpSocketBase(buffersize)
 {
-	
+	zero();
 }
 
 TcpSocket::~TcpSocket()
@@ -295,7 +273,7 @@ void TcpSocket::send_top_msg()
 
 void TcpSocket::zero()
 {
-
+	_userdata = NULL;
 }
 
 void TcpSocket::release()

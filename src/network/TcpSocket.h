@@ -30,10 +30,7 @@ public:
 	std::string remoteIP() const;
 	int remotePort() const;
 	uv_tcp_t* getUvTcp() { return &m_uv_tcp; }
-	void setUserdata(void * userdata) { _userdata = userdata; }
-	void * getUserdata() { return _userdata; }
-	void setUsernum(uint32 num) { _userdata = (void*)num; }
-	uint32 getUsernum() { return (uint32)_userdata; }
+
 protected:
 
 	virtual void on_msgbuffer(MessageBuffer * buffer){};
@@ -51,8 +48,6 @@ private:
 	uv_tcp_t m_uv_tcp;
 	uv_write_t m_write_t;
 	MessageBuffer mBuffer;
-
-	void * _userdata;
 };
 
 #include <list>
@@ -67,6 +62,10 @@ public:
 	virtual void zero();
 	virtual void release();
 
+	void setUserdata(void* userdata) { _userdata = userdata; }
+	void* getUserdata() { return _userdata; }
+	void setUsernum(uint32 num) { _userdata = (void*)num; }
+	uint32 getUsernum() { return (uint32)_userdata; }
 protected:
 
 	void write(BasePacket * packet);
@@ -79,6 +78,8 @@ private:
 private:
 	std::vector<uv_buf_t> mSendBufs;
 	std::list<BasePacket*> mSendPackets;
+
+	void* _userdata;
 };
 
 
