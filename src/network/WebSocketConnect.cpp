@@ -162,7 +162,9 @@ void WebSocketConnect::on_msgbuffer(MessageBuffer * buffer)
 		}
 
 		respondHandshake(__m_handshakeMsg);
-		TcpSocketBase::write((char *)__m_handshakeMsg.data(), __m_handshakeMsg.size() - 1);
+		BasePacket* pack = TcpSocket::createPacket();
+		pack->append((char*)__m_handshakeMsg.data(), __m_handshakeMsg.size() - 1);
+		TcpSocket::write(pack);
 
 		__m_isHandshake = true;
 		__m_webevent->onHandshake(this);

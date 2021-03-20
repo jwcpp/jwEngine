@@ -11,11 +11,6 @@
 
 class TcpSocketBase
 {
-	typedef struct {
-		uv_write_t req;
-		uv_buf_t buf;
-	} write_req_t;
-
 public:
 	TcpSocketBase(uint32 buffersize = MESSAGE_BUFFER_SIZE);
 	virtual ~TcpSocketBase();
@@ -26,7 +21,7 @@ public:
 	void clear();
 	void close();
 	void on_read_start();
-	int write(char * data, uint32 len);
+	int write(const uv_buf_t * buf, uint32 size);
 
 	//static void createConnect(uv_loop_t * loop, const char * ip, int port, std::function<void(std::shared_ptr<TcpSocket> &)> cb, bool ipv6 = false);
 
@@ -54,12 +49,14 @@ private:
 
 private:
 	uv_tcp_t m_uv_tcp;
+	uv_write_t m_write_t;
 	MessageBuffer mBuffer;
-	write_req_t mWriteReq;
+
 	void * _userdata;
 };
 
-#include <queue>
+#include <list>
+#include <vector>
 class BasePacket;
 class TcpSocket : public TcpSocketBase
 {
@@ -80,7 +77,8 @@ protected:
 private:
 	void send_top_msg();
 private:
-	std::queue<BasePacket*> mSendPackets;
+	std::vector<uv_buf_t> mSendBufs;
+	std::list<BasePacket*> mSendPackets;
 };
 
 

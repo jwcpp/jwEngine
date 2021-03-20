@@ -26,7 +26,7 @@ class TcpConnect : public uv_tcp_t
 TcpSocketBase::TcpSocketBase(uint32 buffersize)
 {
 	m_uv_tcp.data = this;
-	mWriteReq.req.data = this;
+	m_write_t.data = this;
 	mBuffer.Resize(buffersize);
 	_userdata = NULL;
 }
@@ -167,11 +167,9 @@ int TcpSocketBase::remotePort() const
 }
 
 
-int TcpSocketBase::write(char * data, uint32 len)
+int TcpSocketBase::write(const uv_buf_t* buf, uint32 size)
 {
-	mWriteReq.buf.base = data;
-	mWriteReq.buf.len = len;
-	return uv_write((uv_write_t*)&mWriteReq, (uv_stream_t *)getUvTcp(), &mWriteReq.buf, 1, echo_write);
+	return uv_write((uv_write_t*)&m_write_t, (uv_stream_t *)getUvTcp(), buf, size, echo_write);
 }
 
 void TcpSocketBase::alloc_buffer(uv_handle_t *handle, size_t suggested_size, uv_buf_t *buf) {
@@ -219,7 +217,7 @@ void TcpSocketBase::echo_write(uv_write_t *req, int status) {
 	uv_write((uv_write_t*)req, client, &req->buf, 1, echo_write);
 	*/
 
-	TcpSocketBase* self = (TcpSocketBase*)(((write_req_t *)req)->req.data);
+	TcpSocketBase* self = (TcpSocketBase*)(req->data);
 	self->on_writecomplete();
 }
 
@@ -240,7 +238,7 @@ TcpSocket::~TcpSocket()
 
 void TcpSocket::write(BasePacket* packet)
 {
-	mSendPackets.push(packet);
+	mSendPackets.push_back(packet);
 	send_top_msg();
 }
 
@@ -256,23 +254,43 @@ void TcpSocket::recyclePacket(BasePacket* packet)
 
 void TcpSocket::on_writecomplete()
 {
-	if (mSendPackets.empty())
-		return;
-
 	//write complete
-	recyclePacket(mSendPackets.front());
-	mSendPackets.pop();
+	int size = mSendBufs.size();
+	for (int i = 0; i < size; ++i)
+	{
+		recyclePacket(mSendPackets.front());
+		mSendPackets.pop_front();
+	}
+	mSendBufs.clear();
 
 	send_top_msg();
 }
 
+#define MAX_SEND_PACKET 10
+#define MAX_SEND_BYTE 1024
+
 void TcpSocket::send_top_msg()
 {
+	if (!mSendBufs.empty())
+		return;
+
 	if (mSendPackets.empty())
 		return;
 
-	BasePacket* pack = mSendPackets.front();
-	TcpSocketBase::write(pack->sendStream(), pack->sendSize());
+	int sumsize = 0;
+	for (auto it = mSendPackets.begin(); it != mSendPackets.end(); ++it)
+	{
+		if (sumsize >= MAX_SEND_BYTE) break;
+		if (mSendBufs.size() >= MAX_SEND_PACKET) break;
+
+		uv_buf_t tmpbuf;
+		tmpbuf.base = (*it)->sendStream();
+		tmpbuf.len = (*it)->sendSize();
+		mSendBufs.push_back(tmpbuf);
+		sumsize += (*it)->sendSize();
+	}
+
+	TcpSocketBase::write(&mSendBufs[0], mSendBufs.size());
 }
 
 void TcpSocket::zero()
@@ -285,6 +303,8 @@ void TcpSocket::release()
 	while (!mSendPackets.empty())
 	{
 		recyclePacket(mSendPackets.front());
-		mSendPackets.pop();
+		mSendPackets.pop_front();
 	}
+
+	mSendBufs.clear();
 }
