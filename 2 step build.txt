@@ -1,7 +1,0 @@
-准备工作：安装Vs2019,安装git客户端
-
-1.下载项目
-    进入指定目录，鼠标右键选择“Git Bish Here”菜单，执行：git clone https://github.com/jwcpp/jwEngine.git
-
-2.生成vs工程
-    进入premake目录，执行premake.bat。在vs编辑器中，设置语言为c++17

@@ -1,0 +1,7 @@
+Ready to work: Visual Studio 2019 and Git
+
+1.Download project => git clone https://github.com/jwcpp/jwEngine.git
+
+2.Generate project => premake/premake.bat
+
+3.Set to c++17
