@@ -47,8 +47,8 @@ public:
 
 protected:
 
-	virtual void onConnect(KcpSession * conn, int argv) {
-		on_connect(conn, argv);
+	virtual void onConnect(KcpSession * conn) {
+		on_connect(conn);
 	};
 	virtual void onClose(KcpSession * conn) {
 		on_close(conn);
@@ -58,7 +58,7 @@ protected:
 	};
 
 public:
-	std::function<void(KcpSession *, int)> on_connect;
+	std::function<void(KcpSession *)> on_connect;
 	std::function<void(KcpSession *)> on_close;
 	std::function<void(KcpSession *, int, UdpPacket *)> on_msg;
 };
