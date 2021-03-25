@@ -217,7 +217,11 @@ TcpSocket::~TcpSocket()
 void TcpSocket::write(BasePacket* packet)
 {
 	mSendPackets.push_back(packet);
-	send_top_msg();
+
+	if (!isSending())
+	{
+		send_top_msg();
+	}
 }
 
 BasePacket* TcpSocket::createPacket()
@@ -233,42 +237,43 @@ void TcpSocket::recyclePacket(BasePacket* packet)
 void TcpSocket::on_writecomplete()
 {
 	//write complete
-	int size = mSendBufs.size();
+	int size = mSending.size();
 	for (int i = 0; i < size; ++i)
 	{
 		recyclePacket(mSendPackets.front());
 		mSendPackets.pop_front();
 	}
-	mSendBufs.clear();
-
+	mSending.clear();
 	send_top_msg();
 }
 
 #define MAX_SEND_PACKET 10
 #define MAX_SEND_BYTE 1024
 
+bool TcpSocket::isSending()
+{
+	return !mSending.empty();
+}
+
 void TcpSocket::send_top_msg()
 {
-	if (!mSendBufs.empty())
-		return;
-
-	if (mSendPackets.empty())
-		return;
-
 	int sumsize = 0;
 	for (auto it = mSendPackets.begin(); it != mSendPackets.end(); ++it)
 	{
 		if (sumsize >= MAX_SEND_BYTE) break;
-		if (mSendBufs.size() >= MAX_SEND_PACKET) break;
+		if (mSending.size() >= MAX_SEND_PACKET) break;
 
 		uv_buf_t tmpbuf;
 		tmpbuf.base = (*it)->sendStream();
 		tmpbuf.len = (*it)->sendSize();
-		mSendBufs.push_back(tmpbuf);
+		mSending.push_back(tmpbuf);
 		sumsize += (*it)->sendSize();
 	}
 
-	TcpSocketBase::write(&mSendBufs[0], mSendBufs.size());
+	if (sumsize > 0)
+	{
+		TcpSocketBase::write(&mSending[0], mSending.size());
+	}
 }
 
 void TcpSocket::zero()
@@ -284,5 +289,5 @@ void TcpSocket::release()
 		mSendPackets.pop_front();
 	}
 
-	mSendBufs.clear();
+	mSending.clear();
 }

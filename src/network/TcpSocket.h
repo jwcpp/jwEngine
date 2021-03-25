@@ -74,9 +74,10 @@ protected:
 	virtual void recyclePacket(BasePacket * packet);
 	virtual void on_writecomplete();
 private:
+	bool isSending();
 	void send_top_msg();
 private:
-	std::vector<uv_buf_t> mSendBufs;
+	std::vector<uv_buf_t> mSending;
 	std::list<BasePacket*> mSendPackets;
 
 	void* _userdata;
