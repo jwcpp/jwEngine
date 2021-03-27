@@ -8,9 +8,13 @@
 ************************************************************************/
 
 class HttpConnect;
+class HttpParser;
 class HttpEvent
 {
 public:
 	virtual void onClose(HttpConnect *conn) = 0;
-	virtual void onMsg(HttpConnect *conn, int method, std::string_view & path, std::string_view & data) = 0;
+
+	virtual void onGet(HttpConnect* conn, std::string_view& path, std::string_view& data) = 0;
+	virtual void onPost(HttpConnect* conn, std::string_view& path, std::string_view& data) = 0;
+	virtual void onOther(HttpConnect* conn, HttpParser * parser) = 0;
 };

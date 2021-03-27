@@ -1,7 +1,6 @@
 #include <string_view>
 #include "HttpConnect.h"
 #include "BasePacket.h"
-#include "http_parser.h"
 #include "CommonPool.h"
 
 /*
@@ -25,43 +24,23 @@ Content-Length: 10\r\n\r\n
 data......
 */
 
-http_parser_settings http_settings;
 HttpConnect::HttpConnect()
 {
-	m_readPacket = new BasePacket();
-	m_parser = (http_parser *)malloc(sizeof(http_parser));
-	m_url = (http_parser_url*)malloc(sizeof(http_parser_url));
-	m_parser->data = this;
-
-	http_settings.on_message_begin = NULL;
-	http_settings.on_url = &HttpConnect::on_url;
-	http_settings.on_status = NULL;
-	http_settings.on_header_field = NULL;
-	http_settings.on_header_value = NULL;
-	http_settings.on_headers_complete = NULL;
-	http_settings.on_body = NULL;
-	http_settings.on_message_complete = NULL;
-	http_settings.on_chunk_header = NULL;
-	http_settings.on_chunk_complete = NULL;
-
-	http_parser_init(m_parser, HTTP_REQUEST);
-
+	m_readPacket = createPacket();
 	zero();
 }
 
 HttpConnect::~HttpConnect()
 {
-	delete m_readPacket;
-	free(m_parser);
-	free(m_url);
+	recyclePacket(m_readPacket);
 }
 
 void HttpConnect::zero()
 {
 	TcpSocket::zero();
 	m_readPacket->zero();
+	m_parser.zero();
 	m_residue = 0;
-	m_urlp = NULL;
 	m_content = NULL;
 }
 
@@ -105,13 +84,6 @@ const char * HttpConnect::getContentTypeStr(enum http_content_type type)
 	return ctype;
 }
 
-int HttpConnect::on_url(http_parser* _, const char *at, size_t length)
-{
-	HttpConnect * conn = (HttpConnect *)(_->data);
-	conn->m_urlp = at;
-	return http_parser_parse_url(at, length, 0, conn->m_url);
-}
-
 void HttpConnect::on_msgbuffer(MessageBuffer * buffer)
 {
 	// http head end: \r\n\r\n
@@ -128,18 +100,17 @@ void HttpConnect::on_msgbuffer(MessageBuffer * buffer)
 				buffer->ReadCompleted(rpos + 4);
 				m_content = (const char *)(m_readPacket->contents() + m_readPacket->wpos());
 
-				if (!parser((const char *)(m_readPacket->contents()), m_readPacket->wpos()))
+				if (!m_parser.parser((const char *)(m_readPacket->contents()), m_readPacket->wpos()))
 				{
 					close();
 					break;
 				}
 				else
 				{
-					if (m_parser->method == HTTP_POST)
+					if (m_parser.method() == HTTP_POST)
 					{
-						m_residue = static_cast<int>(m_parser->content_length);
+						m_residue = static_cast<int>(m_parser.contentLen());
 					}
-					m_close = (http_should_keep_alive(m_parser) == 0);
 				}
 			}
 			else
@@ -176,38 +147,27 @@ void HttpConnect::on_msgbuffer(MessageBuffer * buffer)
 	}
 }
 
-bool HttpConnect::parser(const char * buf, int len)
-{
-	http_parser_execute(m_parser, &http_settings, buf, len);
-	if (m_parser->http_errno != HPE_OK)
-	{
-		return false;
-	}
-
-	return true;
-}
-
 void HttpConnect::complete()
 {
-	std::string_view path(m_urlp + m_url->field_data[UF_PATH].off, m_url->field_data[UF_PATH].len);
+	std::string_view path = m_parser.getUrl()->getPath();
 
-	if (m_parser->method == HTTP_POST)
+	if (m_parser.method() == HTTP_POST)
 	{
-		std::string_view param(m_content, static_cast<int>(m_parser->content_length));
-		if (m_event) m_event->onMsg(this, HTTP_POST, path, param);
+		std::string_view param(m_content, static_cast<int>(m_parser.contentLen()));
+		if (m_event) m_event->onPost(this, path, param);
 	}
-	else if (m_parser->method == HTTP_GET)
+	else if (m_parser.method() == HTTP_GET)
 	{
 		std::string_view param;
-		if ((m_url->field_set & (1 << UF_QUERY)) != 0)
+		if (m_parser.getUrl()->haveParam())
 		{
-			param = std::string_view(m_urlp + m_url->field_data[UF_QUERY].off, m_url->field_data[UF_QUERY].len);
+			param = m_parser.getUrl()->getParam();
 		}
-		if (m_event) m_event->onMsg(this, HTTP_GET, path, param);
+		if (m_event) m_event->onGet(this, path, param);
 	}
 	else
 	{
-
+		if (m_event) m_event->onOther(this, &m_parser);
 	}
 }
 
@@ -218,7 +178,7 @@ void HttpConnect::on_clsesocket()
 
 void HttpConnect::on_writecomplete()
 {
-	if (m_close)
+	if (m_parser.isClose())
 	{
 		this->close();
 	}

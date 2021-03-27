@@ -10,6 +10,7 @@
 #include "TcpSocket.h"
 #include "HttpEvent.h"
 #include "PoolObject.h"
+#include "HttpParser.h"
 
 enum http_content_type
 {
@@ -25,8 +26,6 @@ enum http_content_type
 
 class BasePacket;
 class MessageBuffer;
-struct http_parser;
-struct http_parser_url;
 class HttpConnect : public TcpSocket
 {
 public:
@@ -46,20 +45,14 @@ protected:
 	virtual void on_writecomplete();
 
 private:
-	static int on_url(http_parser*, const char *at, size_t length);
-
-	bool parser(const char *, int);
 	void complete();
 
 private:
 	HttpEvent * m_event = NULL;
-	http_parser * m_parser;
-	http_parser_url * m_url;
 	BasePacket * m_readPacket;
-	const char * m_urlp;	//url指针
-	const char * m_content;	//post数据指针
+	HttpParser  m_parser;
+	const char * m_content;
 	int m_residue;
-	bool m_close = true;
 
 	INCLUDE_POOL_OBJECT
 };
