@@ -161,8 +161,10 @@ void TcpSocketBase::alloc_buffer(uv_handle_t *handle, size_t suggested_size, uv_
 void TcpSocketBase::echo_read(uv_stream_t *tcp, ssize_t nread, const uv_buf_t *buf) {
 
 	if (nread < 0) {
+		/*
 		if (nread != UV_EOF)
 			ERROR_LOG("Read error %s\n", uv_err_name(nread));
+		*/
 		uv_close((uv_handle_t*)tcp, on_uv_close);
 		return;
 	}
