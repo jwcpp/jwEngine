@@ -59,7 +59,6 @@ private:
 	void allocateParamBuffer(MYSQL_BIND* bind);
 	void allocateResultBuffer(MYSQL_BIND* bind, MYSQL_FIELD *field);
 
-public:
 	std::string m_sql;
 	MYSQL_STMT * m_stmt;
 	int m_count;
