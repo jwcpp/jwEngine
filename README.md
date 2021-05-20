@@ -63,6 +63,7 @@ The serialization tool provided is experimental and may be fragile. It is recomm
 [kcp](https://github.com/skywind3000/kcp)  
 [lua-protobuf](https://github.com/starwing/lua-protobuf)  
 [http-parser](https://github.com/nodejs/http-parser)  
+[llhttp](https://github.com/nodejs/llhttp)  
 
 ## Learn more  
 For more examples, please refer to [example](https://github.com/jwcpp/jwEngine/tree/master/example)
