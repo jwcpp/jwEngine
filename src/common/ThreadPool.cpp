@@ -32,6 +32,10 @@ void CThread::backfunc(CThread * t)
 			t->run(task);
 			t->_pool->_completeTasks.push(task);
 		}
+		else
+		{
+			std::this_thread::sleep_for(std::chrono::milliseconds(1));
+		}
 	}
 	t->onEnd();
 }
