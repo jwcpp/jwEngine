@@ -13,7 +13,7 @@ pool:create(1)
 
 function select()
 	local sql = SqlCommand:new("select id, blo from t_blob")
-	local func = function(result)
+	local func = function(errno, err, result)
 			while(result:fetch())
 			do
 				print("tableid:" .. result:getInt32())
@@ -42,7 +42,7 @@ function insert()
 	local pack = BasePacket:new()
 	st:write(pack)
 	sql:pushBlob(pack)
-	sql:addToPool(pool, function(result)
+	sql:addToPool(pool, function(errno, err,result)
 			select()
 		end)
 end

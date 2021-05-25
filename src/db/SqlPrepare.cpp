@@ -7,6 +7,7 @@
 #include "XLog.h"
 #include "BasePacket.h"
 #include "SpinLock.h"
+#include <assert.h>
 
 SpinLock sql_stmt_lock;
 
@@ -507,7 +508,6 @@ void SqlPrepare::allocateResultBuffer(MYSQL_BIND* bind, MYSQL_FIELD *field)
 	}
 }
 
-
 int SqlPrepare::prepare(MYSQL * mysql)
 {
 	sql_stmt_lock.lock();
@@ -527,7 +527,8 @@ int SqlPrepare::prepare(MYSQL * mysql)
 
 	if (mysql_stmt_param_count(m_stmt) != m_count)
 	{
-		return -1;
+		ERROR_LOG("mysql_stmt_param_count(m_stmt) != m_count");
+		assert(0);
 	}
 
 	m_field = mysql_stmt_field_count(m_stmt);

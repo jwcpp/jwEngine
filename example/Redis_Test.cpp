@@ -23,7 +23,7 @@ void select(DBThreadPool * pool)
 
 	std::shared_ptr<DBRedisTask> task(new DBRedisTask(command, result));
 
-	task->backfunc = [](const char * err, std::shared_ptr<RedisResult> result) {
+	task->backfunc = [](int errno_, const char * err, std::shared_ptr<RedisResult> result) {
 
 		while (result->fetch())
 		{
@@ -45,7 +45,7 @@ void insert(DBThreadPool * pool)
 	command->pushInt32(333);
 
 	std::shared_ptr<DBRedisTask> task(new DBRedisTask(command, std::make_shared<RedisResult>()));
-	task->backfunc = [pool](const char* err, std::shared_ptr<RedisResult> result) {
+	task->backfunc = [pool](int errno_, const char* err, std::shared_ptr<RedisResult> result) {
 		select(pool);
 	};
 

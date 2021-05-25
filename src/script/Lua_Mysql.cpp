@@ -52,17 +52,17 @@ public:
 		
 	}
 
-	void addToPool(DBThreadPool * pool, std::function<void(const char *, Lua_SqlResult *)> backfunc)
+	void addToPool(DBThreadPool * pool, std::function<void(int32, const char *, Lua_SqlResult *)> backfunc)
 	{
 		std::shared_ptr<DBSqlTask> dbTask(new DBSqlTask(m_sqlPre));
 
 		// back func
-		dbTask->backfunc = [backfunc](const char* err, std::shared_ptr<SqlPrepare> sqlPre) {
+		dbTask->backfunc = [backfunc](int32 errno_, const char* err, std::shared_ptr<SqlPrepare> sqlPre) {
 
 			if (backfunc != nullptr)
 			{
 				Lua_SqlResult _result(sqlPre);
-				backfunc(err, &_result);
+				backfunc(errno_, err, &_result);
 			}
 		};
 		pool->addTask(dbTask);

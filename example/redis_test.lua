@@ -6,8 +6,8 @@ config.port = 6379
 pool = DBThreadPool:new(config)
 pool:create(1)
 
-func = function(err, result)
-	if err then
+func = function(errno, err, result)
+	if errno ~= 0 then
 		print(err)
 		return
 	end

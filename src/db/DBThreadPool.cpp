@@ -42,6 +42,7 @@ void DBSqlTask::process()
 	if (_ret >= 0) _ret = _pre->execute();
 	if (_ret < 0)
 	{
+		_errno = _dbi->getErrno();
 		_error = _dbi->getError();
 	}
 }
@@ -52,7 +53,7 @@ void DBSqlTask::complete()
 	if (_ret < 0) str = _error.c_str();
 	if (backfunc)
 	{
-		backfunc(str, _pre);
+		backfunc(_errno, str, _pre);
 		backfunc = nullptr;
 	}
 }
@@ -74,7 +75,11 @@ void DBRedisTask::process()
 {
 	DBResult* result = (DBResult*)(_result.get());
 	_ret = static_cast<DBInterfaceRedis *>(_dbi)->execute(_command.get(), result);
-	if (_ret < 0) _error = _dbi->getError();
+	if (_ret < 0)
+	{
+		_errno = _dbi->getErrno();
+		_error = _dbi->getError();
+	}
 }
 
 void DBRedisTask::complete()
@@ -83,7 +88,7 @@ void DBRedisTask::complete()
 	if (_ret < 0) str = _error.c_str();
 	if (backfunc)
 	{
-		backfunc(str, _result);
+		backfunc(_errno, str, _result);
 		backfunc = nullptr;
 	}
 }

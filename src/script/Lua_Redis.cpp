@@ -70,17 +70,17 @@ public:
 	void pushBlob(BasePacket * pack) { m_command->pushBlob(pack); }
 	void pushData(std::string sv) { m_command->pushData(sv); }
 
-	void addToPool(DBThreadPool * pool, std::function<void(const char* , Lua_RedisResult *)> backfunc)
+	void addToPool(DBThreadPool * pool, std::function<void(int32, const char* , Lua_RedisResult *)> backfunc)
 	{
 		std::shared_ptr<DBRedisTask> dbTask(new DBRedisTask(m_command, std::make_shared<RedisResult>()));
 
 		// back func
-		dbTask->backfunc = [backfunc](const char * err, std::shared_ptr<RedisResult> result) {
+		dbTask->backfunc = [backfunc](int32 errno_, const char * err, std::shared_ptr<RedisResult> result) {
 
 			if (backfunc != nullptr)
 			{
 				Lua_RedisResult _result(result);
-				backfunc(err, &_result);
+				backfunc(errno_, err, &_result);
 			}
 		};
 		pool->addTask(dbTask);

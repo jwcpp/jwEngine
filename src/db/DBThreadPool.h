@@ -37,6 +37,7 @@ public:
 protected:
 	DB_Interface * _dbi;
 	int _ret;
+	int32 _errno = 0;
 	std::string _error;
 };
 
@@ -49,7 +50,7 @@ public:
 	virtual void process();
 	virtual void complete();
 public:
-	std::function<void(const char*, std::shared_ptr<SqlPrepare>)> backfunc;
+	std::function<void(int32, const char*, std::shared_ptr<SqlPrepare>)> backfunc;
 private:
 	std::shared_ptr<SqlPrepare> _pre;
 };
@@ -63,7 +64,7 @@ public:
 	virtual void process();
 	virtual void complete();
 public:
-	std::function<void(const char*, std::shared_ptr<RedisResult>)> backfunc;
+	std::function<void(int32, const char*, std::shared_ptr<RedisResult>)> backfunc;
 private:
 	std::shared_ptr<RedisCommand> _command;
 	std::shared_ptr<RedisResult> _result;

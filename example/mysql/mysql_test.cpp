@@ -72,9 +72,9 @@ int main()
 		pre->pushInt32(1);
 
 		std::shared_ptr<DBSqlTask> task(new DBSqlTask(pre));
-		task->backfunc = [](const char* error, std::shared_ptr<SqlPrepare> pre) {
+		task->backfunc = [](int errno_, const char* error, std::shared_ptr<SqlPrepare> pre) {
 
-			if (error)
+			if (errno_ != 0)
 			{
 				printf("%s\n", error);
 			}
