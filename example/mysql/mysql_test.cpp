@@ -31,23 +31,26 @@ int _main()
 	return 0;
 }
 
+#include "SqlResultSet.h"
 
 int __main()
 {
-	DBInterfaceMysql mysql("127.0.0.1", "jw_test", "root", "1111");
+	DBInterfaceMysql mysql("127.0.0.1", "jw_test", "root", "111111");
 	mysql.connect();
 
 
 	SqlPrepare pre("select * from test where id = ?");
 	pre.pushInt32(1);
 	pre.prepare(mysql.mysql());
-	pre.execute();
 
-	while (pre.fetch())
+	std::shared_ptr<SqlResultSet> result = std::make_shared<SqlResultSet>();
+	pre.execute(result.get());
+
+	while (result->fetch())
 	{
-		int id = pre.getInt32();
-		int num = pre.getInt32();
-		std::string name = pre.getString();
+		int id = result->getInt32();
+		int num = result->getInt32();
+		std::string name = result->getString();
 
 		printf("id:%d, num:%d, name:%s\n", id, num, name.c_str());
 	}
@@ -71,8 +74,8 @@ int main()
 		std::shared_ptr<SqlPrepare> pre(new SqlPrepare("select * from test where id = ?"));
 		pre->pushInt32(1);
 
-		std::shared_ptr<DBSqlTask> task(new DBSqlTask(pre));
-		task->backfunc = [](int errno_, const char* error, std::shared_ptr<SqlPrepare> pre) {
+		std::shared_ptr<DBSqlTask> task(new DBSqlTask(pre, std::make_shared<SqlResultSet>()));
+		task->backfunc = [](int errno_, const char* error, std::shared_ptr<SqlResultSet> result) {
 
 			if (errno_ != 0)
 			{
@@ -80,11 +83,11 @@ int main()
 			}
 			else
 			{
-				while (pre->fetch())
+				while (result->fetch())
 				{
-					int id = pre->getInt32();
-					int num = pre->getInt32();
-					std::string name = pre->getString();
+					int id = result->getInt32();
+					int num = result->getInt32();
+					std::string name = result->getString();
 					printf("id:%d, num:%d, name:%s\n", id, num, name.c_str());
 				}
 			}
