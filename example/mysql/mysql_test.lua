@@ -6,6 +6,9 @@ config.user = "root"
 config.pswd = "111111"
 config.port = 3306
 
+mysql_library_init()
+mysql_thread_safe()
+
 pool = DBThreadPool:new(config)
 pool:create(1)
 
@@ -43,3 +46,5 @@ timer:start(function ()
 end, 10, 10)
 
 event_run()
+
+mysql_library_end()
