@@ -8,6 +8,7 @@
 ************************************************************************/
 
 class BasePacket;
+class DBResult;
 class SqlPrepare
 {
 public:
@@ -33,43 +34,17 @@ public:
 	
 	void write(void* pData, int len);
 
-	//get
-	int8 getInt8();
-	uint8 getUint8();
-	int16 getInt16();
-	uint16 getUint16();
-	int32 getInt32();
-	uint32 getUint32();
-	int64 getInt64();
-	uint64 getUint64();
-	float getFloat();
-	double getDouble();
-	std::string getString();
-	int readBlob(BasePacket * packet);
-	std::string getData(); // lua call
-
-	int fieldLen();
-	int read(void * pData);
-
 	int prepare(MYSQL * mysql);
-	int execute();
-	bool fetch();
-
+	int execute(DBResult* result);
+protected:
+	bool _query(MYSQL_RES** pResult);
 private:
-	void allocateParamBuffer(MYSQL_BIND* bind);
-	void allocateResultBuffer(MYSQL_BIND* bind, MYSQL_FIELD *field);
-
+	int m_count;
 	std::string m_sql;
 	MYSQL_STMT * m_stmt;
-	int m_count;
-	int m_field;
 	MYSQL_BIND * m_paramBind;
-	MYSQL_BIND * m_resultBind;
 	unsigned long * m_paramLengths;
-	unsigned long * m_resultLengths;
-	my_bool * m_isNulls;
 
 private:
-	int m_ridx;  // read
 	int m_widx;  // write
 };

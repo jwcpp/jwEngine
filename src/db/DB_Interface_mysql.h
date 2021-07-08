@@ -29,4 +29,12 @@ protected:
 	std::string m_pswd;
 };
 
+namespace MySQL
+{
+	int threadSafe();
+	void libraryInit();
+	void libraryEnd();
+	char const* getLibraryVersion();
+};
+
 #endif

@@ -25,6 +25,7 @@ class DB_Interface;
 class RedisCommand;
 class RedisResult;
 class SqlPrepare;
+class SqlResultSet;
 
 class DBTask : public Task
 {
@@ -44,15 +45,16 @@ protected:
 class DBSqlTask : public DBTask
 {
 public:
-	DBSqlTask(std::shared_ptr<SqlPrepare> pre);
+	DBSqlTask(std::shared_ptr<SqlPrepare> pre, std::shared_ptr <SqlResultSet> result);
 	~DBSqlTask();
 
 	virtual void process();
 	virtual void complete();
 public:
-	std::function<void(int32, const char*, std::shared_ptr<SqlPrepare>)> backfunc;
+	std::function<void(int32, const char*, std::shared_ptr<SqlResultSet>)> backfunc;
 private:
 	std::shared_ptr<SqlPrepare> _pre;
+	std::shared_ptr <SqlResultSet> _result;
 };
 
 class DBRedisTask : public DBTask

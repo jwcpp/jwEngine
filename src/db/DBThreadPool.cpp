@@ -25,8 +25,8 @@ void DBTask::dbi(DB_Interface * dbi)
 
 //------------------------------------------------
 
-DBSqlTask::DBSqlTask(std::shared_ptr<SqlPrepare> pre):
-	_pre(pre)
+DBSqlTask::DBSqlTask(std::shared_ptr<SqlPrepare> pre, std::shared_ptr <SqlResultSet> result):
+	_pre(pre), _result(result)
 {
 
 }
@@ -39,7 +39,8 @@ DBSqlTask::~DBSqlTask()
 void DBSqlTask::process()
 {
 	_ret = _pre->prepare(static_cast<DBInterfaceMysql *>(_dbi)->mysql());
-	if (_ret >= 0) _ret = _pre->execute();
+	DBResult* result = (DBResult*)(_result.get());
+	if (_ret >= 0) _ret = _pre->execute(result);
 	if (_ret < 0)
 	{
 		_errno = _dbi->getErrno();
@@ -53,7 +54,7 @@ void DBSqlTask::complete()
 	if (_ret < 0) str = _error.c_str();
 	if (backfunc)
 	{
-		backfunc(_errno, str, _pre);
+		backfunc(_errno, str, _result);
 		backfunc = nullptr;
 	}
 }

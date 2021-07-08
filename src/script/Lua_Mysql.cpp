@@ -5,37 +5,41 @@
 #include "MysqlResult.h"
 #include "SqlPrepare.h"
 #include "DBThreadPool.h"
+#include "SqlResultSet.h"
 
 class Lua_SqlResult
 {
 public:
-	Lua_SqlResult(std::shared_ptr<SqlPrepare> pre)
+	Lua_SqlResult(std::shared_ptr<SqlResultSet> result):
+		m_result(result)
 	{
-		m_sqlPre = pre;
 	}
 
 	//get
-	int8 getInt8() { return m_sqlPre->getInt8(); }
-	uint8 getUint8() { return m_sqlPre->getUint8(); }
-	int16 getInt16() { return m_sqlPre->getInt16(); }
-	uint16 getUint16() { return m_sqlPre->getUint16(); }
-	int32 getInt32() { return m_sqlPre->getInt32(); }
-	uint32 getUint32() { return m_sqlPre->getUint32(); }
-	int64 getInt64() { return m_sqlPre->getInt64(); }
-	uint64 getUint64() { return m_sqlPre->getUint64(); }
-	float getFloat() { return m_sqlPre->getFloat(); }
-	double getDouble() { return m_sqlPre->getDouble(); }
-	std::string getString() { return m_sqlPre->getString(); }
-	int readBlob(BasePacket * packet) { return m_sqlPre->readBlob(packet); }
-	std::string getData() { return m_sqlPre->getData(); } // lua call
+	int8 getInt8() { return m_result->getInt8(); }
+	uint8 getUint8() { return m_result->getUint8(); }
+	int16 getInt16() { return m_result->getInt16(); }
+	uint16 getUint16() { return m_result->getUint16(); }
+	int32 getInt32() { return m_result->getInt32(); }
+	uint32 getUint32() { return m_result->getUint32(); }
+	int64 getInt64() { return m_result->getInt64(); }
+	uint64 getUint64() { return m_result->getUint64(); }
+	float getFloat() { return m_result->getFloat(); }
+	double getDouble() { return m_result->getDouble(); }
+	std::string getString() { return m_result->getString(); }
+	int readBlob(BasePacket * packet) { return m_result->readBlob(packet); }
+	std::string_view getData() { return m_result->getStrview(); } // lua call
+
+	bool emptyField(int idx) { return m_result->emptyField(idx); }
+	bool empty() { return m_result->isEmpty(); }
 
 	bool fetch()
 	{
-		return m_sqlPre->fetch();
+		return m_result->fetch();
 	}
 
 private:
-	std::shared_ptr<SqlPrepare> m_sqlPre;
+	std::shared_ptr<SqlResultSet> m_result;
 };
 
 class Lua_SqlCommand
@@ -54,14 +58,14 @@ public:
 
 	void addToPool(DBThreadPool * pool, std::function<void(int32, const char *, Lua_SqlResult *)> backfunc)
 	{
-		std::shared_ptr<DBSqlTask> dbTask(new DBSqlTask(m_sqlPre));
+		std::shared_ptr<DBSqlTask> dbTask(new DBSqlTask(m_sqlPre, std::make_shared<SqlResultSet>()));
 
 		// back func
-		dbTask->backfunc = [backfunc](int32 errno_, const char* err, std::shared_ptr<SqlPrepare> sqlPre) {
+		dbTask->backfunc = [backfunc](int32 errno_, const char* err, std::shared_ptr<SqlResultSet> result) {
 
 			if (backfunc != nullptr)
 			{
-				Lua_SqlResult _result(sqlPre);
+				Lua_SqlResult _result(result);
 				backfunc(errno_, err, &_result);
 			}
 		};
@@ -91,6 +95,13 @@ private:
 
 void luabind_mysql(sol::state & lua)
 {
+	{
+		lua["mysql_thread_safe"] = &MySQL::threadSafe;
+		lua["mysql_library_init"] = &MySQL::libraryInit;
+		lua["mysql_library_end"] = &MySQL::libraryEnd;
+		lua["mysql_version"] = &MySQL::getLibraryVersion;
+	}
+
 	lua.new_usertype<DBConfig>("DBConfig",
 		"device", &DBConfig::device,
 		"ip", &DBConfig::ip,
@@ -136,5 +147,7 @@ void luabind_mysql(sol::state & lua)
 		"getString", &Lua_SqlResult::getString,
 		"readBlob", &Lua_SqlResult::readBlob,
 		"getData", &Lua_SqlResult::getData,
-		"fetch", &Lua_SqlResult::fetch);
+		"fetch", &Lua_SqlResult::fetch,
+		"emptyField", &Lua_SqlResult::emptyField,
+		"empty", &Lua_SqlResult::empty);
 }
