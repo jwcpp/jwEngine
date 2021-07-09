@@ -7,9 +7,9 @@
 #include "SqlPrepare.h"
 
 
-int _main()
+void sql_query_1()
 {
-	DBInterfaceMysql mysql("127.0.0.1", "jw_test", "root", "1111");
+	DBInterfaceMysql mysql("127.0.0.1", "jw_test", "root", "111111");
 	mysql.connect();
 
 	
@@ -25,15 +25,14 @@ int _main()
 		result >> id;
 		result >> num;
 		result >> name;
-	}
 
-	system("pause");
-	return 0;
+		printf("id:%d, num:%d, name:%s\n", id, num, name.c_str());
+	}
 }
 
 #include "SqlResultSet.h"
 
-int __main()
+void sql_query_2()
 {
 	DBInterfaceMysql mysql("127.0.0.1", "jw_test", "root", "111111");
 	mysql.connect();
@@ -43,25 +42,22 @@ int __main()
 	pre.pushInt32(1);
 	pre.prepare(mysql.mysql());
 
-	std::shared_ptr<SqlResultSet> result = std::make_shared<SqlResultSet>();
-	pre.execute(result.get());
+	SqlResultSet result;
+	pre.execute(&result);
 
-	while (result->fetch())
+	while (result.fetch())
 	{
-		int id = result->getInt32();
-		int num = result->getInt32();
-		std::string name = result->getString();
+		int id = result.getInt32();
+		int num = result.getInt32();
+		std::string name = result.getString();
 
 		printf("id:%d, num:%d, name:%s\n", id, num, name.c_str());
 	}
-
-	system("pause");
-	return 0;
 }
 
 #include <functional>
 #include "DBThreadPool.h"
-int main()
+void sql_query_3()
 {
 	DBConfig config;
 	config.dbname = "jw_test";
@@ -101,7 +97,21 @@ int main()
 		Sleep(10);
 		pool.update();
 	}
+}
 
-	system("pause");
+#include <iostream>
+int main()
+{
+	MySQL::libraryInit();
+	MySQL::threadSafe();
+
+	sql_query_1();
+	std::cout << "**************************************" << std::endl;
+	sql_query_2();
+	std::cout << "**************************************" << std::endl;
+	sql_query_3();
+
+	MySQL::libraryEnd();
+
 	return 0;
 }
