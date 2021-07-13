@@ -35,10 +35,16 @@ void NetConnect::on_msgbuffer(MessageBuffer * buffer)
 		{
 			uint32 rlen = mReadPacket->readHead(buffer->GetReadPointer(), buffer->GetActiveSize());
 			buffer->ReadCompleted(rlen);
+
+			if (mReadPacket->isHeadFull())
+			{
+				// Empty packets exit the while loop
+				goto read_body;
+			}
 		}
 		else
 		{
-			//read body
+			read_body:
 			int32 needsize = mReadPacket->getMarkLen() + MSG_HEAD_SIZE - mReadPacket->wpos();
 			if (needsize > 0)
 			{
