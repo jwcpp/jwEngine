@@ -187,17 +187,16 @@ int SqlPrepare::prepare(MYSQL * mysql)
 }
 int SqlPrepare::execute(DBResult* resultSet)
 {
-	MYSQL_RES* result = nullptr;
-
-	if (_query(&result))
+	MYSQL_RES* result = _query();
+	if (!result)
 	{
-		if(result) mysql_free_result(result);
 		return -1;
 	}
 
+	std::shared_ptr<void> free_res(nullptr, [result](void*) { mysql_free_result(result); });
+
 	if (mysql_stmt_store_result(m_stmt))
 	{
-		if (result) mysql_free_result(result);
 		return -1;
 	}
 
@@ -206,21 +205,20 @@ int SqlPrepare::execute(DBResult* resultSet)
 	return static_cast<int>(mysql_stmt_affected_rows(m_stmt));
 }
 
-bool SqlPrepare::_query(MYSQL_RES** pResult)
+MYSQL_RES* SqlPrepare::_query()
 {
 	if (m_paramBind)
 	{
 		if (mysql_stmt_bind_param(m_stmt, m_paramBind))
 		{
-			return -1;
+			return NULL;
 		}
 	}
 
 	if (mysql_stmt_execute(m_stmt))
 	{
-		return -1;
+		return NULL;
 	}
 
-	*pResult = reinterpret_cast<MYSQL_RES*>(mysql_stmt_result_metadata(m_stmt));
-	return 0;
+	return mysql_stmt_result_metadata(m_stmt);
 }

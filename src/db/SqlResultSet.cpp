@@ -91,60 +91,57 @@ void SqlResultSet::setResult(MYSQL_STMT* stmt, MYSQL_RES* pResult, uint64 pRowCo
 	m_rowCount = pRowCount;
 	m_fieldCount = pFieldCount;
 
-	if (pFieldCount)
+	if (pFieldCount == 0) return;
+
+	MYSQL_BIND* resultBind = new MYSQL_BIND[pFieldCount];
+	unsigned long* resultLengths = new unsigned long[pFieldCount];
+	my_bool* isNulls = new my_bool[pFieldCount];
+	memset(resultBind, 0, sizeof(MYSQL_BIND) * pFieldCount);
+
+	uint32 nIndex = 0;
+	MYSQL_FIELD* pField = NULL;
+	while ((pField = mysql_fetch_field(pResult)))
 	{
-		MYSQL_BIND* resultBind = new MYSQL_BIND[pFieldCount];
-		unsigned long* resultLengths = new unsigned long[pFieldCount];
-		my_bool* isNulls = new my_bool[pFieldCount];
-		memset(resultBind, 0, sizeof(MYSQL_BIND) * pFieldCount);
-
-		uint32 nIndex = 0;
-		MYSQL_FIELD* pField = NULL;
-		while ((pField = mysql_fetch_field(pResult)))
-		{
-			allocateResultBuffer(&resultBind[nIndex], pField);
-			resultBind[nIndex].length = &resultLengths[nIndex];
-			resultBind[nIndex].is_null = &isNulls[nIndex];
-			nIndex++;
-		}
-
-		if (!mysql_stmt_bind_result(stmt, resultBind))
-		{
-			m_fields.resize(uint32(pRowCount) * pFieldCount);
-
-			// Ìî³ä×Ö¶ÎÊý¾Ý
-			int rowIndex = 0;
-			while (_fetch(stmt))
-			{
-				for (uint32 fIndex = 0; fIndex < pFieldCount; ++fIndex)
-				{
-					const char* pdata = NULL;
-					int len = 0;
-					if (!*resultBind[fIndex].is_null)
-					{
-						pdata = (const char*)resultBind[fIndex].buffer;
-						len = *resultBind[fIndex].length;
-					}
-
-					m_fields[rowIndex * pFieldCount + fIndex].make(pdata, len);
-				}
-				rowIndex++;
-			}
-		}
-
-		// delete
-		for (int i = 0; i< pFieldCount; ++i)
-		{
-			MYSQL_BIND* pBind = &resultBind[i];
-			if(pBind->buffer) delete [] pBind->buffer;
-		}
-
-		delete[] resultBind;
-		delete[] resultLengths;
-		delete[] isNulls;
+		allocateResultBuffer(&resultBind[nIndex], pField);
+		resultBind[nIndex].length = &resultLengths[nIndex];
+		resultBind[nIndex].is_null = &isNulls[nIndex];
+		nIndex++;
 	}
 
-	mysql_free_result(pResult);
+	if (!mysql_stmt_bind_result(stmt, resultBind))
+	{
+		m_fields.resize(uint32(pRowCount) * pFieldCount);
+
+		// Ìî³ä×Ö¶ÎÊý¾Ý
+		int rowIndex = 0;
+		while (_fetch(stmt))
+		{
+			for (uint32 fIndex = 0; fIndex < pFieldCount; ++fIndex)
+			{
+				const char* pdata = NULL;
+				int len = 0;
+				if (!*resultBind[fIndex].is_null)
+				{
+					pdata = (const char*)resultBind[fIndex].buffer;
+					len = *resultBind[fIndex].length;
+				}
+
+				m_fields[rowIndex * pFieldCount + fIndex].make(pdata, len);
+			}
+			rowIndex++;
+		}
+	}
+
+	// delete
+	for (int i = 0; i< pFieldCount; ++i)
+	{
+		MYSQL_BIND* pBind = &resultBind[i];
+		if(pBind->buffer) delete [] pBind->buffer;
+	}
+
+	delete[] resultBind;
+	delete[] resultLengths;
+	delete[] isNulls;
 }
 
 bool SqlResultSet::fetch()
