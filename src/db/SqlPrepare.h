@@ -35,7 +35,7 @@ public:
 	void write(void* pData, int len);
 
 	int prepare(MYSQL * mysql);
-	int execute(DBResult* result);
+	int execute(DBResult* result = NULL);
 protected:
 	MYSQL_RES* _query();
 private:

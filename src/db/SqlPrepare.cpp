@@ -188,17 +188,13 @@ int SqlPrepare::prepare(MYSQL * mysql)
 int SqlPrepare::execute(DBResult* resultSet)
 {
 	MYSQL_RES* result = _query();
-	if (!result)
-	{
-		return -1;
-	}
+	if (!result) return -1;
 
 	std::shared_ptr<void> free_res(nullptr, [result](void*) { mysql_free_result(result); });
 
-	if (mysql_stmt_store_result(m_stmt))
-	{
-		return -1;
-	}
+	if (!resultSet) return 0; // No results are required
+
+	if (mysql_stmt_store_result(m_stmt)) return -1;
 
 	static_cast<SqlResultSet*>(resultSet)->setResult(m_stmt, result, mysql_stmt_num_rows(m_stmt), mysql_stmt_field_count(m_stmt));
 
