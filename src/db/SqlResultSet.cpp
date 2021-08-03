@@ -91,7 +91,7 @@ void SqlResultSet::setResult(MYSQL_STMT* stmt, MYSQL_RES* pResult, uint64 pRowCo
 	m_rowCount = pRowCount;
 	m_fieldCount = pFieldCount;
 
-	if (pFieldCount == 0) return;
+	if (pRowCount == 0) return;
 
 	MYSQL_BIND* resultBind = new MYSQL_BIND[pFieldCount];
 	unsigned long* resultLengths = new unsigned long[pFieldCount];

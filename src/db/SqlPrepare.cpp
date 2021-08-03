@@ -187,34 +187,39 @@ int SqlPrepare::prepare(MYSQL * mysql)
 }
 int SqlPrepare::execute(DBResult* resultSet)
 {
-	MYSQL_RES* result = _query();
-	if (!result) return -1;
+	MYSQL_RES* result = NULL;
+	if(!_query(&result)) return -1;
 
-	std::shared_ptr<void> free_res(nullptr, [result](void*) { mysql_free_result(result); });
+	if (result)
+	{
+		std::shared_ptr<void> free_res(nullptr, [result](void*) { mysql_free_result(result); });
 
-	if (!resultSet) return 0; // No results are required
+		if (resultSet)
+		{
+			if (mysql_stmt_store_result(m_stmt)) return -1;
 
-	if (mysql_stmt_store_result(m_stmt)) return -1;
-
-	static_cast<SqlResultSet*>(resultSet)->setResult(m_stmt, result, mysql_stmt_num_rows(m_stmt), mysql_stmt_field_count(m_stmt));
+			static_cast<SqlResultSet*>(resultSet)->setResult(m_stmt, result, mysql_stmt_num_rows(m_stmt), mysql_stmt_field_count(m_stmt));
+		}
+	}
 
 	return static_cast<int>(mysql_stmt_affected_rows(m_stmt));
 }
 
-MYSQL_RES* SqlPrepare::_query()
+bool SqlPrepare::_query(MYSQL_RES** pRes)
 {
 	if (m_paramBind)
 	{
 		if (mysql_stmt_bind_param(m_stmt, m_paramBind))
 		{
-			return NULL;
+			return false;
 		}
 	}
 
 	if (mysql_stmt_execute(m_stmt))
 	{
-		return NULL;
+		return false;
 	}
 
-	return mysql_stmt_result_metadata(m_stmt);
+	*pRes = mysql_stmt_result_metadata(m_stmt);
+	return true;
 }

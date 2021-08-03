@@ -37,7 +37,7 @@ public:
 	int prepare(MYSQL * mysql);
 	int execute(DBResult* result = NULL);
 protected:
-	MYSQL_RES* _query();
+	bool _query(MYSQL_RES** pRes);
 private:
 	int m_count;
 	std::string m_sql;
