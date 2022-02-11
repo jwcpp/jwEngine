@@ -68,5 +68,7 @@ The serialization tool provided is experimental and may be fragile. It is recomm
 ## Learn more  
 For more examples, please refer to [example](https://github.com/jwcpp/jwEngine/tree/master/example)
 
+我的另一个项目：[jwServer](https://github.com/jwcpp/jwServer) 
+
 有任何建议、BUG、疑问，统一解决QQ群:458421068  
 My email: jw_cpp@163.com
