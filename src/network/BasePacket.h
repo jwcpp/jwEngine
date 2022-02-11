@@ -9,7 +9,6 @@
 #pragma once
 
 #include "ByteBuffer.h"
-#include "PoolObject.h"
 
 class BasePacket : public ByteBuffer
 {
@@ -92,7 +91,5 @@ protected:
 	void setValue(uint32 pos, T t){
 		put(pos, t);
 	}
-
-	INCLUDE_POOL_OBJECT
 };
 
